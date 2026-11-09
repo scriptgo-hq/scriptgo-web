@@ -12,6 +12,7 @@ const NAMES: Record<string, string> = {
   defold: "Defold",
   neovim: "Neovim",
   cctweaked: "CC: Tweaked",
+  dotnet: ".NET",
 };
 
 const LONG_NAMES: Record<string, string> = {
@@ -21,6 +22,7 @@ const LONG_NAMES: Record<string, string> = {
   luanti: "Luanti",
   open77: "OPEN//77",
   cctweaked: "CC: Tweaked (Minecraft)",
+  dotnet: ".NET kit",
 };
 
 const MONOGRAMS: Record<string, string> = {
@@ -33,6 +35,7 @@ const MONOGRAMS: Record<string, string> = {
   defold: "Df",
   neovim: "Nv",
   cctweaked: "CC",
+  dotnet: ".N",
 };
 
 export function envName(slug: string, fallback?: string): string {
