@@ -3,7 +3,7 @@ import { ReleaseDecisionForm } from "@/components/admin/decision-forms";
 import { RightsSummary } from "@/components/admin/parts";
 import { packagePath, reviewStatusMeta } from "@/components/admin/status";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { StatusBadge } from "@/components/ui/badge";
+import { StatusBadge, Tag } from "@/components/ui/badge";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { Identifier } from "@/components/ui/typography";
 import { api, asList } from "@/lib/api";
@@ -29,7 +29,12 @@ export default async function ReleaseReviewPage() {
           {items.map(({ release: r, package: p, review }) => {
             const href = packagePath(p.identifier);
             const failedRequired = r.checks.filter((c) => c.required && c.status === "failed");
+            // Advisory failures do not block publishing but matter to a reviewer (e.g. the manifest
+            // names another author than the publisher).
+            const failedAdvisory = r.checks.filter((c) => !c.required && c.status === "failed");
             const passed = r.checks.filter((c) => c.status === "passed").length;
+            const notRun = r.checks.filter((c) => c.status === "skipped" || c.status === "pending" || c.status === "running").length;
+            const flagged = [...failedRequired, ...failedAdvisory];
             return (
               <li key={review.id} className="panel grid grid-cols-1 gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
                 <article aria-labelledby={`rel-${review.id}`} className="min-w-0 space-y-3">
@@ -67,15 +72,18 @@ export default async function ReleaseReviewPage() {
                     <dd className="tabular">{formatBytes(r.size)}</dd>
                     <dt className="text-ink-3">Checks</dt>
                     <dd className="tabular">
-                      {passed} of {r.checks.length} passed
+                      {passed} passed
                       {failedRequired.length ? <span className="font-semibold text-bad"> · {failedRequired.length} required failed</span> : null}
+                      {failedAdvisory.length ? <span className="font-semibold text-warn"> · {failedAdvisory.length} advisory failed</span> : null}
+                      {notRun ? <span className="text-ink-3"> · {notRun} not run</span> : null}
                     </dd>
                   </dl>
-                  {failedRequired.length ? (
+                  {flagged.length ? (
                     <ul className="space-y-1.5">
-                      {failedRequired.map((c) => (
+                      {flagged.map((c) => (
                         <li key={`${c.stage}-${c.name}`} className="flex flex-wrap items-start gap-2 text-[13.5px]">
                           <StatusBadge size="sm" meta={metaFor(checkMeta, c.status)} />
+                          {c.required ? null : <Tag>advisory</Tag>}
                           <span className="font-mono text-[12.5px]">
                             {c.stage}/{c.name}
                           </span>
