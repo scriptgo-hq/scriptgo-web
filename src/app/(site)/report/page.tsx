@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ReportForm } from "@/components/site/report-form";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
+import { mailEnabled } from "@/lib/platform";
 
 export const metadata: Metadata = {
   title: "Report a package",
@@ -13,6 +14,7 @@ const one = (v: string | string[] | undefined) => ((Array.isArray(v) ? v[0] : v)
 
 export default async function ReportPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
+  const mail = await mailEnabled();
   return (
     <div className="container-page grid gap-10 py-10 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)]">
       <div className="min-w-0">
@@ -24,7 +26,7 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
           Tell us what infringes your rights or causes harm. A moderator reviews every report. You don&rsquo;t need an account.
         </p>
         <div className="mt-8">
-          <ReportForm defaultPackage={one(sp.package)} defaultVersion={one(sp.version)} />
+          <ReportForm defaultPackage={one(sp.package)} defaultVersion={one(sp.version)} mailEnabled={mail} />
         </div>
       </div>
       <aside className="space-y-4 lg:pt-28">

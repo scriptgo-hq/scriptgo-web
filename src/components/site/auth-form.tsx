@@ -5,11 +5,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient, safeNext } from "@/lib/auth-client";
 import { buttonClass } from "@/components/ui/button";
+import { MIN_PASSWORD } from "@/components/site/password-forms";
 
 const input =
   "w-full rounded-[10px] border-2 border-line-soft bg-surface px-3 py-2.5 text-[15px] placeholder:text-ink-3 focus:border-line";
 
-export function AuthForm({ mode, next, githubEnabled }: { mode: "sign-in" | "sign-up"; next: string | null; githubEnabled: boolean }) {
+export function AuthForm({
+  mode,
+  next,
+  githubEnabled,
+  canResetPassword = false,
+}: {
+  mode: "sign-in" | "sign-up";
+  next: string | null;
+  githubEnabled: boolean;
+  /** The server delivers e-mail, so "forgot your password?" can work. */
+  canResetPassword?: boolean;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +38,8 @@ export function AuthForm({ mode, next, githubEnabled }: { mode: "sign-in" | "sig
       const res =
         mode === "sign-in"
           ? await authClient.signIn.email({ email, password })
-          : await authClient.signUp.email({ email, password, name: String(fd.get("name") ?? "").trim() || email.split("@")[0]! });
+          : // callbackURL: where the e-mailed confirmation link lands (when the server sends e-mail).
+            await authClient.signUp.email({ email, password, name: String(fd.get("name") ?? "").trim() || email.split("@")[0]!, callbackURL: dest });
       if (res.error) {
         setError(res.error.message ?? (res.error.status ? `Request failed (HTTP ${res.error.status}).` : "Request failed."));
         setBusy(false);
@@ -73,12 +86,19 @@ export function AuthForm({ mode, next, githubEnabled }: { mode: "sign-in" | "sig
           <input id="email" name="email" type="email" required autoComplete="email" className={`${input} mt-1.5`} />
         </div>
         <div>
-          <label htmlFor="password" className="block text-[14.5px] font-bold">
-            Password
-          </label>
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor="password" className="block text-[14.5px] font-bold">
+              Password
+            </label>
+            {mode === "sign-in" && canResetPassword ? (
+              <Link href="/forgot-password" className="text-[13.5px] font-semibold text-cobalt-ink underline">
+                Forgot your password?
+              </Link>
+            ) : null}
+          </div>
           {mode === "sign-up" ? (
             <p id="password-hint" className="mt-1 text-[13px] text-ink-3">
-              At least 8 characters.
+              At least {MIN_PASSWORD} characters.
             </p>
           ) : null}
           <input
@@ -86,7 +106,8 @@ export function AuthForm({ mode, next, githubEnabled }: { mode: "sign-in" | "sig
             name="password"
             type="password"
             required
-            minLength={mode === "sign-up" ? 8 : undefined}
+            minLength={mode === "sign-up" ? MIN_PASSWORD : undefined}
+            maxLength={256}
             autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
             aria-describedby={mode === "sign-up" ? "password-hint" : undefined}
             className={`${input} mt-1.5`}

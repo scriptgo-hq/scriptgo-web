@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 import type { TokenSummary } from "@/lib/contract";
 import { formatDate, formatDateTime, relativeTime } from "@/lib/format";
 import { getMe } from "@/lib/session";
+import { mailEnabled } from "@/lib/platform";
+import { VerifyEmailButton } from "@/components/site/password-forms";
 
 export const metadata = { title: "Settings" };
 
@@ -23,7 +25,7 @@ export default async function SettingsPage() {
   const me = await getMe();
   if (!me.ok) return <ApiError failure={me} />;
   const { user, creatorProfile: cp, roles } = me.data;
-  const tokens = await api<TokenSummary[]>("/v1/me/tokens", { auth: true });
+  const [tokens, mail] = await Promise.all([api<TokenSummary[]>("/v1/me/tokens", { auth: true }), mailEnabled()]);
 
   return (
     <>
@@ -36,7 +38,15 @@ export default async function SettingsPage() {
             <KeyValue
               items={[
                 { label: "Name", value: user.name },
-                { label: "Email", value: <>{user.email} {user.emailVerified ? <span className="text-ok">· verified</span> : <span className="text-ink-3">· not verified</span>}</> },
+                {
+                  label: "Email",
+                  value: (
+                    <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                      {user.email} {user.emailVerified ? <span className="text-ok">· verified</span> : <span className="text-ink-3">· not verified</span>}
+                      {!user.emailVerified && mail ? <VerifyEmailButton email={user.email} /> : null}
+                    </span>
+                  ),
+                },
                 { label: "Roles", value: roles.length ? roles.join(", ") : "customer" },
                 { label: "Member since", value: formatDate(user.createdAt) },
               ]}

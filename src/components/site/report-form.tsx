@@ -44,7 +44,7 @@ function Field({ id, title, hintText, error, children }: { id: string; title: st
 }
 
 /** Public IP / abuse report. No account required. Posts multipart to /v1/reports. */
-export function ReportForm({ defaultPackage, defaultVersion }: { defaultPackage: string; defaultVersion: string }) {
+export function ReportForm({ defaultPackage, defaultVersion, mailEnabled = false }: { defaultPackage: string; defaultVersion: string; mailEnabled?: boolean }) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const [files, setFiles] = useState<File[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -136,13 +136,20 @@ export function ReportForm({ defaultPackage, defaultVersion }: { defaultPackage:
         <div>
           <h3 className="font-bold">What happens next</h3>
           <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-[14.5px] text-ink-2">
-            <li>This case number is your acknowledgment. SCRIPT//GO does not send e-mail yet, so nothing arrives in your inbox.</li>
+            <li>
+              {mailEnabled
+                ? "We also sent this case number to the address you gave. Nothing within a few minutes? Check your spam folder; the number above is enough to follow up."
+                : "This case number is your acknowledgment. This server does not send e-mail, so nothing arrives in your inbox."}
+            </li>
             <li>A moderator reviews your claim next to a snapshot of the listing as it was when you reported it.</li>
             <li>
               The decision (no action, restrict a release, restrict sales, or suspend the listing) is recorded with its reasons and
-              shown to the creator in their dashboard. Until e-mail is live, quote your case number to ask about it.
+              shown to the creator in their dashboard.{" "}
+              {mailEnabled ? "You receive it by e-mail, with its statement of reasons." : "Quote your case number to ask about it."}
             </li>
-            <li>The creator may appeal once. A different reviewer decides the appeal.</li>
+            <li>
+              The creator may appeal once. A different reviewer decides the appeal{mailEnabled ? ", and you receive the outcome by e-mail too." : "."}
+            </li>
           </ol>
           <p className="mt-3 text-[13.5px] text-ink-3">
             Cases are reviewed in order of age and type. The creator will see the substance of your claim; your email address is not

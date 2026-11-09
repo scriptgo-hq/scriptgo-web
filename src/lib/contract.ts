@@ -76,6 +76,8 @@ import type { Category } from "@scriptgo/shared";
 export interface Health {
   ok: boolean;
   version: string;
+  /** The platform delivers e-mail (SMTP configured on the server). */
+  mail: boolean;
 }
 
 export interface ReportReceipt {

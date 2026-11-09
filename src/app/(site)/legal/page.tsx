@@ -106,6 +106,11 @@ export default function LegalPage() {
             </li>
             <li>Report data: reporter contact details and evidence, shared with moderators and, where required, with the creator.</li>
             <li>Payment data: handled by the payment provider. SCRIPT//GO receives signed payment events, not card details.</li>
+            <li>
+              E-mail we send (report receipts and decisions, appeal outcomes, purchase confirmations, password resets): recipient,
+              subject and text are kept with their delivery status, and handed to the e-mail delivery provider to send. Password reset
+              and confirmation links are removed from our copy once delivered. Purchase e-mails never contain a license key.
+            </li>
             <li>Retention periods, your rights, and how to exercise them.</li>
           </ul>
         </Section>
