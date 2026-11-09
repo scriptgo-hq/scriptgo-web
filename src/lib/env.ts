@@ -11,6 +11,7 @@ const NAMES: Record<string, string> = {
   openresty: "OpenResty",
   defold: "Defold",
   neovim: "Neovim",
+  dotnet: ".NET",
 };
 
 const LONG_NAMES: Record<string, string> = {
@@ -19,6 +20,7 @@ const LONG_NAMES: Record<string, string> = {
   godot: "Godot 4",
   luanti: "Luanti",
   open77: "OPEN//77",
+  dotnet: ".NET kit",
 };
 
 const MONOGRAMS: Record<string, string> = {
@@ -30,6 +32,7 @@ const MONOGRAMS: Record<string, string> = {
   openresty: "OR",
   defold: "Df",
   neovim: "Nv",
+  dotnet: ".N",
 };
 
 export function envName(slug: string, fallback?: string): string {
