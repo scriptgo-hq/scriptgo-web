@@ -11,7 +11,7 @@ import { PackageCard } from "@/components/ui/package";
 import { DisplayTitle, Eyebrow, Stroke, Underlined } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment, Page, PackageSummary, Stats } from "@/lib/contract";
-import { formatCount } from "@/lib/format";
+import { countOf } from "@/lib/format";
 import { ENV_STATUS_ORDER } from "@/lib/status";
 
 export default function HomePage() {
@@ -26,8 +26,9 @@ export default function HomePage() {
             Same code. Real output.
           </DisplayTitle>
           <p className="mt-3 max-w-2xl text-[16px] text-ink-2">
-            A shared module on the left, and what each environment printed when CI ran it. Every line on the right comes
-            from a recorded compatibility run.
+            A package&rsquo;s README example on the left, and what each environment printed when{" "}
+            <code className="font-mono text-[14px]">scriptgo verify</code> ran it next to the package. Every line on the
+            right comes from a recorded compatibility run.
           </p>
           <div className="mt-8">
             <Suspense fallback={<SkeletonBlock h={340} />}>
@@ -64,7 +65,7 @@ async function HeroStats() {
   const s = res.data;
   return (
     <p className="tabular mt-6 font-mono text-[12.5px] text-ink-3">
-      {formatCount(s.packages)} packages · {formatCount(s.creators)} creators · {formatCount(s.environmentsVerified)} environments with
+      {countOf(s.packages, "package")} · {countOf(s.creators, "creator")} · {countOf(s.environmentsVerified, "environment")} with
       verified runs
     </p>
   );
@@ -128,7 +129,7 @@ function HowItWorks() {
     {
       n: 2,
       title: "Adapt.",
-      body: "Adapters map those capabilities onto each runtime. CI runs it there to prove it.",
+      body: "Adapters map those capabilities onto each runtime. scriptgo verify runs it there to prove it.",
       Art: StepAdaptArt,
     },
     {

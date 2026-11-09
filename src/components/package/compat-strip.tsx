@@ -54,7 +54,7 @@ export function EvidencePanel({ entry }: { entry: CompatibilityEntry }) {
           {entry.evidence.map((ev) => (
             <li key={ev.url}>
               <a href={ev.url} className="inline-flex items-center gap-1 font-semibold text-cobalt-ink underline-offset-2 hover:underline" rel="noopener">
-                {ev.kind === "screenshot" ? "CI screenshot" : "Full log"}
+                {ev.kind === "screenshot" ? "Screenshot" : "Full log"}
                 <ExternalLink aria-hidden="true" size={12} />
               </a>
             </li>

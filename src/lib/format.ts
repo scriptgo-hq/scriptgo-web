@@ -86,6 +86,11 @@ export function formatCount(n: number | null | undefined): string {
   return new Intl.NumberFormat("en-GB").format(n);
 }
 
+/** "1 creator", "3 creators": the count and the noun, plural when needed. */
+export function countOf(n: number | null | undefined, singular: string, plural = `${singular}s`): string {
+  return `${formatCount(n)} ${n === 1 ? singular : plural}`;
+}
+
 export function formatDuration(ms: number | null | undefined): string {
   if (ms === null || ms === undefined) return "—";
   if (ms < 1000) return `${ms} ms`;

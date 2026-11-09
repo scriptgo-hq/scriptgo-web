@@ -220,3 +220,17 @@ export function firstLuaBlock(markdown: string): string | null {
   const m = /```lua[^\n]*\n([\s\S]*?)```/.exec(markdown);
   return m ? m[1]!.replace(/\n+$/, "") : null;
 }
+
+/**
+ * The README's example for the proof block: the first block marked `lua runnable` (the one
+ * `scriptgo verify` runs next to the package in every environment), else the first Lua block.
+ */
+export function readmeExample(markdown: string): { code: string; runnable: boolean } | null {
+  const text = markdown.replace(/\r\n/g, "\n");
+  const re = /^(`{3,}|~{3,})[ \t]*lua\b([^\n]*)\n([\s\S]*?)^\1[ \t]*$/gm;
+  for (const m of text.matchAll(re)) {
+    if (/(^|\s)runnable(\s|$)/.test(m[2]!)) return { code: m[3]!.replace(/\n+$/, ""), runnable: true };
+  }
+  const first = firstLuaBlock(text);
+  return first ? { code: first, runnable: false } : null;
+}

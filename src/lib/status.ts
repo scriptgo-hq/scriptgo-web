@@ -58,7 +58,7 @@ const unknown = (value: string): StatusMeta => ({
 });
 
 export const compatibilityMeta: Record<CompatibilityStatus, StatusMeta> = {
-  verified: { label: "Verified", tone: "success", icon: "check", hint: "Passed in the real runtime in CI." },
+  verified: { label: "Verified", tone: "success", icon: "check", hint: "Passed in the real runtime (scriptgo verify)." },
   failing: { label: "Failing", tone: "danger", icon: "x", hint: "The last run failed." },
   stale: { label: "Stale", tone: "warning", icon: "clock", hint: "Verified on an older runtime or adapter than current." },
   not_tested: { label: "Not tested", tone: "neutral", icon: "dashed", hint: "Declared by the creator, no run yet." },

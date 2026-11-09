@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import type { CompatibilityEntry, CreatorProfile, Page, PackageDetail, PackageSummary } from "@/lib/contract";
 import { envLongName } from "@/lib/env";
 import { formatDate } from "@/lib/format";
-import { firstLuaBlock } from "@/lib/markdown";
+import { readmeExample } from "@/lib/markdown";
 import { COMPAT_ORDER, compatibilityMeta, metaFor } from "@/lib/status";
 import { StatusBadge } from "@/components/ui/badge";
 import { CodeBlock, TerminalOutput } from "@/components/ui/code-block";
@@ -74,7 +74,8 @@ export async function ProofBlock() {
   const entries = d.compatibility
     .filter((c) => !version || c.version === version)
     .sort((a, b) => (COMPAT_ORDER[a.status] ?? 9) - (COMPAT_ORDER[b.status] ?? 9) || a.environment.localeCompare(b.environment));
-  const code = firstLuaBlock(d.readme);
+  const example = readmeExample(d.readme);
+  const code = example?.code ?? null;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -84,7 +85,11 @@ export async function ProofBlock() {
             <Identifier value={d.identifier} />
           </Link>
           {version ? <span className="tabular"> · v{version}</span> : null}
-          <span> · from the package README</span>
+          <span>
+            {example?.runnable
+              ? " · the README example, run in each environment on the right"
+              : " · from the package README (not run by verification)"}
+          </span>
         </p>
         {code ? (
           <CodeBlock code={code} lang="lua" filename={`${d.resourceName}/README.md · lua`} />

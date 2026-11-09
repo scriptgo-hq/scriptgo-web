@@ -5,7 +5,7 @@ import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment, Health, Stats } from "@/lib/contract";
-import { formatCount, formatDateTime, relativeTime } from "@/lib/format";
+import { countOf, formatDateTime, relativeTime } from "@/lib/format";
 import { ENV_STATUS_ORDER, compatibilityMeta, environmentMeta, metaFor, type StatusMeta } from "@/lib/status";
 
 export const metadata: Metadata = { title: "Status", description: "Live status of the SCRIPT//GO API and each environment's latest conformance run." };
@@ -56,7 +56,7 @@ export default async function StatusPage() {
               <p className="font-bold">Registry</p>
               <p className="tabular text-[13px] text-ink-3">
                 {stats.ok
-                  ? `${formatCount(stats.data.packages)} packages · ${formatCount(stats.data.creators)} creators · ${formatCount(stats.data.environmentsVerified)} environments with verified runs`
+                  ? `${countOf(stats.data.packages, "package")} · ${countOf(stats.data.creators, "creator")} · ${countOf(stats.data.environmentsVerified, "environment")} with verified runs`
                   : "Counts unavailable."}
               </p>
             </div>
