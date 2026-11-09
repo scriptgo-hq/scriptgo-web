@@ -18,6 +18,11 @@ const NAMES: Record<string, string> = {
   rust: "Rust",
   beammp: "BeamMP",
   fivem: "FiveM",
+  roblox: "Roblox",
+  redm: "RedM",
+  kcdmp: "KCD:MP",
+  zomboid: "Project Zomboid",
+  dst: "Don't Starve Together",
 };
 
 const LONG_NAMES: Record<string, string> = {
@@ -33,6 +38,11 @@ const LONG_NAMES: Record<string, string> = {
   rust: "Rust (Oxide/Carbon)",
   beammp: "BeamMP",
   fivem: "FiveM",
+  roblox: "Roblox",
+  redm: "RedM",
+  kcdmp: "KCD:MP (Kingdom Come)",
+  zomboid: "Project Zomboid",
+  dst: "Don't Starve Together",
 };
 
 const MONOGRAMS: Record<string, string> = {
@@ -51,6 +61,11 @@ const MONOGRAMS: Record<string, string> = {
   rust: "Rs",
   beammp: "BM",
   fivem: "FM",
+  roblox: "Rb",
+  redm: "RM",
+  kcdmp: "KC",
+  zomboid: "PZ",
+  dst: "DS",
 };
 
 export function envName(slug: string, fallback?: string): string {
