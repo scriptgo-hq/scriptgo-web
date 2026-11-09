@@ -8,7 +8,7 @@ import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Developers",
-  description: "Publish portable Lua resources, prove where they run, and sell licenses. Or bring SCRIPT//GO to your engine.",
+  description: "Publish game scripts, prove where they run, protect and sell them with licenses. Or integrate the SCRIPT//GO SDK into your engine.",
 };
 
 const MANIFEST = `resource "inventory_pro"
@@ -32,7 +32,7 @@ const steps = [
   {
     n: 1,
     title: "Create a resource",
-    body: "A folder with a scriptgo.lua manifest and your shared, server and client scripts. The resource shape multiplayer scripters already know.",
+    body: "A folder with a manifest and your shared, server and client scripts: the resource shape multiplayer scripters already know. Lua runs in every environment; TypeScript on the .NET kit.",
     cmd: "scriptgo init inventory_pro",
   },
   {
@@ -50,7 +50,7 @@ const steps = [
   {
     n: 4,
     title: "Connect a store (optional)",
-    body: "Free packages need nothing else. To sell, connect a payment provider in Dashboard → Stores and map its products to your offers.",
+    body: "Free packages need nothing else. To sell, connect your Tebex store in Dashboard → Stores and map its products to your offers. Checkout opens once Tebex approves.",
     cmd: null,
   },
 ];
@@ -62,14 +62,17 @@ export default function DevelopersPage() {
         <div className="container-page grid gap-8 py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center">
           <div>
             <Eyebrow>developers</Eyebrow>
-            <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[68px]">
+            <DisplayTitle as="h1" className="mt-2 text-[44px] sm:text-[58px]">
               Build once.
               <br />
-              <span className="display-italic text-cobalt-ink">Ship everywhere.</span>
+              <span className="display-italic text-cobalt-ink">Protect your work.</span>
+              <br />
+              Monetize it.
             </DisplayTitle>
             <p className="mt-5 max-w-[56ch] text-[17px] text-ink-2">
-              Write a resource against standard capabilities. SCRIPT//GO runs it in each environment you declare, shows only the
-              results that real runs proved, and issues licenses when your customers pay through your own store.
+              Write a resource against standard capabilities: in Lua for every environment, or in TypeScript for the .NET kit.
+              SCRIPT//GO runs it in each environment you declare, shows only the results that real runs proved, and issues
+              licenses when your customers pay through your own Tebex store.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <ButtonLink href="/docs/quickstart" size="lg" arrow>
@@ -139,12 +142,15 @@ export default function DevelopersPage() {
               For platform builders.
             </DisplayTitle>
             <p className="mt-4 max-w-[56ch] text-[16px] text-ink-2">
-              An adapter supplies a clock and a tick, persistence, players, privileges, notification output and, optionally,
-              HTTP. The Lua core knows nothing about engines, so adding an environment means writing one adapter.
+              Two ways in. A host that runs Lua writes one adapter: a clock and a tick, persistence, players, privileges,
+              notification output and, optionally, HTTP. The portable core knows nothing about engines. An engine or server
+              written in .NET embeds the .NET host kit instead, which runs Lua and TypeScript side by side (experimental).
+              Either way, your creators can protect and monetize what they build on your platform.
             </p>
             <ul className="mt-5 space-y-2 text-[15px]">
               {[
                 ["/docs/create-adapter", "Create an adapter"],
+                ["/environments/dotnet", "The .NET host kit"],
                 ["/docs/runtime", "Runtime API and capabilities"],
                 ["/environments", "Current environments and their status"],
               ].map(([href, label]) => (
@@ -165,12 +171,17 @@ export default function DevelopersPage() {
                 <strong className="text-ink">You sell.</strong> Offers belong to you: free, monthly, annual or perpetual.
               </li>
               <li>
-                <strong className="text-ink">The provider takes the payment.</strong> Checkout stays off until your store is
-                approved by the provider.
+                <strong className="text-ink">Tebex takes the payment.</strong> Shops run on your own Tebex store. Checkout stays
+                off until Tebex approves it.
               </li>
               <li>
                 <strong className="text-ink">SCRIPT//GO issues the license</strong>, only after a verified payment event, and your
                 resource checks it with <Link className="font-semibold text-cobalt-ink underline" href="/docs/licensing-api">the licensing API</Link>.
+              </li>
+              <li>
+                <strong className="text-ink">Licenses guard paid resources.</strong> One key per buyer, activation per server,
+                signed answers with offline grace. A refund, a lost dispute or an ended subscription closes the license.
+                Encrypted releases (escrow) are planned, not built.
               </li>
               <li>
                 <strong className="text-ink">Third-party game content is reviewed first.</strong> Paid offers that target a

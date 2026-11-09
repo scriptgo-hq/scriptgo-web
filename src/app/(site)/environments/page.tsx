@@ -8,7 +8,7 @@ import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
-import { ENV_KINDS, dialectLabel, envKind } from "@/lib/env";
+import { ENV_KINDS, envKind, languageLabels } from "@/lib/env";
 import { formatDate, relativeTime } from "@/lib/format";
 import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 import { cn } from "@/lib/cn";
@@ -16,7 +16,7 @@ import { TONE_CLASSES } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
   title: "Environments",
-  description: "Every engine, runtime and mod platform SCRIPT//GO targets, its status, Lua flavour and capability support.",
+  description: "Every engine, runtime and mod platform SCRIPT//GO targets, its status, languages and capability support.",
 };
 
 /** Section header row inside a table: the group name across every column. */
@@ -46,9 +46,10 @@ export default async function EnvironmentsPage() {
         Environments.
       </DisplayTitle>
       <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">
-        Where packages run: engines and runtimes that host Lua themselves, and mod platforms that add it on top of an existing
-        game. Every environment is a peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance
-        runs, never from a form. Planned environments have no install steps yet.
+        Where packages run: engines and runtimes that run scripts themselves, and mod platforms that add scripting on top of an
+        existing game. Every environment runs Lua; the .NET kit also runs TypeScript and JavaScript. Every environment is a
+        peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance runs, never from a form.
+        Planned environments have no install steps yet.
       </p>
       <div className="mt-8">
         {!res.ok ? (
@@ -100,7 +101,7 @@ export default async function EnvironmentsPage() {
                             <th scope="col" className="px-3 py-2.5">Environment</th>
                             <th scope="col" className="px-3 py-2.5">Status</th>
                             <th scope="col" className="px-3 py-2.5">Selling</th>
-                            <th scope="col" className="px-3 py-2.5">Lua</th>
+                            <th scope="col" className="px-3 py-2.5">Languages</th>
                             <th scope="col" className="px-3 py-2.5">Runtime</th>
                             <th scope="col" className="px-3 py-2.5">Capabilities</th>
                             <th scope="col" className="px-3 py-2.5">Verified packages</th>
@@ -121,7 +122,7 @@ export default async function EnvironmentsPage() {
                                   </th>
                                   <td className="px-3 py-2.5"><StatusBadge meta={metaFor(environmentMeta, e.status)} size="sm" /></td>
                                   <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
-                                  <td className="px-3 py-2.5">{e.luaDialects.map(dialectLabel).join(", ") || "—"}</td>
+                                  <td className="px-3 py-2.5">{languageLabels(e).join(" · ")}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>
                                   <td className="tabular px-3 py-2.5">
                                     {supported} of {capKeys.length} supported

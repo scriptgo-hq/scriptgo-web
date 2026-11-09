@@ -9,7 +9,7 @@ import { PackageCard } from "@/components/ui/package";
 import { Prose } from "@/components/ui/prose";
 import { api } from "@/lib/api";
 import { CAPABILITIES, type EnvironmentDetail } from "@/lib/contract";
-import { dialectLabel, envKind } from "@/lib/env";
+import { envKind, languageLabels } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
 import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
@@ -54,7 +54,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             className="mt-5 max-w-xl"
             items={[
               { label: "Adapter", value: <span className="tabular font-mono">{e.adapterVersion || "—"}</span> },
-              { label: "Lua", value: e.luaDialects.map(dialectLabel).join(" · ") || "—" },
+              { label: "Languages", value: languageLabels(e).join(" · ") },
               { label: "Engine versions", value: e.runtimeVersions.join(", ") || "—" },
               { label: "Verified pkgs", value: <span className="tabular">{e.verifiedPackages}</span> },
               {

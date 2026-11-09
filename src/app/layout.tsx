@@ -8,7 +8,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "SCRIPT//GO — Your scripts. Every environment.", template: "%s · SCRIPT//GO" },
   description:
-    "Create, license and run portable Lua resources across games, multiplayer platforms and applications. Compatibility is shown only when a real run passed.",
+    "Create, protect and sell game scripts that run across engines, games and multiplayer platforms. Compatibility is shown only when a real run passed.",
   applicationName: "SCRIPT//GO",
   icons: { icon: "/favicon.svg" },
 };

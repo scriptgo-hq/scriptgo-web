@@ -16,7 +16,7 @@ import { ENV_STATUS_ORDER, environmentMeta, metaFor } from "@/lib/status";
 
 export const metadata: Metadata = {
   title: "Explore scripts",
-  description: "Search portable Lua resources by environment, category, capability and price.",
+  description: "Search game scripts by environment, category, capability and price.",
 };
 
 type SP = Record<string, string | string[] | undefined>;
@@ -75,8 +75,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
               scripts.
             </h1>
             <p className="mt-4 max-w-[48ch] text-[16px] text-ink-2">
-              Discover Lua resources made by creators. Tools, systems, frameworks and more, with the environments each one
-              has actually been run in.
+              Discover scripts made by creators. Tools, systems, frameworks and more, with the environments each one has
+              actually been run in.
             </p>
           </div>
           <ExploreArt className="hidden w-full max-w-[520px] justify-self-end md:block" />

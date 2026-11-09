@@ -1,3 +1,5 @@
+import type { StatusMeta } from "./status";
+
 /**
  * Display names for environment slugs that appear in package summaries (which only carry the slug).
  * These are labels, not data: status, versions and capabilities always come from /v1/environments.
@@ -86,15 +88,15 @@ export function envMonogram(slug: string, name?: string): string {
 }
 
 /**
- * The two kinds of environment, in display order. A runtime hosts Lua itself; a mod platform is a
- * layer on top of an existing game (players bring the game). Rename a section here, nowhere else.
+ * The two kinds of environment, in display order. A runtime runs the scripts itself; a mod platform
+ * is a layer on top of an existing game (players bring the game). Rename a section here, nowhere else.
  */
 export const ENV_KINDS = [
   {
     kind: "runtime",
     title: "Engines & runtimes",
     singular: "Engine or runtime",
-    blurb: "Lua runs inside the engine or runtime itself.",
+    blurb: "The scripts run inside the engine or runtime itself.",
   },
   {
     kind: "mod_platform",
@@ -116,3 +118,41 @@ export function dialectLabel(d: string): string {
   if (d.toLowerCase() === "luau") return "Luau";
   return /^\d/.test(d) ? `Lua ${d}` : d;
 }
+
+const LANGUAGE_NAMES: Record<string, string> = { lua: "Lua", ts: "TypeScript", js: "JavaScript", cs: "C#" };
+
+/**
+ * The languages an environment runs, for display: its Lua dialects in place of "lua", then the
+ * other guest languages ("Lua 5.4", "TypeScript", "JavaScript" for the .NET kit).
+ */
+export function languageLabels(e: { languages?: string[]; luaDialects: string[] }): string[] {
+  const langs = e.languages?.length ? e.languages : ["lua"];
+  return langs.flatMap((l) =>
+    l === "lua" ? (e.luaDialects.length ? e.luaDialects.map(dialectLabel) : ["Lua"]) : [LANGUAGE_NAMES[l] ?? l],
+  );
+}
+
+/**
+ * Where each guest language runs today. Lua: every environment. TypeScript and JavaScript: the .NET
+ * kit only (verified there by sg_probe_ts and the sg_xlang pair). C#: planned, refused today.
+ * Change a line here only when the evidence changes (PROJECT_STATUS.md, verification/reports).
+ */
+export const LANGUAGE_STATES: { language: string; meta: StatusMeta }[] = [
+  {
+    language: "lua",
+    meta: { label: "Lua: everywhere", tone: "success", icon: "check", hint: "Every environment runs Lua." },
+  },
+  {
+    language: "ts",
+    meta: {
+      label: "TypeScript: .NET kit, experimental",
+      tone: "warning",
+      icon: "flask",
+      hint: "TypeScript and JavaScript run on the .NET host kit only. Other environments run Lua.",
+    },
+  },
+  {
+    language: "cs",
+    meta: { label: "C#: next", tone: "muted", icon: "calendar", hint: "Planned. No host runs C# yet." },
+  },
+];

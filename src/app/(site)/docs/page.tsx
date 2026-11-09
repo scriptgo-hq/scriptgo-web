@@ -9,7 +9,7 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Docs",
-  description: "Write a portable Lua resource, run it in several environments, publish and license it.",
+  description: "Write a resource, run it in several environments, publish and license it.",
 };
 
 export default async function DocsHome() {
@@ -22,8 +22,10 @@ export default async function DocsHome() {
       </DisplayTitle>
       <Stroke className="mt-1" />
       <p className="mt-4 max-w-[62ch] text-[17px] text-ink-2">
-        A SCRIPT//GO package is a resource: a declarative <code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
-        manifest plus shared, server and client scripts. Write it once against capabilities; adapters run it everywhere else.
+        A SCRIPT//GO package is a resource: a declarative manifest (<code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
+        or <code className="font-mono text-[0.9em]">scriptgo.json</code>) plus shared, server and client scripts. Write it once
+        against capabilities; each environment&rsquo;s adapter runs it. Lua runs in every environment; TypeScript and JavaScript
+        run on the .NET kit.
       </p>
       <div className="mt-6 max-w-xl">
         <CommandLine command="scriptgo init my_resource" />

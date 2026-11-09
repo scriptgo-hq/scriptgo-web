@@ -14,7 +14,7 @@ export function CreatorCta({ className }: { className?: string }) {
             Are you a creator?
           </h2>
           <p className="mt-2 max-w-xl text-[15.5px] font-medium">
-            Publish your resources, prove where they run, manage releases, and sell licenses through your own store.
+            Publish your scripts, prove where they run, protect them with license keys, and sell them from your own Tebex store.
           </p>
         </div>
         <ButtonLink href="/developers" variant="ink" size="lg" arrow>
