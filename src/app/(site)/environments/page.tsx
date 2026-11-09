@@ -10,7 +10,7 @@ import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
 import { ENV_KINDS, dialectLabel, envKind } from "@/lib/env";
 import { formatDate, relativeTime } from "@/lib/format";
-import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
+import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 import { cn } from "@/lib/cn";
 import { TONE_CLASSES } from "@/components/ui/badge";
 
@@ -99,6 +99,7 @@ export default async function EnvironmentsPage() {
                           <tr>
                             <th scope="col" className="px-3 py-2.5">Environment</th>
                             <th scope="col" className="px-3 py-2.5">Status</th>
+                            <th scope="col" className="px-3 py-2.5">Selling</th>
                             <th scope="col" className="px-3 py-2.5">Lua</th>
                             <th scope="col" className="px-3 py-2.5">Runtime</th>
                             <th scope="col" className="px-3 py-2.5">Capabilities</th>
@@ -108,7 +109,7 @@ export default async function EnvironmentsPage() {
                         </thead>
                         {filled.map((g) => (
                           <tbody key={g.kind}>
-                            <GroupRow title={g.title} span={7} />
+                            <GroupRow title={g.title} span={8} />
                             {g.envs.map((e) => {
                               const supported = Object.values(e.capabilities).filter((s) => s === "supported").length;
                               return (
@@ -119,6 +120,7 @@ export default async function EnvironmentsPage() {
                                     </Link>
                                   </th>
                                   <td className="px-3 py-2.5"><StatusBadge meta={metaFor(environmentMeta, e.status)} size="sm" /></td>
+                                  <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
                                   <td className="px-3 py-2.5">{e.luaDialects.map(dialectLabel).join(", ") || "—"}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>
                                   <td className="tabular px-3 py-2.5">

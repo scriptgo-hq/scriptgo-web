@@ -76,5 +76,7 @@ export function envKind(kind: string) {
 export const KNOWN_ENVIRONMENTS = ["standalone", "love2d", "godot", "luanti", "open77"];
 
 export function dialectLabel(d: string): string {
-  return d === "luajit" ? "LuaJIT" : `Lua ${d}`;
+  if (d.toLowerCase() === "luajit") return "LuaJIT";
+  if (d.toLowerCase() === "luau") return "Luau";
+  return /^\d/.test(d) ? `Lua ${d}` : d;
 }

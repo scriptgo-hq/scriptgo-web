@@ -12,7 +12,7 @@ import { CAPABILITIES, type EnvironmentDetail } from "@/lib/contract";
 import { dialectLabel, envKind } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
-import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
+import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 
 type Params = { slug: string };
 
@@ -46,6 +46,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           <h1 className="display text-[48px] sm:text-[64px]">{e.name}.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
+            {e.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, e.sales)} /> : null}
             <span className="text-[13px] font-bold uppercase tracking-wide text-ink-3">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
@@ -77,6 +78,16 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           <EnvironmentArt slug={e.slug} name={e.name} className="aspect-[5/3] w-full" />
         </div>
       </header>
+
+      {e.sales !== "allowed" ? (
+        <Banner
+          tone={e.sales === "review" ? "warning" : "info"}
+          title={e.sales === "review" ? "Paid packages are reviewed first." : "Free packages only."}
+          className="mt-8"
+        >
+          {e.salesNote || metaFor(salesMeta, e.sales).hint}
+        </Banner>
+      ) : null}
 
       {e.status === "experimental" ? (
         <Banner tone="warning" title="Experimental environment." className="mt-8">

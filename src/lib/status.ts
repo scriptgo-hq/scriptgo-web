@@ -77,6 +77,23 @@ export const environmentMeta: Record<EnvironmentStatus, StatusMeta> = {
   planned: { label: "Planned", tone: "muted", icon: "calendar", hint: "Not usable yet. No install instructions." },
 };
 
+/** Whether paid packages are possible on an environment (the underlying game's rule on selling mods). */
+export const salesMeta: Record<"allowed" | "free_only" | "review", StatusMeta> = {
+  allowed: { label: "Paid allowed", tone: "success", icon: "check", hint: "Creators may sell packages for this environment." },
+  free_only: {
+    label: "Free only",
+    tone: "neutral",
+    icon: "lock",
+    hint: "The game's rights holder does not allow selling mods: packages here are free.",
+  },
+  review: {
+    label: "Paid: review",
+    tone: "warning",
+    icon: "scale",
+    hint: "Paid packages need a review of the rights holder's terms first.",
+  },
+};
+
 export const capabilityMeta: Record<CapabilitySupport, StatusMeta> = {
   supported: { label: "Supported", tone: "success", icon: "check", hint: "Fully provided by the adapter." },
   partial: { label: "Partial", tone: "warning", icon: "alert", hint: "Provided with limitations." },

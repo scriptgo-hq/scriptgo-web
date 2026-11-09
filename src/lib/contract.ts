@@ -13,6 +13,7 @@ export type {
   Classification,
   CompatibilityStatus,
   EnvironmentKind,
+  EnvironmentSales,
   EnvironmentStatus,
   LicenseStatus,
   ListingStatus,

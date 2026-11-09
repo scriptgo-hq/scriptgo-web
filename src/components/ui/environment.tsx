@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { EnvironmentArt } from "@/components/illustrations";
 import type { Environment } from "@/lib/contract";
 import { cn } from "@/lib/cn";
-import { environmentMeta, metaFor } from "@/lib/status";
+import { environmentMeta, metaFor, salesMeta } from "@/lib/status";
 import { StatusBadge } from "./badge";
 
 export function EnvironmentTile({ env, className }: { env: Environment; className?: string }) {
@@ -17,7 +17,10 @@ export function EnvironmentTile({ env, className }: { env: Environment; classNam
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <p className="font-display text-[16px] font-extrabold leading-tight">{env.name}</p>
-        <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" className="self-start" />
+        <div className="flex flex-wrap gap-1.5">
+          <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" />
+          {env.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, env.sales)} size="sm" /> : null}
+        </div>
       </div>
     </Link>
   );
