@@ -13,6 +13,11 @@ const NAMES: Record<string, string> = {
   neovim: "Neovim",
   cctweaked: "CC: Tweaked",
   dotnet: ".NET",
+  garrysmod: "Garry's Mod",
+  hytale: "Hytale",
+  rust: "Rust",
+  beammp: "BeamMP",
+  fivem: "FiveM",
 };
 
 const LONG_NAMES: Record<string, string> = {
@@ -23,6 +28,11 @@ const LONG_NAMES: Record<string, string> = {
   open77: "OPEN//77",
   cctweaked: "CC: Tweaked (Minecraft)",
   dotnet: ".NET kit",
+  garrysmod: "Garry's Mod",
+  hytale: "Hytale",
+  rust: "Rust (Oxide/Carbon)",
+  beammp: "BeamMP",
+  fivem: "FiveM",
 };
 
 const MONOGRAMS: Record<string, string> = {
@@ -36,6 +46,11 @@ const MONOGRAMS: Record<string, string> = {
   neovim: "Nv",
   cctweaked: "CC",
   dotnet: ".N",
+  garrysmod: "GM",
+  hytale: "Hy",
+  rust: "Rs",
+  beammp: "BM",
+  fivem: "FM",
 };
 
 export function envName(slug: string, fallback?: string): string {
