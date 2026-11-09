@@ -56,6 +56,8 @@ const LANG_ALIASES: Record<string, string> = {
   jsonc: "json",
   toml: "ini",
   conf: "ini",
+  cs: "csharp",
+  "c#": "csharp",
 };
 
 let instance: Promise<HighlighterCore> | null = null;
@@ -70,6 +72,7 @@ function getHighlighter(): Promise<HighlighterCore> {
       import("shiki/langs/typescript.mjs"),
       import("shiki/langs/http.mjs"),
       import("shiki/langs/ini.mjs"),
+      import("shiki/langs/csharp.mjs"),
     ],
     engine: createJavaScriptRegexEngine(),
   });

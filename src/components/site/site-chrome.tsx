@@ -81,6 +81,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
             links={[
               ["/explore", "Explore"],
               ["/environments", "Environments"],
+              ["/sdk", "SDK"],
               ["/docs", "Docs"],
               ["/developers", "Developers"],
             ]}

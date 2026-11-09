@@ -1,0 +1,544 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import { ArrowRight } from "lucide-react";
+import { StatusBadge, Tag } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { CodeBlock } from "@/components/ui/code-block";
+import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { api } from "@/lib/api";
+import type { Environment } from "@/lib/contract";
+import { adapterMeta } from "@/lib/integration";
+import type { StatusMeta } from "@/lib/status";
+
+export const metadata: Metadata = {
+  title: "SDK",
+  description:
+    "What the SCRIPT//GO SDK is: a portable Lua core, one adapter per host, a .NET host kit, a CLI and the specs. How an engine integrates it, and what is not built yet.",
+};
+
+// The template from the adapter guide (/docs/create-adapter), trimmed to a server-only host.
+const ADAPTER = `-- adapters/myengine.lua
+return {
+  environment = "myengine",
+  adapterVersion = "myengine-0.1.0",
+  sides = { server = true, client = false },   -- a server-only host
+  capabilities = {
+    storage = true, players = true, permissions = true, commands = true,
+    config = true, ui = true, http = false, licensing = false,
+  },
+
+  now = function() return MyEngine.time_seconds() end,          -- monotonic, in seconds
+  log = function(level, origin, message) MyEngine.log(level, origin .. ": " .. message) end,
+  readFile = function(path) return MyEngine.read_text(path) end, -- nil when missing
+
+  storage = {
+    load = function(key) return MyEngine.kv_get(key) end,       -- JSON text or nil
+    save = function(key, text) MyEngine.kv_set(key, text) end,
+  },
+  permissions = {
+    has = function(playerId, privilege) return MyEngine.has_priv(playerId, privilege) end,
+  },
+  config = {
+    get = function(resourceName, key) return MyEngine.setting(resourceName, key) end,
+  },
+  ui = {
+    notify = function(target, n) MyEngine.toast(target, n.title, n.message) end,
+  },
+}`;
+
+const HOST = `local scriptgo = dofile("sdk/lua/scriptgo/init.lua")
+local host = scriptgo.newHost({ adapter = dofile("adapters/myengine.lua") })
+host:addResource("resources/sg_inventory")
+host:startAll()
+
+-- then, once per frame or server step, from the engine's own loop:
+host:tick()`;
+
+// The embedding example of sdk/dotnet/README.md; the kit's test suite runs it (EmbeddingTests).
+const DOTNET = `using ScriptGo.Host;
+
+var services = new HostServices
+{
+    Log = new ConsoleLog(),
+    Storage = new FolderStorage("data/storage"),
+    // Players, Permissions, Config, Ui and Http are the engine's: implement IHostPlayers, ...
+};
+using var host = new ScriptGoHost(services, new HostOptions { Environment = "dotnet" });
+
+// Natives the engine offers, described once (docs/spec/native-module.schema.json).
+var world = NativeModule.FromJson("""
+    { "name": "world", "global": true,
+      "functions": [{ "name": "greet", "params": [{ "name": "who", "type": "string" }], "returns": "string" }] }
+    """);
+world.Bind("greet", call => [SgValue.Of($"hi {call.Arg(0).AsText()} from {call.Language}")]);
+host.RegisterNativeModule(world);
+
+host.AddResource("resources/sg_inventory");
+var started = host.Start("sg_inventory");
+if (!started.Ok) Console.WriteLine($"not started: {started.Reason}");
+
+host.PlayerJoin(1, "Ann");
+host.RunFor(100);          // or host.Tick() once per engine frame
+host.StopAll();`;
+
+const PIECES: { title: string; path: string; badge?: StatusMeta; body: React.ReactNode; foot?: React.ReactNode }[] = [
+  {
+    title: "Lua core",
+    path: "sdk/lua/scriptgo",
+    body: (
+      <>
+        Pure Lua that runs on any Lua host, from Lua 5.1 to 5.4 and LuaJIT. It gives packages one API: threads and timers,
+        events on a host-wide bus, exports between packages, promises, storage, players, permissions, commands, config, HTTP,
+        licensing, notifications and logging. It knows nothing about engines.
+      </>
+    ),
+  },
+  {
+    title: "Adapters",
+    path: "sdk/adapters/<host>/",
+    body: (
+      <>
+        One per host. An adapter maps the API onto what the host already has: its clock and tick, files, storage, players,
+        privileges, config, notifications and HTTP. Depending on the host it ships as an addon, a mod, a plugin, an in-game
+        computer program or a shim.
+      </>
+    ),
+    foot: (
+      <Link href="/docs/create-adapter" className="font-semibold text-cobalt-ink underline">
+        The adapter contract
+      </Link>
+    ),
+  },
+  {
+    title: ".NET host kit",
+    path: "sdk/dotnet",
+    badge: { label: "Experimental", tone: "warning", icon: "flask", hint: "Measured on Windows x64 only; not published to NuGet." },
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">ScriptGo.Host</code>, a .NET 10 library any C# engine or server can embed,
+        and <code className="font-mono text-[0.9em]">scriptgo-dotnet</code>, its console host. Lua 5.4 (KeraLua) and
+        JavaScript or TypeScript (Jint) run side by side, one VM per resource side and language. Natives are described once
+        and reach every language with generated typings; quotas apply to each call from the host.
+      </>
+    ),
+    foot: (
+      <>
+        Measured on Windows x64 only. Not on NuGet yet.{" "}
+        <Link href="/docs/dotnet-kit" className="font-semibold text-cobalt-ink underline">
+          Embed it
+        </Link>
+      </>
+    ),
+  },
+  {
+    title: "CLI",
+    path: "packages/cli",
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">scriptgo</code>: <code className="font-mono text-[0.9em]">init</code>,{" "}
+        <code className="font-mono text-[0.9em]">validate</code>, <code className="font-mono text-[0.9em]">test</code>,{" "}
+        <code className="font-mono text-[0.9em]">run</code>, <code className="font-mono text-[0.9em]">pack --target</code>,{" "}
+        <code className="font-mono text-[0.9em]">verify --env</code>, <code className="font-mono text-[0.9em]">publish</code>,{" "}
+        <code className="font-mono text-[0.9em]">add</code> and{" "}
+        <code className="font-mono text-[0.9em]">license activate|verify</code>. It compiles TypeScript at pack and verify
+        time, so hosts never do.
+      </>
+    ),
+    foot: (
+      <Link href="/docs/cli" className="font-semibold text-cobalt-ink underline">
+        CLI reference
+      </Link>
+    ),
+  },
+  {
+    title: "@scriptgo/types",
+    path: "packages/types",
+    body: (
+      <>
+        TypeScript declarations for resources, generated from the language-neutral runtime IDL (
+        <code className="font-mono text-[0.9em]">docs/spec/runtime-idl.json</code>). The same IDL defines the API in every
+        language.
+      </>
+    ),
+  },
+  {
+    title: "Specs",
+    path: "docs/spec",
+    body: (
+      <>
+        The runtime API (<code className="font-mono text-[0.9em]">runtime.md</code>), the manifest (
+        <code className="font-mono text-[0.9em]">manifest.md</code>), how values, events and exports cross languages (
+        <code className="font-mono text-[0.9em]">multi-language.md</code>), the IDL format (
+        <code className="font-mono text-[0.9em]">runtime-idl.md</code>) and the HTTP API (
+        <code className="font-mono text-[0.9em]">api.md</code>). Native modules follow{" "}
+        <code className="font-mono text-[0.9em]">native-module.schema.json</code>.
+      </>
+    ),
+    foot: (
+      <>
+        <Link href="/docs/runtime" className="font-semibold text-cobalt-ink underline">
+          Runtime
+        </Link>
+        {" · "}
+        <Link href="/docs/manifest" className="font-semibold text-cobalt-ink underline">
+          Manifest
+        </Link>
+        {" · "}
+        <Link href="/docs/api" className="font-semibold text-cobalt-ink underline">
+          HTTP API
+        </Link>
+      </>
+    ),
+  },
+];
+
+const LANGUAGES: { name: string; status: StatusMeta; body: React.ReactNode }[] = [
+  {
+    name: "Lua",
+    status: { label: "Every environment", tone: "success", icon: "check", hint: "Every environment runs Lua packages." },
+    body: <>Runs on each host&rsquo;s own Lua: 5.1, 5.2, 5.3, 5.4 or LuaJIT, depending on the host.</>,
+  },
+  {
+    name: "TypeScript and JavaScript",
+    status: { label: "Experimental, .NET kit", tone: "warning", icon: "flask", hint: "Runs on the .NET kit only, which is experimental." },
+    body: (
+      <>
+        Through the .NET kit. TypeScript is compiled by esbuild when you pack or verify. Real runs on the kit passed the
+        conformance probe in TypeScript, and a Lua package and a TypeScript package calling each other&rsquo;s exports.
+      </>
+    ),
+  },
+  {
+    name: "C#",
+    status: { label: "Next, not started", tone: "muted", icon: "calendar", hint: "Phase 3 of the plan." },
+    body: <>Planned as guest scripts compiled against an allowed API, with quotas. A spike and a security review come first.</>,
+  },
+];
+
+const PLATFORM: { title: string; body: React.ReactNode; href: string; link: string }[] = [
+  {
+    title: "Licensing and verification",
+    body: (
+      <>
+        License keys, one activation per deployment, verification with an offline grace period, and signed verification
+        tokens. A package checks its license with <code className="font-mono text-[0.9em]">ScriptGo.licensing</code>.
+      </>
+    ),
+    href: "/docs/licensing-api",
+    link: "Licensing API",
+  },
+  {
+    title: "Shops on Tebex",
+    body: (
+      <>
+        Paid packages sell through the creator&rsquo;s own Tebex store, and SCRIPT//GO issues the license after a verified
+        payment event. The Tebex connector has not run against a live store yet; checkout stays off until written approval.
+      </>
+    ),
+    href: "/developers",
+    link: "Selling, plainly",
+  },
+  {
+    title: "Compatibility proof",
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">scriptgo verify</code> runs a package and its README example in the real
+        runtime and writes a report. Statuses and badges come from those reports, never from a form.
+      </>
+    ),
+    href: "/environments",
+    link: "Environments",
+  },
+  {
+    title: "Imports",
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">scriptgo add creator//name</code> downloads a release into{" "}
+        <code className="font-mono text-[0.9em]">./resources</code> and checks its SHA-256 against the registry. Packages
+        declare dependencies in their manifest and call each other through exports.
+      </>
+    ),
+    href: "/docs/cli",
+    link: "scriptgo add",
+  },
+];
+
+const notStarted = (hint: string): StatusMeta => ({ label: "Not started", tone: "muted", icon: "dashed", hint });
+
+const ROADMAP: { title: string; status: StatusMeta; body: React.ReactNode }[] = [
+  {
+    title: "Native C ABI kit",
+    status: notStarted("Phase 4 of the plan."),
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">libscriptgo</code> with C headers, for C and C++ engines: Lua 5.4 or
+        LuaJIT, and JavaScript on QuickJS. Phase 4.
+      </>
+    ),
+  },
+  {
+    title: "Node kit",
+    status: notStarted("Phase 4 of the plan, after the C kit."),
+    body: <>For Node, Bun and Deno servers: Lua and JavaScript each in WebAssembly, isolated per resource. Phase 4, after the C kit.</>,
+  },
+  {
+    title: "JVM kit",
+    status: { label: "Later", tone: "muted", icon: "calendar", hint: "After the C and Node kits." },
+    body: (
+      <>
+        For Java servers. The Lua core already runs on Cobalt inside one JVM plugin (Hytale, written, awaiting a real run); a
+        general kit, with JavaScript, is not started.
+      </>
+    ),
+  },
+  {
+    title: "C# guests",
+    status: notStarted("Phase 3 of the plan."),
+    body: <>Scripts written in C#. Phase 3, after a spike and a security review. Until then a .cs script is refused.</>,
+  },
+  {
+    title: "Code protection beyond license keys",
+    status: notStarted("Phase 2 of the plan."),
+    body: (
+      <>
+        Encrypted releases that only a licensed server can open, with a watermark per license. It deters copying and makes
+        leaks traceable; it is not unbreakable DRM. Today the protection is the license check.
+      </>
+    ),
+  },
+  {
+    title: "SDK packages on NuGet and npm",
+    status: { label: "Not published", tone: "muted", icon: "dashed", hint: "Not published to a package registry yet." },
+    body: <>The .NET kit is not on NuGet, and the CLI and @scriptgo/types are not on npm yet.</>,
+  },
+  {
+    title: "Linux and macOS measurements",
+    status: { label: "Not measured", tone: "muted", icon: "dashed", hint: "No measured run on Linux or macOS for these hosts." },
+    body: <>The .NET kit and the desktop hosts (LÖVE, Godot, Neovim) were measured on Windows only.</>,
+  },
+];
+
+async function AdapterCounts() {
+  const res = await api<Environment[]>("/v1/environments");
+  if (!res.ok || res.data.length === 0) return null;
+  const count = (s: string) => res.data.filter((e) => e.adapterState === s).length;
+  const tiles = [
+    { n: count("verified"), meta: adapterMeta.verified, text: "environments where a real run passed" },
+    { n: count("written"), meta: adapterMeta.written, text: "adapters written, each awaiting its first real run" },
+    { n: count("none"), meta: adapterMeta.none, text: "planned environments with no adapter code yet" },
+  ];
+  return (
+    <ul className="mt-8 grid gap-3 sm:grid-cols-3">
+      {tiles.map((t) => (
+        <li key={t.meta.label}>
+          <Link href="/environments" className="sticker sticker-hover flex h-full flex-col gap-2 p-4">
+            <StatusBadge meta={t.meta} size="sm" className="self-start" />
+            <span className="font-display text-[30px] font-black leading-none tabular">{t.n}</span>
+            <span className="text-[14px] text-ink-2">{t.text}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default function SdkPage() {
+  return (
+    <div>
+      <section className="border-b-2 border-line-soft">
+        <div className="container-page py-12">
+          <Eyebrow>sdk</Eyebrow>
+          <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[68px]">
+            The SDK.
+          </DisplayTitle>
+          <p className="mt-5 max-w-[64ch] text-[17px] text-ink-2">
+            Packages are written once, against one API. The SDK is what runs that API on each host: a Lua core, one adapter per
+            host, a host kit for engines that do not run Lua, a CLI, and the specs that tie them together. This page says what
+            exists, how an engine integrates it, and what is not built yet.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <ButtonLink href="/docs/create-adapter" size="lg" arrow>
+              Write an adapter
+            </ButtonLink>
+            <ButtonLink href="/docs/dotnet-kit" variant="secondary" size="lg">
+              Embed the .NET kit
+            </ButtonLink>
+            <Link href="/docs/sdk" className="inline-flex h-12 items-center px-2 font-bold text-ink underline-offset-4 hover:underline">
+              Read the SDK guide
+            </Link>
+          </div>
+          <AdapterCounts />
+        </div>
+      </section>
+
+      <section aria-labelledby="pieces-title" className="container-page py-12">
+        <DisplayTitle id="pieces-title" className="text-[38px] sm:text-[44px]">
+          What is in it.
+        </DisplayTitle>
+        <Stroke className="mt-1" />
+        <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {PIECES.map((p) => (
+            <li key={p.title} className="sticker flex flex-col gap-2 p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-display text-[21px] font-extrabold leading-tight">{p.title}</h3>
+                {p.badge ? <StatusBadge meta={p.badge} size="sm" /> : null}
+              </div>
+              <Tag mono className="self-start">
+                {p.path}
+              </Tag>
+              <p className="text-[14.5px] text-ink-2">{p.body}</p>
+              {p.foot ? <p className="mt-auto pt-1 text-[13.5px] text-ink-3">{p.foot}</p> : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="paths-title" className="border-t-2 border-line-soft bg-paper-2/60">
+        <div className="container-page py-12">
+          <DisplayTitle id="paths-title" className="text-[38px] sm:text-[44px]">
+            Two ways to integrate.
+          </DisplayTitle>
+          <Stroke className="mt-1" />
+          <div className="mt-8 grid gap-10 lg:grid-cols-2">
+            <div className="min-w-0">
+              <Eyebrow>for a host that runs Lua</Eyebrow>
+              <h3 className="mt-1 font-display text-[26px] font-extrabold leading-tight">Write an adapter.</h3>
+              <p className="mt-3 max-w-[60ch] text-[15px] text-ink-2">
+                Engines, mod frameworks and game servers that already embed Lua keep their own VM. The core runs in it
+                unchanged: you write one adapter table and tick the host from your loop. A host that already runs this resource
+                shape (threads, events, exports) only needs a shim and a pack target.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {["addon", "mod", "plugin", "computer program", "shim"].map((t) => (
+                  <Tag key={t}>{t}</Tag>
+                ))}
+              </div>
+              <div className="mt-5 space-y-3">
+                <CodeBlock code={ADAPTER} lang="lua" filename="adapters/myengine.lua" />
+                <CodeBlock code={HOST} lang="lua" filename="your engine" />
+              </div>
+              <p className="mt-3 text-[13.5px] text-ink-3">
+                From the adapter guide. Then run the conformance probes with{" "}
+                <code className="font-mono">scriptgo verify</code>.{" "}
+                <Link href="/docs/create-adapter" className="font-semibold text-cobalt-ink underline">
+                  Create an adapter
+                </Link>
+              </p>
+            </div>
+            <div className="min-w-0">
+              <Eyebrow>for an engine without Lua</Eyebrow>
+              <h3 className="mt-1 font-display text-[26px] font-extrabold leading-tight">Embed a host kit.</h3>
+              <p className="mt-3 max-w-[60ch] text-[15px] text-ink-2">
+                A C# engine or server references <code className="font-mono text-[0.9em]">ScriptGo.Host</code>, supplies its
+                services (storage, players, permissions, config, notifications, HTTP) and describes its natives once. Its users
+                then write Lua, TypeScript or JavaScript. The .NET kit is the only kit today, and it is experimental; native C,
+                Node and JVM kits are planned.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                <Tag>embedded kit</Tag>
+                <Tag>.NET 10</Tag>
+                <Tag>Lua 5.4 · TypeScript · JavaScript</Tag>
+              </div>
+              <div className="mt-5">
+                <CodeBlock code={DOTNET} lang="csharp" filename="Program.cs" />
+              </div>
+              <p className="mt-3 text-[13.5px] text-ink-3">
+                The embedding example of the kit&rsquo;s README; its test suite runs the same code.{" "}
+                <Link href="/docs/dotnet-kit" className="font-semibold text-cobalt-ink underline">
+                  Embed the .NET kit
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="languages-title" className="container-page py-12">
+        <DisplayTitle id="languages-title" className="text-[38px] sm:text-[44px]">
+          Languages.
+        </DisplayTitle>
+        <Stroke className="mt-1" />
+        <ul className="mt-8 grid gap-5 md:grid-cols-3">
+          {LANGUAGES.map((l) => (
+            <li key={l.name} className="sticker flex flex-col gap-2 p-5">
+              <h3 className="font-display text-[21px] font-extrabold leading-tight">{l.name}</h3>
+              <StatusBadge meta={l.status} size="sm" className="self-start" />
+              <p className="text-[14.5px] text-ink-2">{l.body}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-[13.5px] text-ink-3">
+          One API in every language, defined by the runtime IDL: <code className="font-mono">nil, reason</code> in Lua, errors and
+          promises in JavaScript. How values cross between languages is fixed in{" "}
+          <code className="font-mono">docs/spec/multi-language.md</code>.
+        </p>
+      </section>
+
+      <section aria-labelledby="platform-title" className="border-t-2 border-line-soft bg-paper-2/60">
+        <div className="container-page py-12">
+          <DisplayTitle id="platform-title" className="text-[38px] sm:text-[44px]">
+            On top of the SDK.
+          </DisplayTitle>
+          <Stroke className="mt-1" />
+          <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
+            The SDK runs packages. The platform around it is what creators and server owners use it for.
+          </p>
+          <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {PLATFORM.map((p) => (
+              <li key={p.title} className="sticker flex flex-col gap-2 p-5">
+                <h3 className="font-display text-[19px] font-extrabold leading-tight">{p.title}</h3>
+                <p className="text-[14.5px] text-ink-2">{p.body}</p>
+                <Link href={p.href} className="mt-auto inline-flex items-center gap-1 pt-2 text-[13.5px] font-bold text-cobalt-ink hover:underline">
+                  {p.link} <ArrowRight aria-hidden="true" size={14} strokeWidth={2.5} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="roadmap-title" className="container-page py-12">
+        <DisplayTitle id="roadmap-title" className="text-[38px] sm:text-[44px]">
+          Not built yet.
+        </DisplayTitle>
+        <Stroke className="mt-1" />
+        <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
+          The plan, in the order it is meant to land. Nothing here is usable today; each item is listed only once it passes
+          real runs.
+        </p>
+        <div className="panel relative mt-6 overflow-x-auto">
+          <table className="w-full min-w-[560px] text-left text-[14px]">
+            <caption className="sr-only">SDK roadmap</caption>
+            <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
+              <tr>
+                <th scope="col" className="px-3 py-2.5">Item</th>
+                <th scope="col" className="px-3 py-2.5">State</th>
+                <th scope="col" className="px-3 py-2.5">What it is</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ROADMAP.map((r) => (
+                <tr key={r.title} className="border-t border-line-soft align-top">
+                  <th scope="row" className="px-3 py-2.5 font-bold">
+                    {r.title}
+                  </th>
+                  <td className="px-3 py-2.5">
+                    <StatusBadge meta={r.status} size="sm" />
+                  </td>
+                  <td className="px-3 py-2.5 text-ink-2">{r.body}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 text-[14px] text-ink-2">
+          Running a platform we do not list yet?{" "}
+          <Link href="/docs/create-adapter" className="font-semibold text-cobalt-ink underline">
+            One adapter brings every package to it
+          </Link>
+          .
+        </p>
+      </section>
+    </div>
+  );
+}

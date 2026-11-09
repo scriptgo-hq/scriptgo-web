@@ -5,6 +5,10 @@
  */
 export type {
   ActivationStatus,
+  AdapterState,
+  IntegrationType,
+  EnvironmentIntegration,
+  ProofRun,
   CapabilitySupport,
   CaseStatus,
   Category,

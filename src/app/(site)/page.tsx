@@ -264,7 +264,7 @@ async function Featured() {
 function SideDoors() {
   const doors = [
     {
-      href: "/docs/create-adapter",
+      href: "/sdk",
       icon: Puzzle,
       eyebrow: "for platform builders",
       title: "Add SCRIPT//GO to your engine.",

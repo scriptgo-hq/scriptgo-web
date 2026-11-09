@@ -76,6 +76,20 @@ export const DOCS: DocEntry[] = [
     source: { kind: "guide", file: "create-adapter.md" },
   },
   {
+    slug: "sdk",
+    title: "The SDK",
+    description: "The pieces of the SDK, the two ways to integrate it, and what is not built yet.",
+    group: "Platform builders",
+    source: { kind: "guide", file: "sdk.md" },
+  },
+  {
+    slug: "dotnet-kit",
+    title: "Embed the .NET kit",
+    description: "Run Lua, TypeScript and JavaScript packages inside a .NET 10 engine or server.",
+    group: "Platform builders",
+    source: { kind: "guide", file: "dotnet-kit.md" },
+  },
+  {
     slug: "troubleshooting",
     title: "Troubleshooting",
     description: "Symptoms, causes and fixes for the errors you are most likely to meet.",

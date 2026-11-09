@@ -12,6 +12,7 @@ import { ENV_KINDS, dialectLabel, envKind } from "@/lib/env";
 import { formatDate, relativeTime } from "@/lib/format";
 import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 import { cn } from "@/lib/cn";
+import { adapterMetaFor } from "@/lib/integration";
 import { TONE_CLASSES } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
@@ -119,7 +120,14 @@ export default async function EnvironmentsPage() {
                                       {e.name}
                                     </Link>
                                   </th>
-                                  <td className="px-3 py-2.5"><StatusBadge meta={metaFor(environmentMeta, e.status)} size="sm" /></td>
+                                  <td className="px-3 py-2.5">
+                                    <StatusBadge meta={metaFor(environmentMeta, e.status)} size="sm" />
+                                    {e.status === "planned" ? (
+                                      <span className="mt-1 block text-[12px] leading-snug text-ink-3" title={e.blockedOn || undefined}>
+                                        {adapterMetaFor(e.adapterState).long}
+                                      </span>
+                                    ) : null}
+                                  </td>
                                   <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
                                   <td className="px-3 py-2.5">{e.luaDialects.map(dialectLabel).join(", ") || "—"}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>

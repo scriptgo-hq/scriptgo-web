@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
 import { EnvironmentArt } from "@/components/illustrations";
+import { IntegrationSection } from "@/components/site/integration-section";
 import { StatusBadge } from "@/components/ui/badge";
 import { Breadcrumb, KeyValue } from "@/components/ui/data";
 import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
@@ -94,6 +95,8 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           Its integration tests or its review are still pending. Expect changes, and don&rsquo;t rely on it for production.
         </Banner>
       ) : null}
+
+      <IntegrationSection env={e} />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section aria-labelledby="caps-title">

@@ -144,6 +144,7 @@ export default function DevelopersPage() {
             </p>
             <ul className="mt-5 space-y-2 text-[15px]">
               {[
+                ["/sdk", "The SDK: adapters, host kits and what is planned"],
                 ["/docs/create-adapter", "Create an adapter"],
                 ["/docs/runtime", "Runtime API and capabilities"],
                 ["/environments", "Current environments and their status"],
