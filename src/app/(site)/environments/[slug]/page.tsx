@@ -68,6 +68,13 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
                     </time>
                     <span className="font-mono text-[12.5px] text-ink-3">run {e.lastRun.runId}</span>
                   </span>
+                ) : e.proof.length > 0 ? (
+                  <>
+                    No package run yet.{" "}
+                    <a href="#integration-title" className="font-semibold text-cobalt-ink underline">
+                      Conformance runs below
+                    </a>
+                  </>
                 ) : (
                   "No conformance run recorded yet"
                 ),

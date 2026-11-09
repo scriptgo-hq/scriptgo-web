@@ -30,7 +30,8 @@ function groupProof(proof: ProofRun[]): ProofGroup[] {
     return {
       pkg: first.package,
       version: first.version,
-      runtimes: runs.map((r) => (r.lua && r.lua !== r.runtime ? `${r.runtime} · ${r.lua}` : r.runtime)),
+      // The .NET kit names its Lua inside the runtime string, and also runs TypeScript there: no Lua suffix then.
+      runtimes: runs.map((r) => (r.lua && !r.runtime.includes(r.lua) ? `${r.runtime} · ${r.lua}` : r.runtime)),
       checks: counts.length === 1 && runs.length > 1 ? `${counts[0]} each` : counts.join(", "),
       ranAt: runs.map((r) => r.ranAt).sort().pop()!,
     };
