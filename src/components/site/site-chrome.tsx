@@ -75,13 +75,6 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
             <p className="mt-3 max-w-sm text-[#cfc7b7]">
               Portable Lua resources, proven by real runs, licensed by their creators.
             </p>
-            <p className="mt-3 max-w-sm text-[13px] text-[#cfc7b7]">
-              <strong className="text-[#f5efe3]">Ownership disclosure:</strong> SCRIPT//GO and OPEN//77 share ownership. OPEN//77 is
-              listed as one environment among others, with no preferential treatment.{" "}
-              <Link href="/legal#ownership" className="underline underline-offset-2 hover:text-sun">
-                Details
-              </Link>
-            </p>
           </div>
           <FooterCol
             title="Product"

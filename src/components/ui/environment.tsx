@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { EnvironmentArt } from "@/components/illustrations";
 import type { Environment } from "@/lib/contract";
 import { cn } from "@/lib/cn";
@@ -17,6 +18,39 @@ export function EnvironmentTile({ env, className }: { env: Environment; classNam
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <p className="font-display text-[16px] font-extrabold leading-tight">{env.name}</p>
         <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" className="self-start" />
+      </div>
+    </Link>
+  );
+}
+
+/** An open slot in a directory grid: the way in for a platform that is not listed yet. */
+export function EnvironmentSlotTile({
+  href,
+  title,
+  body,
+  className,
+}: {
+  href: string;
+  title: string;
+  body: string;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group flex flex-col overflow-hidden rounded-[10px] border-[2.5px] border-dashed border-line text-ink transition-colors hover:bg-surface focus-visible:bg-surface",
+        className,
+      )}
+    >
+      <div className="flex aspect-[5/3] items-center justify-center border-b-[2.5px] border-dashed border-line">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border-[2.5px] border-line bg-surface transition-transform group-hover:scale-105">
+          <Plus aria-hidden="true" size={28} strokeWidth={2.75} />
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-1 p-2.5">
+        <p className="font-display text-[16px] font-extrabold leading-tight">{title}</p>
+        <p className="text-[12.5px] leading-snug text-ink-2">{body}</p>
       </div>
     </Link>
   );

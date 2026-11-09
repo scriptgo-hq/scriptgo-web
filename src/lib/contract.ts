@@ -12,6 +12,7 @@ export type {
   CheckStatus,
   Classification,
   CompatibilityStatus,
+  EnvironmentKind,
   EnvironmentStatus,
   LicenseStatus,
   ListingStatus,

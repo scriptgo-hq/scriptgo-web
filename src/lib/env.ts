@@ -49,6 +49,30 @@ export function envMonogram(slug: string, name?: string): string {
   return `${first}${consonant.toLowerCase()}`;
 }
 
+/**
+ * The two kinds of environment, in display order. A runtime hosts Lua itself; a mod platform is a
+ * layer on top of an existing game (players bring the game). Rename a section here, nowhere else.
+ */
+export const ENV_KINDS = [
+  {
+    kind: "runtime",
+    title: "Engines & runtimes",
+    singular: "Engine or runtime",
+    blurb: "Lua runs inside the engine or runtime itself.",
+  },
+  {
+    kind: "mod_platform",
+    title: "Mod platforms",
+    singular: "Mod platform",
+    blurb:
+      "Multiplayer and modding layers that run on top of an existing game. Players bring their own copy of the game; the platform\u2019s servers and clients load the packages.",
+  },
+] as const;
+
+export function envKind(kind: string) {
+  return ENV_KINDS.find((k) => k.kind === kind) ?? ENV_KINDS[0];
+}
+
 export const KNOWN_ENVIRONMENTS = ["standalone", "love2d", "godot", "luanti", "open77"];
 
 export function dialectLabel(d: string): string {

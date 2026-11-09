@@ -9,7 +9,7 @@ import { PackageCard } from "@/components/ui/package";
 import { Prose } from "@/components/ui/prose";
 import { api } from "@/lib/api";
 import { CAPABILITIES, type EnvironmentDetail } from "@/lib/contract";
-import { dialectLabel } from "@/lib/env";
+import { dialectLabel, envKind } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
 import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
@@ -44,8 +44,9 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
       <header className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_320px] md:items-center">
         <div className="min-w-0">
           <h1 className="display text-[48px] sm:text-[64px]">{e.name}.</h1>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
+            <span className="text-[13px] font-bold uppercase tracking-wide text-ink-3">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
           <KeyValue
