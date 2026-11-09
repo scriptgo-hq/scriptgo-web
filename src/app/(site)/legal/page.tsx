@@ -5,11 +5,11 @@ import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Legal",
-  description: "Terms, privacy, IP policy, creator agreement, and the operator and ownership disclosure. Drafts pending legal review.",
+  description: "Terms, privacy, IP policy, creator agreement and the operator. Drafts pending legal review.",
 };
 
 const SECTIONS = [
-  { id: "ownership", title: "Operator and ownership disclosure" },
+  { id: "operator", title: "Operator" },
   { id: "terms", title: "Terms of service" },
   { id: "privacy", title: "Privacy policy" },
   { id: "ip-policy", title: "IP policy" },
@@ -64,21 +64,9 @@ export default function LegalPage() {
           </Banner>
         </div>
 
-        <Section id="ownership" title="Operator and ownership disclosure" draft={false}>
+        <Section id="operator" title="Operator" draft={false}>
           <p>
-            <strong>SCRIPT//GO and OPEN//77 share ownership.</strong> OPEN//77 is a multiplayer platform run by the same owners. We
-            disclose this because OPEN//77 can appear on SCRIPT//GO as an environment.
-          </p>
-          <ul>
-            <li>OPEN//77 is listed as one environment among others. It gets no preferential ranking, placement or status.</li>
-            <li>
-              Its status follows the same rule as every environment: it is shown as <em>Experimental</em> until its integration tests
-              pass and its legal review is complete.
-            </li>
-            <li>Nothing in the SCRIPT//GO core or platform depends on OPEN//77.</li>
-          </ul>
-          <p id="operator">
-            <strong>Operator.</strong> The legal entity that operates SCRIPT//GO, its registered address and its contact details
+            The legal entity that operates SCRIPT//GO, its registered address and its contact details
             will be published here before public launch. Until then, reports and requests go through the{" "}
             <Link href="/report">public report form</Link>.
           </p>

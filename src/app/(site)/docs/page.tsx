@@ -22,7 +22,7 @@ export default async function DocsHome() {
       </DisplayTitle>
       <Stroke className="mt-1" />
       <p className="mt-4 max-w-[62ch] text-[17px] text-ink-2">
-        A SCRIPT//GO package is a resource in the OPEN//77 format: a declarative <code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
+        A SCRIPT//GO package is a resource: a declarative <code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
         manifest plus shared, server and client scripts. Write it once against capabilities; adapters run it everywhere else.
       </p>
       <div className="mt-6 max-w-xl">

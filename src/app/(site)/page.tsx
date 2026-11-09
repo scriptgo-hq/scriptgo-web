@@ -110,7 +110,7 @@ function Hero() {
           <div aria-hidden="true" className="band-cobalt absolute inset-x-[-16px] bottom-[6%] top-[22%] -z-10 lg:hidden" />
           <HeroScene
             className="mx-auto w-full max-w-[640px]"
-            title="Illustration: one Lua script connected to four environment windows labelled Godot, LÖVE, Luanti and OPEN//77."
+            title="Illustration: one Lua script connected to four environment windows labelled Godot, LÖVE, Luanti and Lua."
           />
         </div>
       </div>

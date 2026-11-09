@@ -88,7 +88,7 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
         <FileArchive aria-hidden="true" size={34} strokeWidth={1.75} className="text-cobalt-ink" />
         <p className="font-bold">{file ? file.name : "Drop the resource zip here"}</p>
         <p className="tabular text-[13.5px] text-ink-3">
-          {file ? formatBytes(file.size) : <>The zip holds the folder with <span className="font-mono">scriptgo.lua</span> or <span className="font-mono">open77.lua</span>. Up to {formatBytes(MAX_BYTES)}.</>}
+          {file ? formatBytes(file.size) : <>The zip holds the folder with its <span className="font-mono">scriptgo.lua</span> manifest. Up to {formatBytes(MAX_BYTES)}.</>}
         </p>
         <input ref={input} id="archive" type="file" accept=".zip,application/zip" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         <Button variant="secondary" size="sm" onClick={() => input.current?.click()} disabled={busy}>

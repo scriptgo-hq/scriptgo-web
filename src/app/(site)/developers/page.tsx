@@ -32,7 +32,7 @@ const steps = [
   {
     n: 1,
     title: "Create a resource",
-    body: "A folder with a scriptgo.lua manifest and your shared, server and client scripts. Same format as an OPEN//77 resource.",
+    body: "A folder with a scriptgo.lua manifest and your shared, server and client scripts. The resource shape multiplayer scripters already know.",
     cmd: "scriptgo init inventory_pro",
   },
   {
@@ -117,8 +117,8 @@ export default function DevelopersPage() {
           <div className="min-w-0 space-y-3">
             <CodeBlock code={MANIFEST} lang="lua" filename="inventory_pro/scriptgo.lua" />
             <p className="text-[13.5px] text-ink-3">
-              The manifest is parsed, never executed. Unknown directives are kept as warnings, so one file can serve OPEN//77 and
-              SCRIPT//GO. <Link href="/docs/manifest" className="font-semibold text-cobalt-ink underline">Manifest reference</Link>
+              The manifest is parsed, never executed. Unknown directives are kept as warnings, so one file can serve several
+              environments. <Link href="/docs/manifest" className="font-semibold text-cobalt-ink underline">Manifest reference</Link>
             </p>
           </div>
         </div>

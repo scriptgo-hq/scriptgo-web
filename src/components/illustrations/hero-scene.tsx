@@ -1,6 +1,6 @@
 /* Hero composition: one Lua badge, four environment windows. */
 import type { ReactNode } from "react";
-import { GodotScene, LoveScene, LuantiScene, Open77Scene } from "./environment-art";
+import { GodotScene, LoveScene, LuantiScene, StandaloneScene } from "./environment-art";
 import { Sparkle, StickerLabel, Tick } from "./parts";
 import { INK, PAPER, SUN, svgA11y, r1 } from "./palette";
 
@@ -76,8 +76,8 @@ export function HeroScene({ className, title }: { className?: string; title?: st
       <Win x={16} y={58} w={222} h={160} rot={-5} label="GODOT" labelW={84}>
         <GodotScene />
       </Win>
-      <Win x={326} y={22} w={292} h={200} rot={3} label="OPEN//77" labelW={112} labelFill={SUN}>
-        <Open77Scene />
+      <Win x={326} y={22} w={292} h={200} rot={3} label="LUA" labelW={64} labelFill={SUN}>
+        <StandaloneScene />
       </Win>
       <Win x={12} y={296} w={226} h={168} rot={-3} label="LÖVE" labelW={74}>
         <LoveScene />
