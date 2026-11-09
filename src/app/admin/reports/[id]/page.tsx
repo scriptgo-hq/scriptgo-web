@@ -12,6 +12,7 @@ import { ApiError, Banner } from "@/components/ui/feedback";
 import { Identifier } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { AuditEntry, CaseDetail } from "@/lib/contract";
+import { getMe } from "@/lib/session";
 import { formatBytes, formatDateTime, shortHash } from "@/lib/format";
 import { caseMeta, metaFor } from "@/lib/status";
 
@@ -58,6 +59,8 @@ function AuditList({ entries }: { entries: AuditEntry[] }) {
 export default async function CasePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const res = await api<CaseDetail>(`/v1/admin/reports/${encodeURIComponent(decodeURIComponent(id))}`, { auth: true });
+  const me = await getMe();
+  const viewerId = me.ok ? me.data.user.id : null;
   if (!res.ok) {
     if (res.status === 404) notFound();
     return (
@@ -263,7 +266,7 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
                   {d.reversedAt ? <span className="tabular text-[12.5px] font-semibold text-ok">· reversed {formatDateTime(d.reversedAt)}</span> : null}
                   <span className="tabular ml-auto text-[13px] text-ink-3">
                     {formatDateTime(d.decidedAt)}
-                    {d.decidedBy ? ` · by ${d.decidedBy}` : ""}
+                    {d.decidedBy ? ` · by ${d.decidedBy === viewerId ? "you" : (d.decidedByName ?? "a former reviewer")}` : ""}
                   </span>
                 </div>
                 <p className="mt-1 text-[13px] text-ink-3">
@@ -298,7 +301,16 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
                     <span className="whitespace-pre-wrap">{a.outcome}</span>
                   </p>
                 ) : null}
-                {a.status === "open" ? <AppealDecisionForm appealId={a.id} /> : null}
+                {a.status === "open" ? (
+                  viewerId && c.decisions.find((d) => d.id === a.decisionId)?.decidedBy === viewerId ? (
+                    <p role="note" className="mt-3 rounded-lg border-2 border-line-soft bg-surface px-3 py-2 text-[14px]">
+                      <span className="font-bold">You took the decision under appeal.</span> The creator was told a different reviewer
+                      decides: another moderator or admin records the outcome.
+                    </p>
+                  ) : (
+                    <AppealDecisionForm appealId={a.id} />
+                  )
+                ) : null}
               </li>
             ))}
           </ol>
@@ -309,7 +321,7 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
         <SectionTitle id="decide-title">Record a decision</SectionTitle>
         {openAppeals.length ? (
           <Banner className="mt-3" tone="info" title="An appeal is open on this case.">
-            Appeals should be decided by a reviewer who did not take the original decision.
+            A reviewer who did not take the original decision decides the appeal; the API refuses the one who did.
           </Banner>
         ) : null}
         <div className="sticker mt-3 p-5">
