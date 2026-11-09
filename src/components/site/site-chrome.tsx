@@ -56,7 +56,9 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
               <p className="display-italic text-[34px] leading-[0.95] text-white sm:text-[44px]">
                 Build once.
                 <br />
-                Ship everywhere.
+                Protect your work.
+                <br />
+                Monetize it.
               </p>
               <ButtonLink href="/docs/quickstart" variant="secondary" size="lg" arrow className="md:ml-6">
                 Start building
@@ -73,7 +75,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
               SCRIPT<span className="text-[#a2abff]">//</span>GO
             </span>
             <p className="mt-3 max-w-sm text-[#cfc7b7]">
-              Portable Lua resources, proven by real runs, licensed by their creators.
+              Game scripts proven by real runs, protected and sold by their creators.
             </p>
           </div>
           <FooterCol
@@ -107,7 +109,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
         </div>
         <div className="container-page flex flex-wrap justify-between gap-2 border-t border-[#3a362e] py-4 text-[12.5px] text-[#ada594]">
           <span>SCRIPT//GO is a working name. Engine and provider names are trademarks of their owners; no endorsement implied.</span>
-          <span className="font-mono">{"// "}build once, ship everywhere</span>
+          <span className="font-mono">{"// "}build once, protect your work, monetize it</span>
         </div>
       </div>
     </footer>

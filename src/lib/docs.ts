@@ -28,8 +28,8 @@ export const DOCS: DocEntry[] = [
   },
   {
     slug: "manifest",
-    title: "Manifest: scriptgo.lua",
-    description: "The declarative resource manifest: directives, parsing and resolution rules.",
+    title: "Manifest",
+    description: "The declarative resource manifest, scriptgo.lua or scriptgo.json: directives, script languages, parsing and resolution rules.",
     group: "Reference",
     source: { kind: "spec", file: "manifest.md" },
   },

@@ -58,7 +58,7 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
             </p>
             <KeyValue
               className="mt-5"
-              labelWidth="6.5rem"
+              labelWidth="7.5rem"
               items={[
                 {
                   label: "Type",
@@ -75,7 +75,7 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
                     </span>
                   ),
                 },
-                { label: "Adapter", value: <AdapterStateBadge state={e.adapterState} long /> },
+                { label: "Adapter state", value: <AdapterStateBadge state={e.adapterState} long /> },
               ]}
             />
           </div>

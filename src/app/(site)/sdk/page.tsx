@@ -7,6 +7,7 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
+import { LANGUAGE_STATES } from "@/lib/env";
 import { adapterMeta } from "@/lib/integration";
 import type { StatusMeta } from "@/lib/status";
 
@@ -192,15 +193,16 @@ const PIECES: { title: string; path: string; badge?: StatusMeta; body: React.Rea
   },
 ];
 
-const LANGUAGES: { name: string; status: StatusMeta; body: React.ReactNode }[] = [
+// States come from LANGUAGE_STATES (lib/env.ts), the one place they change when the evidence does.
+const LANGUAGES: { language: string; name: string; body: React.ReactNode }[] = [
   {
+    language: "lua",
     name: "Lua",
-    status: { label: "Every environment", tone: "success", icon: "check", hint: "Every environment runs Lua packages." },
     body: <>Runs on each host&rsquo;s own Lua: 5.1, 5.2, 5.3, 5.4 or LuaJIT, depending on the host.</>,
   },
   {
+    language: "ts",
     name: "TypeScript and JavaScript",
-    status: { label: "Experimental, .NET kit", tone: "warning", icon: "flask", hint: "Runs on the .NET kit only, which is experimental." },
     body: (
       <>
         Through the .NET kit. TypeScript is compiled by esbuild when you pack or verify. Real runs on the kit passed the
@@ -209,11 +211,15 @@ const LANGUAGES: { name: string; status: StatusMeta; body: React.ReactNode }[] =
     ),
   },
   {
+    language: "cs",
     name: "C#",
-    status: { label: "Next, not started", tone: "muted", icon: "calendar", hint: "Phase 3 of the plan." },
     body: <>Planned as guest scripts compiled against an allowed API, with quotas. A spike and a security review come first.</>,
   },
 ];
+
+function languageState(language: string) {
+  return LANGUAGE_STATES.find((s) => s.language === language)?.meta;
+}
 
 const PLATFORM: { title: string; body: React.ReactNode; href: string; link: string }[] = [
   {
@@ -462,7 +468,7 @@ export default function SdkPage() {
           {LANGUAGES.map((l) => (
             <li key={l.name} className="sticker flex flex-col gap-2 p-5">
               <h3 className="font-display text-[21px] font-extrabold leading-tight">{l.name}</h3>
-              <StatusBadge meta={l.status} size="sm" className="self-start" />
+              {languageState(l.language) ? <StatusBadge meta={languageState(l.language)!} size="sm" className="self-start" /> : null}
               <p className="text-[14.5px] text-ink-2">{l.body}</p>
             </li>
           ))}

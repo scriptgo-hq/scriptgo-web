@@ -94,8 +94,8 @@ export async function ProofBlock() {
         {code ? (
           <CodeBlock code={code} lang="lua" filename={`${d.resourceName}/README.md · lua`} />
         ) : (
-          <EmptyState title="No Lua example in this README" icon={FileCode2}>
-            The package README has no Lua code block to show here.
+          <EmptyState title="No example in this README" icon={FileCode2}>
+            The proof block shows a Lua example from the package README. This README has none.
           </EmptyState>
         )}
       </div>

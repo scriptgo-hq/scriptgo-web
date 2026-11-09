@@ -4,6 +4,7 @@ import { ArrowRight, BookOpen, Puzzle, Scale } from "lucide-react";
 import { HeroScene, StepAdaptArt, StepBuildArt, StepMonetizeArt } from "@/components/illustrations";
 import { CreatorCta } from "@/components/site/creator-cta";
 import { ProofBlock } from "@/components/site/proof-block";
+import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { EnvironmentTile } from "@/components/ui/environment";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
@@ -11,6 +12,7 @@ import { PackageCard } from "@/components/ui/package";
 import { DisplayTitle, Eyebrow, Stroke, Underlined } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment, Page, PackageSummary, Stats } from "@/lib/contract";
+import { LANGUAGE_STATES } from "@/lib/env";
 import { countOf } from "@/lib/format";
 import { ENV_STATUS_ORDER } from "@/lib/status";
 
@@ -40,6 +42,7 @@ export default function HomePage() {
       <Suspense fallback={<SkeletonBlock h={260} />}>
         <EnvironmentsStrip />
       </Suspense>
+      <Builders />
       <Suspense fallback={<SkeletonBlock h={320} />}>
         <Featured />
       </Suspense>
@@ -89,7 +92,7 @@ function Hero() {
             </span>
           </h1>
           <p className="mt-6 max-w-[34ch] text-[18px] leading-relaxed text-ink-2 sm:text-[19px]">
-            Create, license and run Lua resources across games, multiplayer platforms and applications.
+            Create, protect and sell game scripts that run across engines, games and multiplayer platforms.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <ButtonLink href="/docs/quickstart" variant="primary" size="lg" arrow>
@@ -123,7 +126,7 @@ function HowItWorks() {
     {
       n: 1,
       title: "Build.",
-      body: "Write a Lua resource once, against standard capabilities like events and storage.",
+      body: "Write a resource once, against standard capabilities like events and storage.",
       Art: StepBuildArt,
     },
     {
@@ -135,7 +138,7 @@ function HowItWorks() {
     {
       n: 3,
       title: "Monetize.",
-      body: "Sell licenses or subscriptions through your own store. Free stays free.",
+      body: "Sell licenses or subscriptions from your own Tebex store. Free stays free.",
       Art: StepMonetizeArt,
     },
   ];
@@ -225,6 +228,50 @@ async function EnvironmentsStrip() {
   );
 }
 
+/** For engine and platform builders: the SDK pitch and where each language runs today. */
+function Builders() {
+  return (
+    <section aria-labelledby="builders-title" className="border-t-2 border-line-soft bg-paper-2/60 py-12">
+      <div className="container-page grid gap-6 lg:grid-cols-[290px_1fr] lg:items-center">
+        <div>
+          <Eyebrow>for engines and mod platforms</Eyebrow>
+          <DisplayTitle id="builders-title" className="mt-2 text-[40px] sm:text-[44px]">
+            Integrate
+            <br />
+            the SDK.
+          </DisplayTitle>
+        </div>
+        <div className="min-w-0">
+          <p className="max-w-[64ch] text-[16px] text-ink-2">
+            Embed the SCRIPT//GO sandbox in your engine or mod platform, with one adapter or the .NET host kit. Your creators
+            can then protect and monetize what they build: licenses, Tebex shops, verified compatibility.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <Eyebrow className="mr-1">languages</Eyebrow>
+            {LANGUAGE_STATES.map((l) => (
+              <StatusBadge key={l.language} meta={l.meta} />
+            ))}
+          </div>
+          <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[15px]">
+            {[
+              ["/sdk", "The SDK"],
+              ["/docs/create-adapter", "Create an adapter"],
+              ["/environments/dotnet", "The .NET host kit"],
+              ["/developers", "For creators"],
+            ].map(([href, label]) => (
+              <li key={href}>
+                <Link href={href!} className="inline-flex items-center gap-1.5 font-bold text-cobalt-ink hover:underline">
+                  {label} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.5} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 async function Featured() {
   const res = await api<Page<PackageSummary>>("/v1/packages?sort=downloads&pageSize=4");
   return (
@@ -275,14 +322,14 @@ function SideDoors() {
       icon: Scale,
       eyebrow: "rights and licensing",
       title: "Who sells, who charges, who licenses.",
-      body: "Creators sell. A payment provider takes the payment. SCRIPT//GO issues the license. Read the IP policy and who operates the platform.",
+      body: "Creators sell from their own Tebex store. Tebex takes the payment. SCRIPT//GO issues the license. Read the IP policy and who operates the platform.",
     },
     {
       href: "/docs",
       icon: BookOpen,
       eyebrow: "docs",
       title: "Manifest, runtime and API.",
-      body: "The scriptgo.lua manifest, the runtime globals, capabilities and the HTTP contract, in plain language.",
+      body: "The manifest, the runtime globals, capabilities, languages and the HTTP contract, in plain language.",
     },
   ];
   return (
