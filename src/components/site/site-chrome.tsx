@@ -18,7 +18,8 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
     <footer className="mt-auto">
       {band ? (
         <section className="closing" aria-labelledby="closing-title">
-          <img className="closing-bg" src={SCENES.band.src} width={SCENES.band.width} height={SCENES.band.height} alt="" loading="lazy" decoding="async" />
+          <img className="closing-bg closing-bg-traveller" src={SCENES.band.src} width={SCENES.band.width} height={SCENES.band.height} alt="" loading="lazy" decoding="async" />
+          <img className="closing-bg closing-bg-ranges" src={SCENES.ranges.src} width={SCENES.ranges.width} height={SCENES.ranges.height} alt="" loading="lazy" decoding="async" />
           <div className="container-page closing-in">
             <h2 id="closing-title" className="display">
               One script.

@@ -236,6 +236,8 @@ export const SCENES = {
   strongbox: { src: "/ink/scene-strongbox.webp", width: 1152, height: 691 },
   signpost: { src: "/ink/scene-signpost.webp", width: 1152, height: 691 },
   band: { src: "/ink/band-ridge.webp", width: 2000, height: 750 },
+  /** The same country without the traveller, drawn as a wide panorama: the home page's closing band. */
+  ranges: { src: "/ink/band-ranges.webp", width: 2560, height: 720 },
   /** The home hero: the traveller on the right, a calm left half for the headline. 16:9, three widths. */
   hero: {
     src: "/ink/hero-ridge-1920.webp",

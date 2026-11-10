@@ -1115,8 +1115,11 @@
   .closing h2 em { color: #ffc83d; }
   .closing .cta-row { justify-content: flex-end; margin-top: 32px; }
   .closing .btn { --plate-btn: #2f3ce0; }
-  /* The home page already shows the traveller in its hero: its closing band keeps the ranges only. */
-  body:has(.lobby) .closing-bg { inset: 0 0 0 auto; width: 205%; max-width: none; object-position: 100% 62%; }
+  /* The home page already shows the traveller in its hero: its closing band is the same country
+     without him, a panorama drawn for this width (never a zoomed crop of the other image). */
+  .closing-bg-ranges { display: none; object-position: 50% 58%; }
+  body:has(.lobby) .closing-bg-ranges { display: block; }
+  body:has(.lobby) .closing-bg-traveller { display: none; }
   @media (max-width: 640px) {
     .closing-in { justify-items: start; text-align: left; padding-block: 72px 80px; }
     .closing .cta-row { justify-content: flex-start; }
