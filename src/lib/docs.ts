@@ -73,6 +73,20 @@ const BUILT_IN_DOCS: DocEntry[] = [
     source: { kind: "guide", file: "cli.md" },
   },
   {
+    slug: "environments",
+    title: "Environments and statuses",
+    description: "What an environment is, how it earns its status from real runs, and how to read the directory.",
+    group: "Reference",
+    source: { kind: "guide", file: "environments.md" },
+  },
+  {
+    slug: "selling",
+    title: "Selling",
+    description: "Who sells, who charges and who licenses; the two ways to earn; opening a shop; the rules a seller answers for.",
+    group: "Licensing",
+    source: { kind: "guide", file: "selling.md" },
+  },
+  {
     slug: "licensing-api",
     title: "Licensing API",
     description: "Activate, verify and deactivate licenses from a deployment, with offline grace.",
