@@ -1,13 +1,17 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import pkg from "../../package.json" with { type: "json" };
 import { parseFrontMatter } from "./markdown";
 
 /**
- * Docs registry. Spec pages are read from the repository's docs/spec at build time; guides live in
- * src/content/docs. Pages using this module are statically generated. A few guides live in the
- * repository's docs/guides, next to the code they describe: each is listed only when its file exists
- * at build time, so the site never links to a page it cannot render.
+ * Docs registry. Every page is read at build time from the SCRIPT//GO SDK (scriptgo-hq/scriptgo-sdk,
+ * MIT), at the tag pinned in package.json (`scriptgo.sdk`): docs/site for the guides, docs/spec for
+ * the specifications, docs/guides for the guides written next to the SDK code. `scripts/fetch-sdk.mjs`
+ * puts that tag in `.sdk/` before `next dev` and `next build`; SCRIPTGO_SDK_DIR points at a local
+ * checkout instead, to preview a documentation change. Pages using this module are statically
+ * generated. A repository guide is listed only when its file exists at build time, so the site never
+ * links to a page it cannot render.
  */
 export interface DocEntry {
   slug: string;
@@ -17,10 +21,16 @@ export interface DocEntry {
   source: { kind: "spec" | "guide" | "repo-guide"; file: string };
 }
 
-const ROOT = process.cwd();
-const SPEC_DIR = path.resolve(ROOT, "../../docs/spec");
-const GUIDE_DIR = path.resolve(ROOT, "src/content/docs");
-const REPO_GUIDE_DIR = path.resolve(ROOT, "../../docs/guides");
+const SDK_DIR = path.resolve(process.cwd(), process.env.SCRIPTGO_SDK_DIR || ".sdk");
+const SPEC_DIR = path.join(SDK_DIR, "docs/spec");
+const GUIDE_DIR = path.join(SDK_DIR, "docs/site");
+const REPO_GUIDE_DIR = path.join(SDK_DIR, "docs/guides");
+
+/** The SDK tag the site is built from, and where a page's source can be read. */
+export const SDK_TAG: string = (pkg as { scriptgo: { sdk: string } }).scriptgo.sdk;
+export function sourceUrl(repoPath: string): string {
+  return `https://github.com/scriptgo-hq/scriptgo-sdk/blob/${SDK_TAG}/${repoPath}`;
+}
 
 /** The adapter guide for escrow, written next to the SDK. Listed only when the file is there. */
 export const ESCROW_ADAPTER_GUIDE_SLUG = "guides/bring-escrow-to-your-platform";
@@ -185,7 +195,7 @@ export async function loadDoc(entry: DocEntry): Promise<{ markdown: string; repo
   const { data, body } = parseFrontMatter(raw);
   return {
     markdown: body,
-    repoPath: `apps/web/src/content/docs/${entry.source.file}`,
+    repoPath: `docs/site/${entry.source.file}`,
     title: data.title || entry.title,
     description: data.description || entry.description,
   };

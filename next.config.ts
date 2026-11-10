@@ -12,7 +12,6 @@ const securityHeaders = [
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  transpilePackages: ["@scriptgo/shared"],
   // The browser talks to the API through the web origin so better-auth cookies stay first-party.
   async rewrites() {
     return [

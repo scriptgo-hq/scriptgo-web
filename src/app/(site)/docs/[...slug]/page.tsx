@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/data";
 import { Prose } from "@/components/ui/prose";
-import { DOCS, findDoc, loadDoc, neighbours } from "@/lib/docs";
+import { DOCS, findDoc, loadDoc, neighbours, sourceUrl } from "@/lib/docs";
 import { renderMarkdown } from "@/lib/markdown";
 
 export const dynamic = "force-static";
@@ -44,7 +44,10 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
           <span>SDK scriptgo_version 0.1</span>
           <span aria-hidden="true">·</span>
           <span>
-            Source: <code>{doc.repoPath}</code>
+            Source:{" "}
+            <a href={sourceUrl(doc.repoPath)} className="underline hover:text-ink">
+              <code>scriptgo-sdk/{doc.repoPath}</code>
+            </a>
           </span>
           {entry.source.kind === "spec" ? (
             <>
