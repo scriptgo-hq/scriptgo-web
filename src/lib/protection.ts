@@ -96,7 +96,7 @@ export const tierBlurb: Record<ProtectionTier, string> = {
     "The host runs compiled code outside the script VM, so it can hold a key. An encrypted release is decrypted in memory, for a licensed and bound server only.",
   license:
     "The host runs plain script. Your server checks its licence and the release is signed, but the operator can read what the host loads. We make no code-secrecy claim here.",
-ours  none: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
+  none: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
 };
 
 /** A tier in a few words, for a table's group row. The sentence above it is for tooltips and docs. */
