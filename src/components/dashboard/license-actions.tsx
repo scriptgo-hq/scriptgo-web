@@ -100,7 +100,7 @@ export function LicenseKeyField({
           Rotate unavailable: {disabledReason}
         </p>
       ) : (
-        <p className="text-[13px] text-ink-3">The full key is shown once after purchase and once after each rotation. Lost it? Rotate to get a new one.</p>
+        <p className="text-[13px] text-ink-3">The full key is shown once after the license is issued and once after each rotation. Lost it? Rotate to get a new one.</p>
       )}
       {key ? <Secret value={key} label="Your license key." /> : null}
       {error ? (
