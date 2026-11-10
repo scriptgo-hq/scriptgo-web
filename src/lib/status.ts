@@ -161,7 +161,7 @@ export const licenseMeta: Record<LicenseStatus, StatusMeta> = {
     hint: "Cancelled at the provider. Active until the end of the paid period.",
   },
   expired: { label: "Expired", tone: "muted", icon: "minus", hint: "No longer valid." },
-  revoked: { label: "Revoked", tone: "danger", icon: "ban", hint: "Revoked by SCRIPT//GO." },
+  revoked: { label: "Revoked", tone: "danger", icon: "ban", hint: "Revoked: by SCRIPT//GO, or by the creator who granted it." },
   refunded: { label: "Refunded", tone: "muted", icon: "undo", hint: "Payment refunded; license ended." },
 };
 

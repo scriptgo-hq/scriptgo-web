@@ -47,6 +47,17 @@ export default async function SettingsPage() {
                     </span>
                   ),
                 },
+                {
+                  label: "Account id",
+                  value: (
+                    <span className="inline-flex flex-col">
+                      <code className="break-all font-mono text-[13px]" data-account-id>
+                        {user.id}
+                      </code>
+                      <span className="text-[12.5px] text-ink-3">Not a secret. Give it to a creator who wants to grant you a free license.</span>
+                    </span>
+                  ),
+                },
                 { label: "Roles", value: roles.length ? roles.join(", ") : "customer" },
                 { label: "Member since", value: formatDate(user.createdAt) },
               ]}

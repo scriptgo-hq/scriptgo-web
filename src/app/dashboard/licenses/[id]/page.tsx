@@ -19,7 +19,7 @@ import { activationMeta, licenseMeta, metaFor } from "@/lib/status";
 
 export const metadata = { title: "License" };
 
-const SOURCE: Record<string, string> = { provider: "Provider event", user: "You", admin: "Administrator", system: "System" };
+const SOURCE: Record<string, string> = { provider: "Provider event", user: "You", admin: "Administrator", system: "System", creator: "Creator" };
 
 export default async function LicenseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -38,6 +38,8 @@ export default async function LicenseDetailPage({ params }: { params: Promise<{ 
       : null;
   const ident = l.package.identifier;
   const env = l.environments[0] ?? "standalone";
+  // Granted for free by the package's creator (ADR-0036): no offer, no payment provider.
+  const granted = l.origin.source === "creator";
 
   // The protected release this license opens, if the package has one, and what each environment gives.
   const [creatorName, packageName] = ident.split("//");
@@ -113,9 +115,30 @@ end)`;
         description={
           <span className="flex flex-col gap-1">
             <span>
-              <Identifier value={ident} /> · {l.offer.name} · {intervalLabel(l.offer.interval)}
+              <Identifier value={ident} />
+              {l.offer ? (
+                <>
+                  {" "}
+                  · {l.offer.name} · {intervalLabel(l.offer.interval)}
+                </>
+              ) : null}
             </span>
-            <SellerLine creator={l.seller.creator} provider={l.seller.provider} />
+            {granted ? (
+              <span className="text-[13px] text-ink-2" data-license-origin="creator">
+                {l.origin.recipient === "server_key" ? (
+                  <>
+                    Granted by you to a server key. You hold this license for the operator of that server.{" "}
+                  </>
+                ) : (
+                  <>
+                    Granted by <strong className="text-ink">{l.origin.grantedBy ?? l.seller.creator}</strong>.{" "}
+                  </>
+                )}
+                A free license: nothing was sold and no payment provider is involved. License issued by <strong className="text-ink">SCRIPT//GO</strong>.
+              </span>
+            ) : (
+              <SellerLine creator={l.seller.creator} provider={l.seller.provider} />
+            )}
           </span>
         }
         actions={
@@ -123,7 +146,7 @@ end)`;
             <StatusBadge meta={metaFor(licenseMeta, l.status)} />
             <span className="tabular text-[13px] text-ink-3">
               {l.status === "active" && l.currentPeriodEnd
-                ? `renews ${formatDate(l.currentPeriodEnd)}`
+                ? `${granted ? "ends" : "renews"} ${formatDate(l.currentPeriodEnd)}`
                 : l.currentPeriodEnd
                   ? `${live ? "active until" : "ended"} ${formatDate(l.currentPeriodEnd)}`
                   : ""}
@@ -149,10 +172,17 @@ end)`;
           </Banner>
         ) : null}
         {l.status === "revoked" ? (
-          <Banner tone="danger" title="Revoked by SCRIPT//GO.">
-            {l.revokedReason ? <>Reason: {l.revokedReason}. </> : null}
-            Questions? Use the <Link href="/report" className="underline">contact form</Link> and quote this license.
-          </Banner>
+          l.revokedBy === "creator" ? (
+            <Banner tone="danger" title={`Revoked by ${l.origin.grantedBy ?? l.seller.creator}, the creator who granted it.`}>
+              {l.revokedReason ? <>Reason: {l.revokedReason}. </> : null}
+              The key is refused from now on; a server that is running stops when its offline grace ends.
+            </Banner>
+          ) : (
+            <Banner tone="danger" title="Revoked by SCRIPT//GO.">
+              {l.revokedReason ? <>Reason: {l.revokedReason}. </> : null}
+              Questions? Use the <Link href="/report" className="underline">contact form</Link> and quote this license.
+            </Banner>
+          )
         ) : null}
         {l.status === "refunded" ? <Banner tone="info" title="Refunded. This license has ended." /> : null}
       </div>
@@ -286,7 +316,7 @@ end)`;
               <p>
                 <strong className="font-mono">{version.version}</strong> is delivered as an encrypted bundle. It opens only on a server that
                 holds one of the deployment tokens above and the key pair bound to it. The key is released for a short time and asked for
-                again; after a refund or a revocation the next request is refused and the server stops when its offline grace ends.
+                again; after {granted ? "a revocation by the creator or by SCRIPT//GO" : "a refund or a revocation"} the next request is refused and the server stops when its offline grace ends.
               </p>
               <dl className="grid grid-cols-1 gap-y-1 text-[14px] sm:grid-cols-[10rem_minmax(0,1fr)]">
                 <dt className="text-ink-3">Signed by</dt>

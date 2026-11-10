@@ -29,16 +29,16 @@ export default async function CustomersPage() {
       <PageHeader
         eyebrow="publishing"
         title="Customers."
-        description="Licenses issued for your offers. You see a username, never an email or payment details: those stay with the payment provider."
+        description="Licenses issued for your packages: sold through your offers, or granted by you for free. You see a username, never an email or payment details: those stay with the payment provider."
       />
       {!res.ok ? (
         <ApiError failure={res} title="Your customers couldn't be loaded." />
       ) : res.data.length === 0 ? (
-        <EmptyState title="No customers yet">Licenses appear here once a payment provider confirms a purchase, or when you get a free license.</EmptyState>
+        <EmptyState title="No customers yet">Licenses appear here once a payment provider confirms a purchase, or when you grant a free license to an account from a package&rsquo;s page.</EmptyState>
       ) : (
         <div className="panel relative overflow-x-auto">
           <table className="w-full min-w-[820px] text-left text-[14px]">
-            <caption className="sr-only">Licenses issued for your offers</caption>
+            <caption className="sr-only">Licenses issued for your packages</caption>
             <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
               <tr>
                 <th scope="col" className="px-3 py-2.5">Customer</th>
@@ -57,11 +57,20 @@ export default async function CustomersPage() {
                   <td className="px-3 py-2.5">
                     <Identifier value={r.package.identifier} />
                   </td>
-                  <td className="tabular px-3 py-2.5">
-                    {r.offer.name}
-                    <span className="block text-[12.5px] text-ink-3">
-                      {r.offer.interval === "free" ? "Free" : `${formatMoney(r.offer.price)} · ${intervalLabel(r.offer.interval)}`}
-                    </span>
+                  <td className="tabular px-3 py-2.5" data-license-source={r.source}>
+                    {r.offer ? (
+                      <>
+                        {r.offer.name}
+                        <span className="block text-[12.5px] text-ink-3">
+                          {r.offer.interval === "free" ? "Free" : `${formatMoney(r.offer.price)} · ${intervalLabel(r.offer.interval)}`}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        Granted by you
+                        <span className="block text-[12.5px] text-ink-3">Free · no payment</span>
+                      </>
+                    )}
                   </td>
                   <td className="px-3 py-2.5">
                     <StatusBadge meta={metaFor(licenseMeta, r.license.status)} size="sm" />

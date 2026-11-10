@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Upload } from "lucide-react";
+import { GrantsPanel } from "@/components/dashboard/grants-panel";
 import { KeyActivityPanel } from "@/components/dashboard/key-activity";
 import { OfferForm, PackageForm, WithdrawOfferButton } from "@/components/dashboard/package-forms";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -11,7 +12,7 @@ import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
 import { Identifier } from "@/components/ui/typography";
 import { api, asList } from "@/lib/api";
 import type { CreatorPackageDetail, Environment, Provider, Store } from "@/lib/contract";
-import { envName } from "@/lib/env";
+import { envLongName, envName } from "@/lib/env";
 import { formatBytes, formatDate, formatMoney, intervalLabel, shortHash } from "@/lib/format";
 import { tierMeta } from "@/lib/protection";
 import { classificationMeta, listingMeta, metaFor, releaseMeta, visibilityMeta } from "@/lib/status";
@@ -240,6 +241,23 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
               <ApiError compact failure={envRes} title="New offers need the environment list, which couldn't be loaded." />
             )}
           </div>
+        </section>
+
+        <section id="grants" aria-labelledby="grants-title" className="scroll-mt-20">
+          <H2 id="grants-title">Free licenses</H2>
+          <p className="mt-2 max-w-prose text-[14px] text-ink-2">
+            Protect without selling. Grant a free license to another account, or to the key of a server whose operator sent it to you, so
+            {protectedReleases.length > 0 ? " your protected release runs" : " the package runs under a license"} on the servers you chose. Nothing is sold here and no payment
+            provider is involved. A granted license is an ordinary license: bound to one server per deployment, every key delivery logged,
+            and you can revoke it. That deters copying and lets you trace and cut off a copy; it does not make the code impossible to copy.
+          </p>
+          {protectedReleases.length === 0 ? (
+            <p className="mt-2 max-w-prose text-[13.5px] text-ink-3">
+              No release of this package is protected yet: a license then only gates the package&rsquo;s own license check. Upload a release with
+              &ldquo;Protect this release (escrow)&rdquo; to deliver it encrypted.
+            </p>
+          ) : null}
+          <GrantsPanel packageName={p.name} identifier={p.identifier} environments={p.environments.map((e) => ({ slug: e.slug, name: envLongName(e.slug) }))} />
         </section>
 
         <section aria-labelledby="det-title">
