@@ -107,7 +107,7 @@ export function MarkerLookup() {
                 ) : null}
                 {result.kind === "delivery" ? (
                   <>
-                    <dt className="text-ink-3">Deliveries</dt>
+                    <dt className="text-ink-3" title="Key releases still in the log. Old repeats are trimmed; the first and the last are kept.">Deliveries in the log</dt>
                     <dd className="tabular">
                       {result.deliveries.count}
                       {result.deliveries.firstAt ? <> · first {formatDateTime(result.deliveries.firstAt)}</> : null}
@@ -118,7 +118,7 @@ export function MarkerLookup() {
               </dl>
               {result.kind === "delivery" && result.deliveries.recent.length > 1 ? (
                 <details className="mt-3">
-                  <summary className="cursor-pointer text-[13px] font-semibold text-cobalt-ink">Recent delivery times</summary>
+                  <summary className="cursor-pointer text-[13px] font-semibold text-cobalt-ink">Latest delivery times (up to 20)</summary>
                   <ul className="tabular mt-1 space-y-0.5 text-[13px] text-ink-2">
                     {result.deliveries.recent.map((t, i) => (
                       <li key={`${t}-${i}`}>{formatDateTime(t)}</li>
