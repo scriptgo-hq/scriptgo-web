@@ -15,7 +15,8 @@ import {
   SquareTerminal,
   type LucideIcon,
 } from "lucide-react";
-import { CategoryCover, categoryLabel } from "@/components/illustrations";
+import { categoryLabel } from "@/components/illustrations";
+import { CategoryArt } from "@/components/site/world-art";
 import type { Category, CompatibilityStatus, PackageSummary, Pricing } from "@/lib/contract";
 import { cn } from "@/lib/cn";
 import { envName } from "@/lib/env";
@@ -44,7 +45,7 @@ export function packageHref(p: { creator: { username: string }; name: string }):
   return `/packages/${encodeURIComponent(p.creator.username)}/${encodeURIComponent(p.name)}`;
 }
 
-const AVATAR_COLORS = ["#2f3ce0", "#e0582f", "#7b3fe4", "#17703a", "#c2367a", "#0f7c8c", "#8a5a00"];
+const AVATAR_COLORS = ["#2f3ce0", "#d6383d", "#7a3cc8", "#2f8f4e", "#c2367a", "#0f8a8a", "#51607f"];
 
 function hashColor(s: string): string {
   let h = 0;
@@ -56,7 +57,7 @@ export function Avatar({ name, size = 22, className }: { name: string; size?: nu
   return (
     <span
       aria-hidden="true"
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full border-2 border-line font-bold text-white", className)}
+      className={cn("inline-flex shrink-0 -skew-x-6 items-center justify-center border-2 border-line font-display font-extrabold text-white", className)}
       style={{ width: size, height: size, background: hashColor(name), fontSize: Math.max(9, size * 0.42) }}
     >
       {monogram(name)}
@@ -103,14 +104,14 @@ export function CreatorLine({
 export function PriceCapsule({ pricing, className }: { pricing: Pricing; className?: string }) {
   if (pricing.kind === "free") {
     return (
-      <span className={cn("rounded-md border-2 border-ok/50 bg-ok-soft px-2 py-0.5 text-[12.5px] font-extrabold text-ok", className)}>
+      <span className={cn("sheet inline-block -skew-x-6 border-2 border-line bg-surface px-2.5 py-0.5 font-display text-[14px] font-black text-ok", className)}>
         Free
       </span>
     );
   }
   return (
     <span
-      className={cn("tabular whitespace-nowrap rounded-md border-2 border-line bg-surface px-2 py-0.5 text-[12.5px] font-extrabold", className)}
+      className={cn("sheet tabular inline-block -skew-x-6 whitespace-nowrap border-2 border-line bg-sun px-2.5 py-0.5 font-display text-[14px] font-black text-on-sun", className)}
       title={pricing.checkoutEnabled ? "Lowest paid plan" : "Lowest paid plan. Checkout is not available yet."}
     >
       <span className="sr-only">From </span>
@@ -126,11 +127,7 @@ export function EnvCompatTag({ slug, status, className }: { slug: string; status
   return (
     <span
       title={`${envName(slug)}: ${meta.label}`}
-      className={cn(
-        "inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-1.5 py-[3px] text-[11.5px] font-semibold leading-none",
-        TONE_CLASSES[meta.tone],
-        className,
-      )}
+      className={cn("tok", TONE_CLASSES[meta.tone], className)}
     >
       <StatusIcon name={meta.icon} size={11} />
       {envName(slug)}
@@ -151,13 +148,13 @@ export function EnvCompatTags({ envs, max = 3, className }: { envs: PackageSumma
     return <span className="text-[12px] text-ink-3">No environments declared</span>;
   }
   return (
-    <div className={cn("flex flex-wrap gap-1", className)}>
+    <div className={cn("flex flex-wrap gap-1.5", className)}>
       {shown.map((e) => (
         <EnvCompatTag key={e.slug} slug={e.slug} status={e.status} />
       ))}
       {rest > 0 ? (
         <span
-          className="inline-flex items-center rounded-full border border-line-soft px-1.5 py-[3px] text-[11.5px] font-semibold leading-none text-ink-2"
+          className="tok tok-muted"
           title={sorted
             .slice(max)
             .map((e) => `${envName(e.slug)}: ${metaFor(compatibilityMeta, e.status).label}`)
@@ -176,25 +173,23 @@ export function PackageCard({ pkg, className, showSummary = false }: { pkg: Pack
   const Icon = CATEGORY_ICONS[pkg.category] ?? Package;
   const restricted = pkg.listingStatus !== "active";
   return (
-    <article className={cn("sticker sticker-hover relative flex flex-col overflow-hidden", className)}>
-      <div className="relative aspect-[2/1] overflow-hidden border-b-[2.5px] border-line bg-surface-2">
-        <CategoryCover category={pkg.category} className="h-full w-full" />
-        <span
-          className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-md border-2 border-line bg-surface text-ink"
-          title={categoryLabel(pkg.category)}
-        >
-          <Icon aria-hidden="true" size={15} strokeWidth={2.25} />
-          <span className="sr-only">{categoryLabel(pkg.category)}</span>
+    <article className={cn("panel sticker-hover relative flex flex-col", className)}>
+      <div className="relative aspect-[16/10] border-b-[2.5px] border-line bg-paper-2">
+        <CategoryArt category={pkg.category} />
+        <span className="absolute -left-[7px] top-3 inline-flex -skew-x-12 items-center gap-1.5 bg-[#0b0b1e] px-2.5 pb-[3px] pt-1 font-display text-[12px] font-bold uppercase tracking-[0.1em] text-[#f3ecdc]" style={{ fontStretch: "80%" }}>
+          <Icon aria-hidden="true" size={13} strokeWidth={2.5} />
+          {categoryLabel(pkg.category)}
         </span>
         {pkg.isDemo ? (
-          <span className="absolute left-2 top-2 rounded-md border-2 border-line bg-sun px-1.5 py-0.5 font-mono text-[10.5px] font-bold uppercase text-on-sun">
+          <span className="absolute right-2 top-2 border-2 border-[#0b0b1e] bg-[#fffdf6] px-1.5 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#0b0b1e]" style={{ fontStretch: "80%" }}>
             Example
           </span>
         ) : null}
+        <PriceCapsule pricing={pkg.pricing} className="absolute -bottom-[13px] -right-[9px] z-[2] !text-[16px]" />
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
+      <div className="flex flex-1 flex-col gap-2 p-4 pt-[18px]">
         <div className="min-w-0">
-          <h3 className="font-display text-[17px] font-extrabold leading-tight tracking-[-0.01em]">
+          <h3 className="font-display text-[19px] font-extrabold leading-tight tracking-[-0.015em]">
             <Link href={packageHref(pkg)} className="after:absolute after:inset-0 after:z-[1] focus-visible:outline-none">
               {pkg.title}
             </Link>
@@ -204,11 +199,13 @@ export function PackageCard({ pkg, className, showSummary = false }: { pkg: Pack
           </p>
           {showSummary ? <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-ink-2">{pkg.summary}</p> : null}
         </div>
-        <EnvCompatTags envs={pkg.environments} />
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+          <span className="label !text-[11.5px] !text-ink-3">Runs on</span>
+          <EnvCompatTags envs={pkg.environments} />
+        </div>
         {restricted ? <StatusBadge meta={metaFor(listingMeta, pkg.listingStatus)} size="sm" className="self-start" /> : null}
         <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           <CreatorLine creator={pkg.creator} />
-          <PriceCapsule pricing={pkg.pricing} className="relative z-[2]" />
         </div>
       </div>
     </article>
@@ -219,8 +216,8 @@ export function PackageCard({ pkg, className, showSummary = false }: { pkg: Pack
 export function PackageRow({ pkg }: { pkg: PackageSummary }) {
   const Icon = CATEGORY_ICONS[pkg.category] ?? Package;
   return (
-    <li className="relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-line-soft px-3 py-3 last:border-b-0 hover:bg-surface-2 md:grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1.2fr)_auto] md:items-center">
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border-2 border-line bg-surface">
+    <li className="relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 border-b border-line-soft px-3 py-3 last:border-b-0 hover:bg-sun-soft md:grid-cols-[auto_minmax(0,1.6fr)_minmax(0,1.2fr)_auto] md:items-center">
+      <span className="inline-flex h-9 w-9 -skew-x-6 items-center justify-center border-2 border-line bg-paper-2">
         <Icon aria-hidden="true" size={17} strokeWidth={2.25} />
       </span>
       <div className="min-w-0">
@@ -234,7 +231,8 @@ export function PackageRow({ pkg }: { pkg: PackageSummary }) {
         </p>
         <p className="truncate text-[13.5px] text-ink-2">{pkg.summary}</p>
       </div>
-      <div className="col-span-2 md:col-span-1">
+      <div className="col-span-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 md:col-span-1">
+        <span className="label !text-[11.5px] !text-ink-3">Runs on</span>
         <EnvCompatTags envs={pkg.environments} max={4} />
       </div>
       <div className="col-span-2 flex items-center justify-between gap-3 md:col-span-1 md:flex-col md:items-end md:gap-1">

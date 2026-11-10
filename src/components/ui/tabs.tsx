@@ -80,7 +80,7 @@ export function Tabs({
         aria-label={label}
         className={cn(
           "relative max-w-full gap-1 overflow-x-auto",
-          variant === "underline" ? "flex border-b-2 border-line-soft" : "inline-flex rounded-full border-2 border-line bg-surface p-1",
+          variant === "underline" ? "flex border-b-[3px] border-line" : "flex flex-wrap gap-1.5 overflow-visible",
           listClassName,
         )}
       >
@@ -101,15 +101,15 @@ export function Tabs({
               onClick={() => select(item.id)}
               onKeyDown={(e) => onKeyDown(e, i)}
               className={cn(
-                "shrink-0 whitespace-nowrap font-semibold transition-colors duration-150",
+                "shrink-0 whitespace-nowrap font-display font-extrabold transition-colors duration-150",
                 variant === "underline"
                   ? cn(
-                      "-mb-[2px] border-b-[3px] px-3 py-2.5 text-[14.5px]",
-                      selected ? "border-cobalt text-ink" : "border-transparent text-ink-3 hover:text-ink",
+                      "px-4 pb-2 pt-2.5 text-[15px] [clip-path:polygon(9px_0,100%_0,calc(100%-9px)_100%,0_100%)]",
+                      selected ? "bg-ink text-paper" : "text-ink hover:bg-sun hover:text-on-sun",
                     )
                   : cn(
-                      "rounded-full px-3.5 py-1.5 text-[13px]",
-                      selected ? "bg-ink text-paper" : "text-ink-2 hover:bg-surface-2",
+                      "sheet border-2 border-line px-3 py-1.5 text-[13.5px]",
+                      selected ? "bg-ink text-paper" : "bg-surface text-ink hover:bg-sun hover:text-on-sun",
                     ),
               )}
             >

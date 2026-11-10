@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Download, Flag, ScrollText } from "lucide-react";
-import { CategoryCover, categoryLabel } from "@/components/illustrations";
+import { categoryLabel } from "@/components/illustrations";
+import { ReadMore } from "@/components/site/diagrams";
+import { CategoryArt } from "@/components/site/world-art";
 import { CheckoutControl } from "@/components/package/checkout-control";
 import { CompatStrip, EvidencePanel, sortCompat } from "@/components/package/compat-strip";
 import { ProtectionPanel, ReleaseProtectionBadges } from "@/components/package/protection-panel";
@@ -15,7 +17,7 @@ import { CreatorLine } from "@/components/ui/package";
 import { Popover } from "@/components/ui/popover";
 import { Prose } from "@/components/ui/prose";
 import { EnvTabs, Tabs } from "@/components/ui/tabs";
-import { Identifier } from "@/components/ui/typography";
+import { Eyebrow, Identifier } from "@/components/ui/typography";
 import { api, API_URL, qs } from "@/lib/api";
 import type { EnvironmentDetail, Offer, PackageDetail } from "@/lib/contract";
 import { dialectLabel, envLongName } from "@/lib/env";
@@ -77,7 +79,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const downloadPath = viewing ? `/v1/packages/${encodeURIComponent(d.creator.username)}/${encodeURIComponent(d.name)}/versions/${encodeURIComponent(viewing)}/download` : null;
 
   return (
-    <div className="container-page py-8">
+    <div className="container-page pb-16 pt-8">
       <Breadcrumb
         items={[{ label: "Explore", href: "/explore" }, { label: d.creator.username, href: `/creators/${encodeURIComponent(d.creator.username)}` }, { label: d.name }]}
       />
@@ -113,21 +115,20 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mt-6 grid gap-x-11 gap-y-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         {/* Header */}
         <header className="min-w-0 lg:col-start-1">
-          <div className="flex items-start gap-4">
-            <div className="hidden h-[84px] w-[168px] shrink-0 overflow-hidden rounded-[10px] border-[2.5px] border-line shadow-[3px_3px_0_0_var(--shadow)] sm:block">
-              <CategoryCover category={d.category} className="h-full w-full" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="display text-[38px] sm:text-[48px]">{d.title}</h1>
-              <p className="mt-1 text-[15px] text-ink-2">
-                <Identifier value={d.identifier} className="font-semibold text-ink" />
-              </p>
-            </div>
+          <div className="mr-[9px] aspect-[16/9] border-[2.5px] border-line bg-paper-2 shadow-[9px_9px_0_0_var(--cobalt)] max-sm:shadow-[6px_6px_0_0_var(--cobalt)]">
+            <CategoryArt category={d.category} eager />
           </div>
-          <p className="mt-4 max-w-[62ch] text-[17px] text-ink-2">{d.summary}</p>
+          <div className="mt-10 min-w-0">
+            <Eyebrow className="mb-[18px]">{categoryLabel(d.category)}</Eyebrow>
+            <h1 className="display text-[clamp(34px,4vw,52px)]">{d.title}</h1>
+            <p className="mt-2.5 text-[14.5px] text-ink-2">
+              <Identifier value={d.identifier} className="font-semibold text-ink" />
+            </p>
+          </div>
+          <p className="lede mt-4 !max-w-[60ch] text-ink-2">{d.summary}</p>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px]">
             <CreatorLine creator={d.creator} />
             {viewing ? (
@@ -148,17 +149,17 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
             <span className="tabular text-ink-3">{formatCount(d.downloads)} downloads</span>
           </div>
           <div className="mt-6">
-            <h2 className="mb-2 font-mono text-[11.5px] font-bold uppercase tracking-wide text-ink-3">
-              Compatibility{viewing ? ` · ${viewing}` : ""}
+            <h2 className="label mb-2.5">
+              Runs on{viewing ? ` · ${viewing}` : ""}
             </h2>
             <CompatStrip entries={compat} />
           </div>
         </header>
 
         {/* Right rail: Get it */}
-        <aside aria-label="Get it" className="space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <div className="sticker space-y-4 p-5">
-            <h2 className="font-display text-[22px] font-extrabold tracking-[-0.02em]">Get it.</h2>
+        <aside aria-label="Get it" className="space-y-8 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          <div className="sticker space-y-4 p-5" style={{ "--plate": "var(--sun)" } as React.CSSProperties}>
+            <h2 className="display text-[28px]">Get it.</h2>
             {!viewing ? (
               <p className="text-[14px] text-ink-2">No release has been published yet, so there is nothing to install.</p>
             ) : blockedDownload ? (
@@ -185,10 +186,10 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
               <CheckoutControl offers={paidOffers} signedIn={signedIn} returnTo={href} />
             ) : null}
             {paidOffers.length > 0 || d.seller.provider ? (
-              <SellerLine creator={d.creator.displayName || d.seller.creator} provider={d.seller.provider} className="border-t-2 border-line-soft pt-3 text-[13px] text-ink-2" />
+              <SellerLine creator={d.creator.displayName || d.seller.creator} provider={d.seller.provider} className="border-t-2 border-dashed border-line-soft pt-3 text-[13.5px] text-ink-2" />
             ) : null}
           </div>
-          <div className="panel p-4">
+          <div className="sticker p-5" style={{ "--plate": "var(--cobalt)" } as React.CSSProperties}>
             <KeyValue
               labelWidth="5.5rem"
               items={[
@@ -290,7 +291,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                           {downloadPath ? (
                             <a
                               href={downloadPath}
-                              className="inline-flex items-center gap-2 rounded-[10px] border-2 border-line bg-surface px-4 py-2 font-bold shadow-[3px_3px_0_0_var(--shadow)]"
+                              className="btn btn-secondary"
                             >
                               <Download aria-hidden="true" size={16} /> Download {d.resourceName}-{viewing}{escrowed ? ".escrow" : ""}.zip
                             </a>
@@ -465,9 +466,11 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                       </div>
                     )}
                     <SellerLine creator={d.creator.displayName || d.seller.creator} provider={d.seller.provider} />
-                    <p className="text-[13.5px] text-ink-3">
-                      A license is granted only when the provider&rsquo;s signed payment event arrives, or by an audited administrative
-                      grant. Cancel at the provider at any time; the license stays active until the end of the paid period.
+                    <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13.5px] text-ink-3">
+                      A license is granted only on a verified payment event.
+                      <ReadMore href="/docs/licensing-api#who-does-what" className="!text-[14px] text-ink">
+                        Who does what
+                      </ReadMore>
                     </p>
                   </div>
                 ),
@@ -525,7 +528,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
             ]}
           />
           <p className="mt-10 text-[12px] text-ink-3">
-            Data from the SCRIPT//GO API{API_URL.includes("localhost") ? " (development)" : ""}. Compatibility shows only what recorded runs proved.
+            Data from the SCRIPT//GO API{API_URL.includes("localhost") ? " (development)" : ""}. Only recorded runs count.
           </p>
         </div>
       </div>

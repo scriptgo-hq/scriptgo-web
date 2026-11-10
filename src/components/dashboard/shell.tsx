@@ -27,6 +27,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/site/theme-toggle";
+import { Wordmark } from "@/components/ui/typography";
 
 export interface NavItem {
   href: string;
@@ -68,7 +69,7 @@ function Nav({ groups, root }: { groups: NavGroup[]; root: string }) {
     <div className="space-y-5">
       {groups.map((g, gi) => (
         <div key={g.label ?? gi}>
-          {g.label ? <p className="mb-1.5 px-3 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-3">{g.label}</p> : null}
+          {g.label ? <p className="label mb-1.5 px-3 !text-[12px] !text-ink-3">{g.label}</p> : null}
           <ul className="space-y-0.5">
             {g.items.map((it) => {
               const Icon = ICONS[it.icon];
@@ -79,14 +80,14 @@ function Nav({ groups, root }: { groups: NavGroup[]; root: string }) {
                     href={it.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-lg border-2 px-3 py-2 text-[14.5px] font-semibold",
-                      active ? "border-line bg-surface shadow-[2px_2px_0_0_var(--shadow)]" : "border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink",
+                      "flex items-center gap-2.5 border-2 px-3 py-2 font-display text-[14.5px] font-bold",
+                      active ? "border-line bg-sun text-on-sun shadow-[3px_3px_0_0_var(--line)]" : "border-transparent text-ink-2 hover:border-line hover:bg-surface hover:text-ink",
                     )}
                   >
                     <Icon aria-hidden="true" size={17} strokeWidth={2.25} />
                     <span className="flex-1">{it.label}</span>
                     {it.badge ? (
-                      <span className="tabular rounded-full border-2 border-line bg-sun px-1.5 text-[11.5px] font-bold text-on-sun">
+                      <span className="tabular border-2 border-line bg-cobalt px-1.5 text-[11.5px] font-bold text-on-cobalt">
                         {it.badge}
                         <span className="sr-only"> unread</span>
                       </span>
@@ -118,7 +119,7 @@ export function SignOutButton({ className }: { className?: string }) {
           router.refresh();
         }
       }}
-      className={cn("inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 hover:bg-surface-2 hover:text-ink", className)}
+      className={cn("inline-flex items-center gap-2 border-2 border-transparent px-3 py-2 font-display text-[14px] font-bold text-ink-2 hover:border-line hover:bg-surface hover:text-ink", className)}
     >
       <LogOut aria-hidden="true" size={16} />
       {busy ? "Signing out…" : "Sign out"}
@@ -145,24 +146,27 @@ export function DashboardShell({
   useEffect(() => setOpen(false), [pathname]);
 
   const brand = (
-    <Link href="/" className="font-display text-[20px] font-black uppercase tracking-[-0.02em]" style={{ fontStretch: "105%" }}>
-      SCRIPT<span className="text-cobalt-ink">//</span>GO
+    <Link href="/" aria-label="SCRIPT//GO home">
+      <Wordmark compact />
     </Link>
   );
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="hidden border-r-2 border-line-soft bg-paper-2/70 lg:block">
+      <aside className="hidden border-r-[3px] border-line bg-paper-2 lg:block">
         <div className="sticky top-0 flex h-dvh flex-col gap-6 overflow-y-auto px-3 py-5">
-          <div className="flex items-center justify-between px-3">
+          <div className="flex items-center justify-between gap-2 px-2">
             {brand}
             <ThemeToggle />
           </div>
-          <p className="px-3 font-mono text-[11.5px] font-bold uppercase tracking-wider text-cobalt-ink">{"// "}{title}</p>
+          <p className="tag px-3">
+            <span aria-hidden="true" className="tag-slashes" />
+            <span className="tag-plate">{title}</span>
+          </p>
           <nav aria-label={title}>
             <Nav groups={groups} root={root} />
           </nav>
-          <div className="mt-auto border-t-2 border-line-soft pt-4">
+          <div className="mt-auto border-t-2 border-dashed border-line pt-4">
             {account ? (
               <p className="truncate px-3 text-[13px]">
                 <span className="block font-bold">{account.name}</span>
@@ -174,23 +178,23 @@ export function DashboardShell({
         </div>
       </aside>
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b-2 border-line-soft bg-paper/95 px-4 lg:hidden">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b-[3px] border-line bg-paper px-4 lg:hidden">
           {brand}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
               type="button"
               aria-expanded={open}
               aria-controls="dash-drawer"
               onClick={() => setOpen((o) => !o)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 border-line bg-surface"
+              className="inline-flex h-10 w-10 items-center justify-center border-[2.5px] border-line bg-surface hover:bg-sun hover:text-on-sun"
             >
               {open ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
               <span className="sr-only">{open ? "Close navigation" : "Open navigation"}</span>
             </button>
           </div>
         </header>
-        <div id="dash-drawer" hidden={!open} className="border-b-2 border-line bg-paper-2 px-3 py-4 lg:hidden">
+        <div id="dash-drawer" hidden={!open} className="border-b-[3px] border-line bg-paper-2 px-3 py-4 lg:hidden">
           <nav aria-label={title}>
             <Nav groups={groups} root={root} />
           </nav>

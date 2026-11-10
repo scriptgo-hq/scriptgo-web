@@ -19,7 +19,7 @@ export function KeyValue({
     >
       {items.map((it) => (
         <div key={it.label} className="contents">
-          <dt className="pt-[2px] font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink-3">{it.label}</dt>
+          <dt className="label pt-[3px] !text-[12px] !text-ink-3">{it.label}</dt>
           <dd className="min-w-0 break-words">{it.value}</dd>
         </div>
       ))}
@@ -38,9 +38,9 @@ export function Meter({ used, allowed, label = "in use", className }: { used: nu
         aria-valuemax={allowed}
         aria-valuenow={used}
         aria-label={`Deployments: ${used} of ${allowed} ${label}`}
-        className="h-3 w-40 max-w-full overflow-hidden rounded-full border-2 border-line bg-surface-2"
+        className="h-3.5 w-40 max-w-full overflow-hidden border-2 border-line bg-paper-2"
       >
-        <div className="h-full bg-cobalt" style={{ width: `${pct}%` }} />
+        <div className="h-full border-r-2 border-line bg-cobalt" style={{ width: `${pct}%` }} />
       </div>
       <span className="tabular text-[14px] font-semibold">
         {used} of {allowed} {label}
@@ -52,13 +52,13 @@ export function Meter({ used, allowed, label = "in use", className }: { used: nu
 /** `Explore // kestrel // inventory-pro` */
 export function Breadcrumb({ items, className }: { items: { label: string; href?: string }[]; className?: string }) {
   return (
-    <nav aria-label="Breadcrumb" className={cn("font-mono text-[12.5px] text-ink-3", className)}>
+    <nav aria-label="Breadcrumb" className={cn("text-[14px] font-semibold text-ink-2", className)}>
       <ol className="flex flex-wrap items-center gap-x-1.5">
         {items.map((it, i) => (
           <li key={`${it.label}-${i}`} className="flex items-center gap-x-1.5">
             {i > 0 ? (
-              <span aria-hidden="true" className="text-cobalt-ink">
-                {"//"}
+              <span aria-hidden="true" className="text-ink-3">
+                /
               </span>
             ) : null}
             {it.href && i < items.length - 1 ? (
@@ -66,7 +66,7 @@ export function Breadcrumb({ items, className }: { items: { label: string; href?
                 {it.label}
               </Link>
             ) : (
-              <span aria-current={i === items.length - 1 ? "page" : undefined} className="text-ink-2">
+              <span aria-current={i === items.length - 1 ? "page" : undefined} className="text-ink">
                 {it.label}
               </span>
             )}
@@ -105,7 +105,7 @@ export function Pagination({
 }) {
   const pages = Math.max(1, Math.ceil(total / pageSize));
   if (pages <= 1) return null;
-  const arrow = "inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-2";
+  const arrow = "sheet inline-flex h-9 w-9 items-center justify-center border-2 border-line bg-surface text-ink hover:bg-sun hover:text-on-sun";
   return (
     <nav aria-label="Pagination" className={cn("flex items-center justify-center gap-1", className)}>
       {page > 1 ? (
@@ -129,8 +129,8 @@ export function Pagination({
             aria-current={p === page ? "page" : undefined}
             aria-label={`Page ${p}`}
             className={cn(
-              "tabular inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-[14px] font-bold",
-              p === page ? "bg-ink text-paper" : "hover:bg-surface-2",
+              "sheet tabular inline-flex h-9 min-w-9 items-center justify-center border-2 border-line px-2 font-display text-[14px] font-extrabold",
+              p === page ? "bg-ink text-paper" : "bg-surface text-ink hover:bg-sun hover:text-on-sun",
             )}
           >
             {p}

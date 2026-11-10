@@ -1,19 +1,20 @@
-import { CreatorBoxArt } from "@/components/illustrations";
+import { Ridge } from "@/components/site/ink";
+import { Eyebrow } from "@/components/ui/typography";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
-/** Sun-yellow slanted band inviting creators to publish. */
+/** Sun band inviting creators to publish, opened by a ridge. */
 export function CreatorCta({ className }: { className?: string }) {
   return (
-    <section aria-labelledby="creator-cta-title" className={cn("relative isolate py-12", className)}>
-      <div aria-hidden="true" className="band-sun absolute inset-x-0 inset-y-2 -z-10 border-y-0" />
-      <div className="container-page flex flex-col items-start gap-5 md:flex-row md:items-center">
-        <CreatorBoxArt className="h-20 w-20 shrink-0" />
-        <div className="min-w-0 flex-1 text-on-sun">
-          <h2 id="creator-cta-title" className="display text-[34px] sm:text-[40px]">
-            Are you a creator?
+    <section aria-labelledby="creator-cta-title" className={cn("g-sun relative", className)}>
+      <Ridge from="paper" to="sun" ink="orange" n={2} small />
+      <div className="container-page flex flex-col items-start gap-6 pb-14 pt-8 md:flex-row md:items-center">
+        <div className="min-w-0 flex-1">
+          <Eyebrow className="mb-4">For creators</Eyebrow>
+          <h2 id="creator-cta-title" className="display text-[34px] sm:text-[44px]">
+            Are you <em>a creator?</em>
           </h2>
-          <p className="mt-2 max-w-xl text-[15.5px] font-medium">
+          <p className="mt-3 max-w-xl text-[16px] font-medium">
             Publish your scripts, prove where they run, protect them with license keys, and sell them from your own Tebex store.
           </p>
         </div>

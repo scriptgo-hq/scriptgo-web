@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { EnvironmentArt } from "@/components/illustrations";
+import { EnvironmentCardArt } from "@/components/site/world-art";
 import type { Environment } from "@/lib/contract";
 import { cn } from "@/lib/cn";
 import { platformRulesInfo } from "@/lib/platform-rules";
@@ -12,14 +12,14 @@ export function EnvironmentTile({ env, className }: { env: Environment; classNam
   return (
     <Link
       href={`/environments/${encodeURIComponent(env.slug)}`}
-      className={cn("sticker sticker-hover flex flex-col overflow-hidden", className)}
+      className={cn("sticker sticker-hover flex flex-col", className)}
     >
-      <div className="aspect-[5/3] overflow-hidden border-b-[2.5px] border-line">
-        <EnvironmentArt slug={env.slug} name={env.name} className="h-full w-full" />
+      <div className="aspect-[5/3] overflow-hidden border-b-[2.5px] border-line bg-paper-2">
+        <EnvironmentCardArt slug={env.slug} name={env.name} />
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <p className="font-display text-[16px] font-extrabold leading-tight">{env.name}</p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-2 pt-0.5">
           <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" />
           {platformRulesInfo(env).notable ? <StatusBadge meta={platformRulesInfo(env).meta} size="sm" /> : null}
           {env.status === "planned" ? <AdapterStateBadge state={env.adapterState} blockedOn={env.blockedOn} /> : null}
@@ -45,18 +45,18 @@ export function EnvironmentSlotTile({
     <Link
       href={href}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-[10px] border-[2.5px] border-dashed border-line text-ink transition-colors hover:bg-surface focus-visible:bg-surface",
+        "sheet group flex flex-col overflow-hidden border-[2.5px] border-dashed border-line bg-paper-2 text-ink transition-colors hover:bg-sun hover:text-on-sun focus-visible:bg-sun",
         className,
       )}
     >
       <div className="flex aspect-[5/3] items-center justify-center border-b-[2.5px] border-dashed border-line">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border-[2.5px] border-line bg-surface transition-transform group-hover:scale-105">
+        <span className="inline-flex h-14 w-14 -skew-x-12 items-center justify-center border-[2.5px] border-line bg-surface text-ink shadow-[4px_4px_0_0_var(--line)] transition-transform group-hover:scale-105">
           <Plus aria-hidden="true" size={28} strokeWidth={2.75} />
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-1 p-2.5">
         <p className="font-display text-[16px] font-extrabold leading-tight">{title}</p>
-        <p className="text-[12.5px] leading-snug text-ink-2">{body}</p>
+        <p className="text-[12.5px] leading-snug">{body}</p>
       </div>
     </Link>
   );
@@ -68,7 +68,7 @@ export function EnvMonogramTile({ label, className }: { label: string; className
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-2 border-line bg-surface font-mono text-[11px] font-bold",
+        "tok h-7 min-w-8 shrink-0 justify-center !px-1.5",
         className,
       )}
     >

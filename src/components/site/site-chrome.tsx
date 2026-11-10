@@ -1,117 +1,87 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { HikerRidgeArt } from "@/components/illustrations";
-import { ButtonLink, buttonClass } from "@/components/ui/button";
-import { Wordmark } from "@/components/ui/typography";
+import { ButtonLink } from "@/components/ui/button";
+import { BRAND } from "@/components/ui/typography";
 import { hasSessionCookie } from "@/lib/session";
-import { MobileMenu, NavLinks, SearchBox } from "./nav";
+import { SCENES } from "./ink";
+import { TopBar } from "./nav";
 import { ThemeToggle } from "./theme-toggle";
 
 export async function SiteHeader() {
   const signedIn = await hasSessionCookie();
-  return (
-    <header className="sticky top-0 z-40 border-b-2 border-line-soft bg-paper/95 backdrop-blur-[2px]">
-      <nav aria-label="Main" className="container-page relative flex h-16 items-center gap-3">
-        <Link href="/" className="mr-2 shrink-0 rounded-md" aria-label="SCRIPT//GO home">
-          <Wordmark />
-        </Link>
-        <NavLinks />
-        <div className="ml-auto hidden w-56 xl:block">
-          <SearchBox />
-        </div>
-        <div className="ml-auto flex items-center gap-2 xl:ml-0">
-          <ThemeToggle />
-          <div className="hidden items-center gap-2 lg:flex">
-            {signedIn ? (
-              <ButtonLink href="/dashboard" variant="primary" size="sm">
-                Dashboard
-              </ButtonLink>
-            ) : (
-              <>
-                <Link href="/sign-in" className={buttonClass("secondary", "sm")}>
-                  Sign in
-                </Link>
-                <ButtonLink href="/sign-up" variant="primary" size="sm">
-                  Create account
-                </ButtonLink>
-              </>
-            )}
-          </div>
-          <MobileMenu signedIn={signedIn} />
-        </div>
-      </nav>
-    </header>
-  );
+  return <TopBar signedIn={signedIn} />;
 }
 
-/** Cobalt band with the hiker, then the plain footer with the operator disclosure. */
+/** The closing band (the traveller above the ranges), then the footer with the operator disclosure. */
 export function SiteFooter({ band = true }: { band?: boolean }) {
   return (
     <footer className="mt-auto">
       {band ? (
-        <div className="relative isolate overflow-hidden pt-10">
-          <div aria-hidden="true" className="band-cobalt absolute inset-x-0 bottom-0 top-8 -z-10" />
-          <div className="container-page grid items-end gap-6 pb-10 md:grid-cols-[260px_1fr]">
-            <HikerRidgeArt className="hidden h-[200px] w-auto md:block" />
-            <div className="flex flex-col items-start gap-4 pt-12 md:flex-row md:items-center md:justify-end md:pt-16">
-              <p className="display-italic text-[34px] leading-[0.95] text-white sm:text-[44px]">
-                Build once.
-                <br />
-                Protect your work.
-                <br />
-                Monetize it.
-              </p>
-              <ButtonLink href="/docs/quickstart" variant="secondary" size="lg" arrow className="md:ml-6">
-                Start building
+        <section className="closing" aria-labelledby="closing-title">
+          <img className="closing-bg closing-bg-traveller" src={SCENES.band.src} width={SCENES.band.width} height={SCENES.band.height} alt="" loading="lazy" decoding="async" />
+          <img className="closing-bg closing-bg-ranges" src={SCENES.ranges.src} width={SCENES.ranges.width} height={SCENES.ranges.height} alt="" loading="lazy" decoding="async" />
+          <div className="container-page closing-in">
+            <h2 id="closing-title" className="display">
+              One script.
+              <br />
+              <em>Every world.</em>
+            </h2>
+            <div className="cta-row">
+              <ButtonLink href="/sign-up" variant="sun" size="lg">
+                Create your account
+              </ButtonLink>
+              <ButtonLink href="/docs/sdk" variant="secondary" size="lg">
+                Read the SDK docs
               </ButtonLink>
             </div>
           </div>
-        </div>
+        </section>
       ) : null}
-      {/* Always dark, in both themes: fixed values rather than the ink/paper tokens, which swap in dark mode. */}
-      <div className="border-t-2 border-line bg-[#15130f] text-[#f5efe3]">
-        <div className="container-page grid gap-8 py-10 text-[14px] md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
-            <span className="font-display text-[22px] font-black uppercase tracking-[-0.02em]" style={{ fontStretch: "105%" }}>
-              SCRIPT<span className="text-[#a2abff]">//</span>GO
-            </span>
-            <p className="mt-3 max-w-sm text-[#cfc7b7]">
-              Game scripts proven by real runs, protected and sold by their creators.
-            </p>
+      {/* Always ink, in both themes. */}
+      <div className="site-foot">
+        <div className="container-page">
+          <div className="foot-grid">
+            <div>
+              <img className="foot-logo" src={BRAND.word.src} width={BRAND.word.width} height={BRAND.word.height} alt="SCRIPT//GO" loading="lazy" decoding="async" />
+              <p className="mt-[18px] max-w-[34ch] opacity-80">The scripting sandbox for the games you run. Build once, protect your work, monetize it.</p>
+            </div>
+            <FooterCol
+              title="SDK"
+              links={[
+                ["/sdk", "The SDK"],
+                ["/docs", "Docs"],
+                ["/environments", "Platforms"],
+                ["/docs/create-adapter", "Write an adapter"],
+                ["/status", "Status"],
+              ]}
+            />
+            <FooterCol
+              title="Monetize"
+              links={[
+                ["/developers", "Sell from your own store"],
+                ["/protect", "Protect your work"],
+                ["/docs/licensing-api", "Licensing API"],
+                ["/explore", "Scripts directory"],
+                ["/dashboard", "Dashboard"],
+              ]}
+            />
+            <FooterCol
+              title="Trust"
+              links={[
+                ["/legal", "Legal"],
+                ["/legal#ip-policy", "IP policy"],
+                ["/legal#protection", "Code protection terms"],
+                ["/legal#privacy", "Privacy"],
+                ["/report", "Report a package"],
+              ]}
+            />
           </div>
-          <FooterCol
-            title="Product"
-            links={[
-              ["/explore", "Explore"],
-              ["/environments", "Environments"],
-              ["/protect", "Protect your work"],
-              ["/sdk", "SDK"],
-              ["/docs", "Docs"],
-              ["/developers", "Developers"],
-            ]}
-          />
-          <FooterCol
-            title="Platform"
-            links={[
-              ["/status", "Status"],
-              ["/docs/licensing-api", "Licensing API"],
-              ["/docs/create-adapter", "Create an adapter"],
-              ["/dashboard", "Dashboard"],
-            ]}
-          />
-          <FooterCol
-            title="Trust"
-            links={[
-              ["/legal", "Legal"],
-              ["/legal#ip-policy", "IP policy"],
-              ["/legal#protection", "Code protection terms"],
-              ["/legal#privacy", "Privacy"],
-              ["/report", "Report a package"],
-            ]}
-          />
-        </div>
-        <div className="container-page flex flex-wrap justify-between gap-2 border-t border-[#3a362e] py-4 text-[12.5px] text-[#ada594]">
-          <span>SCRIPT//GO is a working name. Engine and provider names are trademarks of their owners; no endorsement implied.</span>
-          <span className="font-mono">{"// "}build once, protect your work, monetize it</span>
+          <div className="foot-fine">
+            <span className="max-w-[78ch]">
+              SCRIPT//GO is a working name. Game, engine and provider names are trademarks of their owners; no endorsement is implied.
+            </span>
+            <ThemeToggle label />
+          </div>
         </div>
       </div>
     </footer>
@@ -121,11 +91,12 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
 function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
   return (
     <div>
-      <p className="font-mono text-[11.5px] font-bold uppercase tracking-wider text-[#ada594]">{title}</p>
-      <ul className="mt-3 space-y-2">
+      <h2 className="label !text-[#ffc83d]">{title}</h2>
+      <ul>
         {links.map(([href, label]) => (
           <li key={href}>
-            <Link href={href} className="hover:text-sun hover:underline">
+            {/* Account pages redirect a signed-out visitor: never prefetch them, or the redirect is what the router remembers after sign-in. */}
+            <Link href={href} prefetch={href.startsWith("/dashboard") ? false : undefined}>
               {label}
             </Link>
           </li>

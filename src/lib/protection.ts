@@ -33,9 +33,19 @@ export const tierMeta: Record<ProtectionTier, StatusMeta> = {
 export function protectionMeta(p: EnvironmentProtection): StatusMeta {
   const base = tierMeta[p.tier];
   if (p.state === "planned") {
-    return { ...base, label: `${base.label}: planned`, tone: "neutral", icon: "hourglass", hint: p.note || base.hint };
+    return { ...base, label: `${base.label}: planned`, tone: "neutral", icon: "hourglass", hint: protectionNote(p) };
   }
-  return { ...base, hint: p.note || base.hint };
+  return { ...base, hint: protectionNote(p) };
+}
+
+/**
+ * The registry's sentence for an environment, as written. The one exception is the "no licence check"
+ * tier: its registry sentence still speaks of what may be sold there, which is the platform's rule
+ * and not a matter of protection (see lib/platform-rules.ts), so the tier's own sentence is used.
+ */
+export function protectionNote(p: EnvironmentProtection): string {
+  if (p.tier === "none") return tierBlurb.none;
+  return p.note || tierBlurb[p.tier];
 }
 
 /** Short heading for a tier, used in tables. */
@@ -86,7 +96,14 @@ export const tierBlurb: Record<ProtectionTier, string> = {
     "The host runs compiled code outside the script VM, so it can hold a key. An encrypted release is decrypted in memory, for a licensed and bound server only.",
   license:
     "The host runs plain script. Your server checks its licence and the release is signed, but the operator can read what the host loads. We make no code-secrecy claim here.",
-  none: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
+ours  none: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
+};
+
+/** A tier in a few words, for a table's group row. The sentence above it is for tooltips and docs. */
+export const tierShort: Record<ProtectionTier, string> = {
+  escrow: "Decrypted in memory, for a licensed and bound server only.",
+  license: "Licence check and signed releases. The host runs plain script: no code-secrecy claim.",
+  none: "Signed releases. No licence check runs here.",
 };
 
 /**

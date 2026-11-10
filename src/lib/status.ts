@@ -78,6 +78,13 @@ export const environmentMeta: Record<EnvironmentStatus, StatusMeta> = {
 };
 
 // An environment's own rules on paid scripts are worded in one place: lib/platform-rules.ts.
+/** Announced and being built, not usable yet. The one stamp for everything in that state. */
+export const IN_DEVELOPMENT: StatusMeta = {
+  label: "In development",
+  tone: "warning",
+  icon: "hourglass",
+  hint: "Being built. Not usable yet.",
+};
 
 export const capabilityMeta: Record<CapabilitySupport, StatusMeta> = {
   supported: { label: "Supported", tone: "success", icon: "check", hint: "Fully provided by the adapter." },
@@ -177,7 +184,7 @@ export const storeMeta: Record<StoreStatus, StatusMeta> = {
     label: "Connected, checkout off",
     tone: "warning",
     icon: "lock",
-    hint: "Awaiting provider approval before real checkout.",
+    hint: "The shop is set up. Real checkout is not live yet, for any shop, until Tebex approves it in writing.",
   },
   live: { label: "Live", tone: "success", icon: "check", hint: "Taking real payments." },
   needs_attention: { label: "Needs attention", tone: "danger", icon: "alert", hint: "Webhook deliveries are failing." },

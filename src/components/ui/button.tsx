@@ -5,32 +5,12 @@ import { cn } from "@/lib/cn";
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "sun" | "danger" | "ink";
 export type ButtonSize = "sm" | "md" | "lg";
 
-const LIFT =
-  "shadow-[3px_3px_0_0_var(--shadow)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--shadow)] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_0_var(--shadow)]";
-
-const VARIANTS: Record<ButtonVariant, string> = {
-  primary: `bg-cobalt text-on-cobalt border-line ${LIFT}`,
-  secondary: `bg-surface text-ink border-line ${LIFT}`,
-  sun: `bg-sun text-on-sun border-line ${LIFT}`,
-  ink: "bg-ink text-paper border-line shadow-[3px_3px_0_0_var(--cobalt)] hover:-translate-x-px hover:-translate-y-px",
-  ghost: "bg-transparent text-ink border-transparent hover:bg-surface-2",
-  danger: "bg-surface text-bad border-bad hover:bg-bad-soft",
-};
-
-const SIZES: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-[13px] gap-1.5 rounded-lg",
-  md: "h-10 px-4 text-[14.5px] gap-2 rounded-[10px]",
-  lg: "h-12 px-5 text-[16px] gap-2 rounded-[12px]",
-};
-
+/**
+ * Slanted slab, printed in two plates (the face and its offset). The look lives in globals.css
+ * (`.btn`): the slab is drawn behind the label, so the text itself stays upright.
+ */
 export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md", className?: string): string {
-  return cn(
-    "inline-flex select-none items-center justify-center whitespace-nowrap border-2 font-bold transition-[transform,box-shadow,background-color] duration-150 ease-out",
-    "disabled:pointer-events-none disabled:opacity-55 disabled:shadow-none aria-disabled:pointer-events-none aria-disabled:opacity-55",
-    VARIANTS[variant],
-    SIZES[size],
-    className,
-  );
+  return cn("btn", `btn-${variant}`, size !== "md" && `btn-${size}`, className);
 }
 
 interface CommonProps {

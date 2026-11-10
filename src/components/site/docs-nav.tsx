@@ -15,13 +15,13 @@ function NavList({ groups, pathname }: { groups: DocsNavGroup[]; pathname: strin
       <Link
         href="/docs"
         aria-current={pathname === "/docs" ? "page" : undefined}
-        className={cn("block rounded-md px-2 py-1 text-[14px] font-bold", pathname === "/docs" ? "bg-cobalt-soft text-ink" : "hover:bg-surface-2")}
+        className={cn("block px-2 py-1.5 font-display text-[14.5px] font-extrabold", pathname === "/docs" ? "bg-ink text-paper" : "hover:bg-sun hover:text-on-sun")}
       >
         Docs home
       </Link>
       {groups.map((g) => (
         <div key={g.group}>
-          <p className="eyebrow px-2">{"// "}{g.group}</p>
+          <p className="eyebrow px-2">{g.group}</p>
           <ul className="mt-1.5 space-y-0.5">
             {g.items.map((it) => {
               const href = `/docs/${it.slug}`;
@@ -32,8 +32,8 @@ function NavList({ groups, pathname }: { groups: DocsNavGroup[]; pathname: strin
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "block rounded-md border-l-[3px] px-2 py-1.5 text-[14px]",
-                      active ? "border-cobalt bg-cobalt-soft font-bold text-ink" : "border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink",
+                      "block border-l-[5px] px-2.5 py-1.5 text-[14.5px]",
+                      active ? "border-cobalt bg-sun font-bold text-on-sun" : "border-transparent text-ink-2 hover:border-line hover:text-ink",
                     )}
                   >
                     {it.title}
@@ -53,11 +53,11 @@ export function DocsNav({ groups }: { groups: DocsNavGroup[] }) {
   const pathname = usePathname() ?? "/docs";
   return (
     <>
-      <nav aria-label="Documentation" className="sticky top-24 hidden max-h-[calc(100dvh-7rem)] overflow-y-auto pb-8 pr-2 lg:block">
+      <nav aria-label="Documentation" className="sticky top-28 hidden max-h-[calc(100dvh-7rem)] overflow-y-auto pb-8 pr-2 lg:block">
         <NavList groups={groups} pathname={pathname} />
       </nav>
       <details className="panel mb-6 lg:hidden">
-        <summary className="cursor-pointer px-4 py-3 font-bold">Docs menu</summary>
+        <summary className="cursor-pointer px-4 py-3 font-display font-extrabold">Docs menu</summary>
         <nav aria-label="Documentation" className="border-t border-line-soft px-2 py-3">
           <NavList groups={groups} pathname={pathname} />
         </nav>

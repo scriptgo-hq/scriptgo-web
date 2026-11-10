@@ -1,23 +1,39 @@
 import { cn } from "@/lib/cn";
 
-/** SCRIPT//GO wordmark: a type treatment only, the `//` is the single accent. */
-export function Wordmark({ className }: { className?: string }) {
+/** Public paths of the brand art (keycap mark and plate wordmark). */
+export const BRAND = {
+  mark: { src: "/ink/logo-mark.webp", width: 240, height: 200 },
+  word: { src: "/ink/logo-word.webp", width: 560, height: 152 },
+} as const;
+
+/**
+ * The brand: keycap mark and SCRIPT//GO plate wordmark. Hovering presses the key (`.brand` in
+ * globals.css). `compact` is the small version used in the dashboard sidebar.
+ */
+export function Wordmark({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
-    <span
-      className={cn("font-display text-[22px] font-black uppercase leading-none tracking-[-0.02em]", className)}
-      style={{ fontStretch: "105%" }}
-    >
-      SCRIPT<span className="text-cobalt-ink">//</span>GO
+    <span className={cn("brand", compact && "brand-sm", className)}>
+      <span className="brand-key">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="brand-mark" src={BRAND.mark.src} width={BRAND.mark.width} height={BRAND.mark.height} alt="" decoding="async" />
+      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="brand-word" src={BRAND.word.src} width={BRAND.word.width} height={BRAND.word.height} alt="SCRIPT//GO" decoding="async" />
     </span>
   );
 }
 
-/** `// eyebrow` reading as a code comment. */
+/** The tag that opens a section: two slashes, then a slanted plate. */
 export function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("eyebrow", className)}>{"// "}{children}</p>;
+  return (
+    <p className={cn("tag", className)}>
+      <span aria-hidden="true" className="tag-slashes" />
+      <span className="tag-plate">{children}</span>
+    </p>
+  );
 }
 
-/** Heavy display headline. Headlines end with a period. */
+/** Heavy wide display headline. Wrap the accent words in <em>. */
 export function DisplayTitle({
   as: Tag = "h2",
   children,
@@ -36,37 +52,21 @@ export function DisplayTitle({
   );
 }
 
-/** Hand-drawn sun-yellow underline stroke beneath inline text. */
+/** A marker stroke behind inline text. */
 export function Underlined({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("relative inline-block", className)}>
-      <span className="relative z-[1]">{children}</span>
-      <svg
-        aria-hidden="true"
-        focusable="false"
-        viewBox="0 0 300 24"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute -bottom-[0.18em] left-[-2%] z-0 h-[0.32em] w-[104%]"
-      >
-        <path
-          d="M4 16 C 60 6, 130 4, 200 8 S 280 14, 296 9"
-          fill="none"
-          stroke="var(--sun)"
-          strokeWidth="9"
-          strokeLinecap="round"
-        />
-      </svg>
+    <span
+      className={cn("px-[0.04em]", className)}
+      style={{ background: "linear-gradient(var(--g-sun), var(--g-sun)) 0 88% / 100% 0.28em no-repeat" }}
+    >
+      {children}
     </span>
   );
 }
 
-/** Small sun-yellow brush stroke under a section title (the mockup's "How it works." underline). */
+/** Two slanted sun slashes under a section title: the brand's `//`. */
 export function Stroke({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" focusable="false" viewBox="0 0 140 18" className={cn("h-3 w-28", className)}>
-      <path d="M4 12 C 40 4, 90 3, 136 8" fill="none" stroke="var(--sun)" strokeWidth="8" strokeLinecap="round" />
-    </svg>
-  );
+  return <span aria-hidden="true" className={cn("tag-slashes mt-3 flex", className)} />;
 }
 
 /** Package identifier in mono: `creator//package`. */

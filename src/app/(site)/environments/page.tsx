@@ -5,7 +5,8 @@ import { ProtectionTierTable } from "@/components/site/integration-section";
 import { EnvironmentSlotTile, EnvironmentTile } from "@/components/ui/environment";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/tabs";
-import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
+import { ReadMore } from "@/components/site/diagrams";
+import { PageHead, SCENES } from "@/components/site/ink";
 import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
@@ -23,11 +24,19 @@ export const metadata: Metadata = {
   description: "Every engine, runtime and mod platform SCRIPT//GO targets, its status, languages and capability support.",
 };
 
+/** The four statuses, in as few words as the chips need. The full meaning is in /docs/environments. */
+const STATUS_LEGEND = [
+  ["available", "stable, suite passing"],
+  ["beta", "usable, partly proven"],
+  ["experimental", "expect changes"],
+  ["planned", "not usable yet"],
+] as const;
+
 /** Section header row inside a table: the group name across every column. */
 function GroupRow({ title, span }: { title: string; span: number }) {
   return (
-    <tr className="border-t border-line-soft bg-surface-2">
-      <th scope="colgroup" colSpan={span} className="px-3 py-2 text-[12px] font-bold uppercase tracking-wide text-ink-3">
+    <tr className="border-t-[2.5px] border-line bg-paper-2">
+      <th scope="colgroup" colSpan={span} className="px-3 py-2 text-[12.5px] font-bold uppercase tracking-wide text-ink">
         {title}
       </th>
     </tr>
@@ -44,22 +53,33 @@ export default async function EnvironmentsPage() {
   const capKeys = Array.from(new Set([...CAPABILITIES, ...envs.flatMap((e) => Object.keys(e.capabilities))]));
 
   return (
-    <div className="container-page py-10">
-      <Eyebrow>environments</Eyebrow>
-      <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[64px]">
-        Environments.
-      </DisplayTitle>
-      <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">
-        Where packages run: engines and runtimes that run scripts themselves, and mod platforms that add scripting on top of an
-        existing game. Every environment runs Lua; the .NET kit also runs TypeScript and JavaScript. Every environment is a
-        peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance runs, never from a form.
-        Planned environments have no install steps yet. The{" "}
-        <a href="#protection" className="font-semibold text-cobalt-ink underline">
-          Protection
-        </a>{" "}
-        view says what a buyer&rsquo;s server gets in each one.
-      </p>
-      <div className="mt-8">
+    <>
+    <PageHead
+      id="envs-h1"
+      tag="Platforms"
+      art={{ ...SCENES.signpost, position: "60% 45%" }}
+      title={
+        <>
+          Environ&shy;ments, <em>by real status.</em>
+        </>
+      }
+      lede="Every engine, runtime and mod platform a SCRIPT//GO script runs on, with the status its last real run earned."
+    />
+    <div className="container-page pb-16 pt-10">
+      <div className="mb-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+        <ul className="flex flex-wrap gap-x-5 gap-y-3" aria-label="What each status means">
+          {STATUS_LEGEND.map(([status, words]) => (
+            <li key={status} className="flex items-center gap-2.5 text-[14px] text-ink-2">
+              <StatusBadge meta={environmentMeta[status]} size="sm" />
+              {words}
+            </li>
+          ))}
+        </ul>
+        <ReadMore href="/docs/environments" className="!text-[14.5px]">
+          How a status is earned
+        </ReadMore>
+      </div>
+      <div>
         {!res.ok ? (
           <ApiError failure={res} title="Environments could not be loaded." />
         ) : envs.length === 0 ? (
@@ -73,7 +93,7 @@ export default async function EnvironmentsPage() {
                 id: "directory",
                 label: "Directory",
                 content: (
-                  <div className="space-y-10 pt-6">
+                  <div className="space-y-12 pt-8">
                     {groups.map((g) => (
                       <section key={g.kind} aria-labelledby={`kind-${g.kind}`}>
                         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
@@ -82,7 +102,7 @@ export default async function EnvironmentsPage() {
                           </h2>
                           <p className="max-w-[70ch] text-[14.5px] text-ink-2">{g.blurb}</p>
                         </div>
-                        <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                        <ul className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
                           {g.envs.map((e) => (
                             <li key={e.slug}>
                               <EnvironmentTile env={e} className="h-full" />
@@ -172,21 +192,15 @@ export default async function EnvironmentsPage() {
                 label: "Protection",
                 content: (
                   <div className="pt-6">
-                    <p className="max-w-[70ch] text-[15px] text-ink-2">
-                      What a buyer&rsquo;s server gets in each environment. Code escrow needs a host that runs compiled code and can
-                      hold a key. A host that runs plain script gets a licence check and signed releases, and no code-secrecy
-                      claim. Where the rights holder allows free packages only, nothing is sold.
-                    </p>
-                    <div className="mt-4">
+                    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                      <p className="text-[16px] text-ink-2">What a buyer&rsquo;s server gets on each host.</p>
+                      <ReadMore href="/docs/protect-your-work#tiers" className="!text-[14.5px]">
+                        The tiers
+                      </ReadMore>
+                    </div>
+                    <div className="mt-5">
                       <ProtectionTierTable envs={envs} />
                     </div>
-                    <p className="mt-3 text-[13px] text-ink-3">
-                      Each sentence comes from the adapter registry, as written. Protection is deterrence, traceability and
-                      revocation.{" "}
-                      <Link href="/protect" className="font-semibold text-cobalt-ink underline">
-                        How protection works, and what it does not do
-                      </Link>
-                    </p>
                   </div>
                 ),
               },
@@ -225,7 +239,7 @@ export default async function EnvironmentsPage() {
                                   return (
                                     <td key={c} className="px-2 py-2" title={meta ? `${e.name} · ${c}: ${meta.label}${note ? ` — ${note}` : ""}` : undefined}>
                                       {meta ? (
-                                        <span className={cn("inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11.5px] font-semibold", TONE_CLASSES[meta.tone])}>
+                                        <span className={cn("tok", TONE_CLASSES[meta.tone])}>
                                           <StatusIcon name={meta.icon} size={11} />
                                           {meta.label}
                                         </span>
@@ -250,5 +264,6 @@ export default async function EnvironmentsPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

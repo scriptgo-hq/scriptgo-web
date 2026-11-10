@@ -66,7 +66,7 @@ export function AuthForm({
   return (
     <div className="space-y-5">
       {error ? (
-        <p role="alert" className="rounded-[10px] border-2 border-bad/50 bg-bad-soft px-3 py-2 text-[14px] font-semibold text-bad">
+        <p role="alert" className="border-[2.5px] border-bad bg-bad-soft px-3 py-2 text-[14px] font-semibold text-ink">
           {error}
         </p>
       ) : null}

@@ -13,7 +13,7 @@ export function AutoSubmitSelect({
       {...rest}
       onChange={(e) => e.currentTarget.form?.requestSubmit()}
       className={cn(
-        "h-10 appearance-none rounded-full border-2 border-line bg-surface bg-[length:14px] bg-[right_12px_center] bg-no-repeat pl-4 pr-9 text-[14px] font-semibold",
+        "h-10 appearance-none border-[2.5px] border-line bg-surface bg-[length:14px] bg-[right_12px_center] bg-no-repeat pl-4 pr-9 text-[14px] font-semibold",
         className,
       )}
       style={{

@@ -40,10 +40,10 @@ export function CopyButton({
         type="button"
         onClick={copy}
         className={cn(
-          "inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-[12px] font-semibold transition-colors duration-150",
+          "inline-flex h-7 items-center gap-1.5 border-[1.5px] px-2 text-[12px] font-bold transition-colors duration-150",
           tone === "dark"
-            ? "border-[#4a463d] text-[#f4eee2] hover:bg-[#2a2720]"
-            : "border-line-soft bg-surface text-ink hover:bg-surface-2",
+            ? "border-[#6d6b91] text-[#f3ecdc] hover:border-[#ffc83d] hover:bg-[#ffc83d] hover:text-[#0b0b1e]"
+            : "border-line bg-surface text-ink hover:bg-sun hover:text-on-sun",
           className,
         )}
       >

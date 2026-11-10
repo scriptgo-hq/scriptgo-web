@@ -35,10 +35,10 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
   const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_220px]">
+    <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_220px]">
       <article className="min-w-0">
         <Breadcrumb items={[{ label: "Docs", href: "/docs" }, ...key.split("/").map((s) => ({ label: s }))]} />
-        <h1 className="display mt-4 text-[40px] sm:text-[50px]">{doc.title.replace(/\.$/, "")}.</h1>
+        <h1 className="display mt-5 text-[40px] sm:text-[54px]">{doc.title.replace(/\.$/, "")}.</h1>
         <p className="mt-3 max-w-[64ch] text-[17px] text-ink-2">{doc.description}</p>
         <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[12px] text-ink-3">
           <span>SDK scriptgo_version 0.1</span>
@@ -84,7 +84,7 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
       {toc.length > 0 ? (
         <aside aria-label="On this page" className="hidden xl:block">
           <div className="sticky top-24">
-            <p className="eyebrow">{"// on this page"}</p>
+            <p className="eyebrow">On this page</p>
             <TocList toc={toc} className="mt-2" />
           </div>
         </aside>

@@ -1,210 +1,116 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight } from "lucide-react";
-import { StepAdaptArt, StepBuildArt, StepMonetizeArt } from "@/components/illustrations";
+import { FlaskConical, FolderPlus, Lock, Store, Upload } from "lucide-react";
+import { Flow, PictureCard, ReadMore } from "@/components/site/diagrams";
+import { PageHead, Ridge, SCENES } from "@/components/site/ink";
 import { ButtonLink } from "@/components/ui/button";
-import { CodeBlock, CommandLine } from "@/components/ui/code-block";
-import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Developers",
   description: "Publish game scripts, prove where they run, protect and sell them with licenses. Or integrate the SCRIPT//GO SDK into your engine.",
 };
 
-const MANIFEST = `resource "inventory_pro"
-version "1.4.1"
-scriptgo_version ">=0.1.0"
-
-title "Inventory Pro"
-license "MIT"
-category "inventory"
-
-lua { "5.1", "5.4", "luajit" }
-environments { "standalone", "love2d", "godot", "luanti" }
-capabilities { "events", "storage" }
-optional_capabilities { "ui" }
-
-shared_script "shared/core.lua"
-server_script "server/main.lua"
-test_script "tests/core_test.lua"`;
-
-const steps = [
-  {
-    n: 1,
-    title: "Create a resource",
-    body: "A folder with a manifest and your shared, server and client scripts: the resource shape multiplayer scripters already know. Lua runs in every environment; TypeScript on the .NET kit.",
-    cmd: "scriptgo init inventory_pro",
-  },
-  {
-    n: 2,
-    title: "Test it locally",
-    body: "Runs your test_script files in the standalone host, the reference environment.",
-    cmd: "scriptgo test",
-  },
-  {
-    n: 3,
-    title: "Publish a release",
-    body: "Uploads the archive. Validation checks archive safety, the manifest and hashes; compatibility runs decide each environment's status.",
-    cmd: "scriptgo publish",
-  },
-  {
-    n: 4,
-    title: "Protect a paid release (optional)",
-    body: "Publish it encrypted. The key is released only to a licensed server bound by its own key, and you choose which files stay readable. The site offers the same option on the new-release page.",
-    cmd: "scriptgo publish --escrow",
-  },
-  {
-    n: 5,
-    title: "Connect a store (optional)",
-    body: "Free packages need nothing else. To sell, connect your Tebex store in Dashboard → Stores and map its products to your offers. Checkout opens once Tebex approves.",
-    cmd: null,
-  },
-];
+const NOT_LIVE = { label: "Checkout not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." } as const;
 
 export default function DevelopersPage() {
   return (
     <div>
-      <section className="border-b-2 border-line-soft">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center">
+      <PageHead
+        id="developers-h1"
+        tag="Monetize"
+        art={{ ...SCENES.stall, position: "80% 40%" }}
+        title={
+          <>
+            Build once. <em>Protect your work.</em> Monetize it.
+          </>
+        }
+        lede="Publish a script once, prove where it runs, and sell it from your own Tebex store."
+      >
+        <div className="cta-row mt-8">
+          <ButtonLink href="/sign-up" variant="sun" size="lg" arrow>
+            Create an account
+          </ButtonLink>
+          <ButtonLink href="/docs/quickstart" variant="secondary" size="lg">
+            Read the quickstart
+          </ButtonLink>
+        </div>
+      </PageHead>
+
+      <section aria-labelledby="creators-title" className="sec g-paper bleed sec-sweeps container-page !pt-12">
+        <div className="sec-head">
           <div>
-            <Eyebrow>developers</Eyebrow>
-            <DisplayTitle as="h1" className="mt-2 text-[44px] sm:text-[58px]">
-              Build once.
-              <br />
-              <span className="display-italic text-cobalt-ink">Protect your work.</span>
-              <br />
-              Monetize it.
+            <Eyebrow className="mb-[18px]">For creators</Eyebrow>
+            <DisplayTitle id="creators-title" className="text-[38px] sm:text-[48px]">
+              From folder <em>to store.</em>
             </DisplayTitle>
-            <p className="mt-5 max-w-[56ch] text-[17px] text-ink-2">
-              Write a resource against standard capabilities: in Lua for every environment, or in TypeScript for the .NET kit.
-              SCRIPT//GO runs it in each environment you declare, shows only the results that real runs proved, and issues
-              licenses when your customers pay through your own Tebex store.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="/docs/quickstart" size="lg" arrow>
-                Read the quickstart
-              </ButtonLink>
-              <ButtonLink href="/sign-up" variant="secondary" size="lg">
-                Create an account
-              </ButtonLink>
+          </div>
+          <ReadMore href="/docs/selling#from-folder-to-store">Each step, in detail</ReadMore>
+        </div>
+        <Flow
+          numbered
+          label="From a folder to a store"
+          steps={[
+            { icon: FolderPlus, title: "Create", note: "a manifest and your scripts", code: "scriptgo init" },
+            { icon: FlaskConical, title: "Test", note: "in the standalone host", code: "scriptgo test", accent: "cobalt" },
+            { icon: Upload, title: "Publish", note: "real runs set each status", code: "scriptgo publish", accent: "ink" },
+            { icon: Lock, title: "Protect", note: "optional: deliver it encrypted", code: "--escrow" },
+            { icon: Store, title: "Open your shop", note: "on your own Tebex store", chip: NOT_LIVE, accent: "cobalt" },
+          ]}
+        />
+        <p className="mt-7 text-[14.5px] text-ink-2">
+          The CLI is in preview. <ReadMore href="/docs/cli" className="!text-[14.5px]">The CLI</ReadMore>
+        </p>
+      </section>
+
+      <Ridge from="paper" to="cobalt" ink="violet" n={1} />
+      <section aria-labelledby="selling-title" className="sec g-cobalt sec-sweeps !pt-10">
+        <div className="container-page">
+          <div className="sec-head">
+            <div>
+              <Eyebrow className="mb-[18px]">The rules</Eyebrow>
+              <DisplayTitle id="selling-title" className="text-[38px] sm:text-[48px]">
+                Selling, <em>plainly.</em>
+              </DisplayTitle>
+              <p className="one-line mt-4 text-ink-2">You sell, Tebex takes the payment, SCRIPT//GO issues the licence.</p>
             </div>
+            <ReadMore href="/docs/selling">How selling works</ReadMore>
           </div>
-          <div className="grid grid-cols-3 items-end gap-3">
-            <StepBuildArt className="w-full" />
-            <StepAdaptArt className="w-full" />
-            <StepMonetizeArt className="w-full" />
+          <div className="pcards pcards-4">
+            <PictureCard art={SCENES.stall} title="Sold as a SCRIPT//GO script.">
+              It &ldquo;runs on&rdquo; environments. It is never sold &ldquo;for&rdquo; a platform.
+            </PictureCard>
+            <PictureCard art={SCENES.scales} title="You declare, you answer.">
+              A declaration of rights puts an offer on sale. No pre-approval.
+            </PictureCard>
+            <PictureCard art={SCENES.watchtower} title="We act on reports.">
+              Restrict, suspend or take down, with notice and appeal.
+            </PictureCard>
+            <PictureCard art={SCENES.gate} chip={NOT_LIVE} title="Anyone can open a shop.">
+              Real checkout waits for Tebex&rsquo;s written approval.
+            </PictureCard>
           </div>
         </div>
       </section>
 
-      <section aria-labelledby="creators-title" className="container-page py-12">
-        <DisplayTitle id="creators-title" className="text-[38px] sm:text-[44px]">
-          For creators.
-        </DisplayTitle>
-        <Stroke className="mt-1" />
-        <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <ol className="space-y-6">
-            {steps.map((s) => (
-              <li key={s.n} className="flex gap-4">
-                <span
-                  aria-hidden="true"
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-line bg-sun font-display text-[18px] font-black text-on-sun"
-                >
-                  {s.n}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-[20px] font-extrabold">
-                    <span className="sr-only">Step {s.n}: </span>
-                    {s.title}
-                  </h3>
-                  <p className="mt-1 text-[15px] text-ink-2">{s.body}</p>
-                  {s.cmd ? <CommandLine command={s.cmd} className="mt-3" /> : null}
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div className="min-w-0 space-y-3">
-            <CodeBlock code={MANIFEST} lang="lua" filename="inventory_pro/scriptgo.lua" />
-            <p className="text-[13.5px] text-ink-3">
-              The manifest is parsed, never executed. Unknown directives are kept as warnings, so one file can serve several
-              environments. <Link href="/docs/manifest" className="font-semibold text-cobalt-ink underline">Manifest reference</Link>
-            </p>
-          </div>
-        </div>
-        <div className="mt-8 rounded-[10px] border-2 border-dashed border-line-soft p-4 text-[14px] text-ink-2">
-          The <code className="font-mono">scriptgo</code> CLI is in preview and ships as <code className="font-mono">@scriptgo/cli</code>. Sign it in with a
-          personal access token from{" "}
-          <Link href="/dashboard/settings" className="font-semibold text-cobalt-ink underline">
-            Dashboard → Settings
-          </Link>
-          . Details on the <Link href="/docs/cli" className="font-semibold text-cobalt-ink underline">CLI page</Link>.
-        </div>
-      </section>
-
-      <section aria-labelledby="builders-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-2">
+      <Ridge from="cobalt" to="paper2" ink="sun" n={2} />
+      <section aria-labelledby="builders-title" className="sec g-paper2 bleed sec-sweeps container-page !pt-10">
+        <div className="sec-head">
           <div>
-            <DisplayTitle id="builders-title" className="text-[38px] sm:text-[44px]">
-              For platform builders.
+            <Eyebrow className="mb-[18px]">For platforms</Eyebrow>
+            <DisplayTitle id="builders-title" className="text-[38px] sm:text-[48px]">
+              For <em>platform builders.</em>
             </DisplayTitle>
-            <p className="mt-4 max-w-[56ch] text-[16px] text-ink-2">
-              Two ways in. A host that runs Lua writes one adapter: a clock and a tick, persistence, players, privileges,
-              notification output and, optionally, HTTP. The portable core knows nothing about engines. An engine or server
-              written in .NET embeds the .NET host kit instead, which runs Lua and TypeScript side by side (experimental).
-              Either way, your creators can protect and monetize what they build on your platform.
-            </p>
-            <ul className="mt-5 space-y-2 text-[15px]">
-              {[
-                ["/sdk", "The SDK: adapters, host kits and what is planned"],
-                ["/docs/create-adapter", "Create an adapter"],
-                ["/sdk#protect-title", "Let your creators protect their work"],
-                ["/environments/dotnet", "The .NET host kit"],
-                ["/docs/runtime", "Runtime API and capabilities"],
-                ["/environments", "Current environments and their status"],
-              ].map(([href, label]) => (
-                <li key={href}>
-                  <Link href={href!} className="inline-flex items-center gap-1.5 font-bold text-cobalt-ink hover:underline">
-                    {label} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.5} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <p className="one-line mt-4 text-ink-2">Bring SCRIPT//GO to your engine, and your creators can protect and sell what they build on it.</p>
           </div>
-          <div>
-            <DisplayTitle as="h2" className="text-[38px] sm:text-[44px]">
-              Selling, plainly.
-            </DisplayTitle>
-            <ul className="mt-4 space-y-3 text-[15px] text-ink-2">
-              <li>
-                <strong className="text-ink">You sell.</strong> Offers belong to you: free, monthly, annual or perpetual.
-              </li>
-              <li>
-                <strong className="text-ink">Tebex takes the payment.</strong> Shops run on your own Tebex store. Checkout stays
-                off until Tebex approves it.
-              </li>
-              <li>
-                <strong className="text-ink">SCRIPT//GO issues the license</strong>, only after a verified payment event, and your
-                resource checks it with <Link className="font-semibold text-cobalt-ink underline" href="/docs/licensing-api">the licensing API</Link>.
-              </li>
-              <li>
-                <strong className="text-ink">Licenses guard paid resources.</strong> One key per buyer, activation per server,
-                signed answers with offline grace. A refund, a lost dispute or an ended subscription closes the license.
-              </li>
-              <li>
-                <strong className="text-ink">Every release is signed. A release can also be encrypted.</strong> The key of an
-                encrypted release goes only to a licensed server bound by its own key, and each delivery is marked. On a host
-                that runs compiled code it is decrypted in memory; on a host that runs plain script the protection is the
-                licence and the signature. It deters copying and makes leaks traceable. It does not make copying impossible.{" "}
-                <Link className="font-semibold text-cobalt-ink underline" href="/protect">
-                  How protection works
-                </Link>
-              </li>
-              <li>
-                <strong className="text-ink">You decide what you sell, and you answer for it.</strong> SCRIPT//GO does not review
-                offers before sale: an offer can be bought once you have declared your rights, and we act on reports.
-              </li>
-            </ul>
-          </div>
+          <ReadMore href="/sdk">The SDK</ReadMore>
+        </div>
+        <div className="pcards pcards-2">
+          <PictureCard art={SCENES.adapter} label="Your host runs Lua" title="Write an adapter." more={{ href: "/docs/create-adapter", label: "Create an adapter" }}>
+            One table maps the API onto your host.
+          </PictureCard>
+          <PictureCard art={SCENES.toolcase} label="Your engine has no Lua" title="Embed the .NET host kit." more={{ href: "/docs/dotnet-kit", label: "Embed the .NET kit" }}>
+            It runs Lua and TypeScript side by side. Experimental.
+          </PictureCard>
         </div>
       </section>
     </div>

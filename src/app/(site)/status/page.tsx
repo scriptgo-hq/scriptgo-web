@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { StatusBadge } from "@/components/ui/badge";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
-import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
+import { PageHead, SCENES } from "@/components/site/ink";
 import { api } from "@/lib/api";
 import type { Environment, Health, Stats } from "@/lib/contract";
 import { countOf, formatDateTime, relativeTime } from "@/lib/format";
@@ -23,18 +23,26 @@ export default async function StatusPage() {
   const apiMeta = health.ok ? (health.data.ok ? UP : DEGRADED) : health.kind === "unreachable" ? DOWN : DEGRADED;
 
   return (
-    <div className="container-page py-10">
-      <Eyebrow>status</Eyebrow>
-      <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[64px]">
-        Status.
-      </DisplayTitle>
-      <p className="mt-3 text-[14px] text-ink-3">
-        Checked <time dateTime={checkedAt}>{formatDateTime(checkedAt)}</time>, when this page was rendered. Reload to check again.
-      </p>
-
-      <section aria-labelledby="svc-title" className="mt-8">
-        <h2 id="svc-title" className="font-display text-[24px] font-extrabold">Services</h2>
-        <ul className="panel mt-3 divide-y divide-line-soft">
+    <>
+    <PageHead
+      id="status-h1"
+      tag="Platform"
+      art={{ ...SCENES.beacon, position: "74% 40%" }}
+      title={
+        <>
+          Status<em>.</em>
+        </>
+      }
+      lede={
+        <>
+          Checked <time dateTime={checkedAt}>{formatDateTime(checkedAt)}</time>. Reload to check again.
+        </>
+      }
+    />
+    <div className="container-page pb-16 pt-6">
+      <section aria-labelledby="svc-title" className="mt-4">
+        <h2 id="svc-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Services</h2>
+        <ul className="sticker mt-4 divide-y-[1.5px] divide-line-soft">
           <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
             <div>
               <p className="font-bold">API</p>
@@ -66,7 +74,7 @@ export default async function StatusPage() {
       </section>
 
       <section aria-labelledby="ci-title" className="mt-10">
-        <h2 id="ci-title" className="font-display text-[24px] font-extrabold">Latest conformance run per environment</h2>
+        <h2 id="ci-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Latest conformance run per environment</h2>
         <div className="mt-3">
           {!envs.ok ? (
             <ApiError failure={envs} compact />
@@ -119,5 +127,6 @@ export default async function StatusPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

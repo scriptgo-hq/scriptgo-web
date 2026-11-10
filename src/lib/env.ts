@@ -103,7 +103,7 @@ export const ENV_KINDS = [
     title: "Mod platforms",
     singular: "Mod platform",
     blurb:
-      "Multiplayer and modding layers that run on top of an existing game. Players bring their own copy of the game; the platform\u2019s servers and clients load the packages.",
+      "Layers that add scripting on top of an existing game. Players bring their own copy.",
   },
 ] as const;
 

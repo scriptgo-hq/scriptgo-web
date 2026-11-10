@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 
 export function SectionTitle({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) {
   return (
-    <h2 id={id} className={cn("font-mono text-[12px] font-bold uppercase tracking-wider text-ink-3", className)}>
+    <h2 id={id} className={cn("label", className)}>
       {children}
     </h2>
   );
@@ -55,7 +55,7 @@ export function RightsSummary({ rights, detailed = false }: { rights: RightsDecl
         </li>
       </ul>
       {detailed && rights.thirdPartyAssets.length > 0 ? (
-        <div className="relative overflow-x-auto rounded-lg border border-line-soft">
+        <div className="relative overflow-x-auto border-2 border-line">
           <table className="w-full min-w-[480px] text-left text-[13px]">
             <caption className="sr-only">Third-party assets declared</caption>
             <thead className="bg-surface-2 text-[11.5px] uppercase tracking-wide text-ink-3">
@@ -100,7 +100,7 @@ export function CountTile({
     <Link href={href} className="sticker sticker-hover block p-4">
       <p className="text-[13.5px] font-bold text-ink-2">{label}</p>
       {count !== null ? (
-        <p className="tabular display mt-1 text-[40px]">{count}</p>
+        <p className="tabular display mt-1.5 text-[44px]">{count}</p>
       ) : (
         <p className="mt-2 text-[15px] font-bold text-bad">
           Unavailable

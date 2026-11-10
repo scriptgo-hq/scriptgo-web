@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
-import { EnvironmentArt } from "@/components/illustrations";
+import { Ridge } from "@/components/site/ink";
+import { EnvironmentCardArt } from "@/components/site/world-art";
+import { worldArt, worldSrc, WORLD_SIZE } from "@/lib/worlds";
 import { IntegrationSection, ProtectionSection } from "@/components/site/integration-section";
 import { StatusBadge } from "@/components/ui/badge";
 import { Breadcrumb, KeyValue } from "@/components/ui/data";
@@ -40,22 +42,29 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
   const planned = e.status === "planned";
   const setup = !planned && e.setupMarkdown ? await renderMarkdown(e.setupMarkdown, { trusted: true }) : null;
   const capKeys = Array.from(new Set([...CAPABILITIES, ...Object.keys(e.capabilities)]));
+  const art = worldArt(e.slug);
+  const rule = platformRulesInfo(e);
 
   return (
-    <div className="container-page py-8">
+    <>
+    <div className={art ? "page-head has-art g-night" : "page-head g-night"}>
+      {art ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="page-head-art" src={worldSrc(art.art)} width={WORLD_SIZE.width} height={WORLD_SIZE.height} alt="" fetchPriority="high" decoding="async" />
+      ) : null}
+      <div className="container-page pb-8 pt-8">
       <Breadcrumb items={[{ label: "Environments", href: "/environments" }, { label: e.slug }]} />
-      <header className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_320px] md:items-center">
+      <header className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-center">
         <div className="min-w-0">
-          <h1 className="display text-[48px] sm:text-[64px]">{e.name}.</h1>
+          <h1 className="display">{e.name}.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
-            {platformRulesInfo(e).notable ? <StatusBadge meta={platformRulesInfo(e).meta} /> : null}
             {e.protection.tier !== "none" ? (
-              <a href="#protection-title" className="rounded-full">
+              <a href="#protection-title">
                 <StatusBadge meta={protectionMeta(e.protection)} />
               </a>
             ) : null}
-            <span className="text-[13px] font-bold uppercase tracking-wide text-ink-3">{envKind(e.kind).singular}</span>
+            <span className="label">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
           <KeyValue
@@ -89,20 +98,21 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             ]}
           />
         </div>
-        <div className="sticker overflow-hidden">
-          <EnvironmentArt slug={e.slug} name={e.name} className="aspect-[5/3] w-full" />
-        </div>
+        {art ? null : (
+          <div className="sticker hidden aspect-[5/3] overflow-hidden md:block">
+            <EnvironmentCardArt slug={e.slug} name={e.name} large />
+          </div>
+        )}
       </header>
+      </div>
+      <Ridge from="transparent" to="paper" ink="cobalt" n={1} small className="relative z-[1]" />
+    </div>
+    <div className="container-page pb-16 pt-2">
 
-      {platformRulesInfo(e).notable ? (
-        <Banner tone="info" title="This platform&rsquo;s own rules on paid scripts." className="mt-8">
-          {platformRulesInfo(e).note} {PLATFORM_RULES_LEAD}
-        </Banner>
-      ) : null}
 
       {e.status === "experimental" ? (
         <Banner tone="warning" title="Experimental environment." className="mt-8">
-          Its integration tests or its review are still pending. Expect changes, and don&rsquo;t rely on it for production.
+          Expect changes. Do not rely on it for production yet.
         </Banner>
       ) : null}
 
@@ -110,8 +120,23 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
 
       <ProtectionSection env={e} />
 
+      <section aria-labelledby="platform-rule-title" className="mt-10">
+        <h2 id="platform-rule-title" className="display scroll-mt-28 text-[30px]">
+          Paid scripts: the platform&rsquo;s own rules.
+        </h2>
+        <div className="panel mt-4 grid gap-4 p-4 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:items-start">
+          <div>
+            <StatusBadge meta={rule.meta} />
+          </div>
+          <div className="min-w-0 text-[15px] text-ink-2">
+            <p className="max-w-[70ch] text-ink">{rule.note}</p>
+            <p className="mt-2 max-w-[70ch] text-[13.5px] text-ink-3">{PLATFORM_RULES_LEAD}</p>
+          </div>
+        </div>
+      </section>
+
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <section aria-labelledby="caps-title">
+        <section aria-labelledby="caps-title" className="min-w-0">
           <h2 id="caps-title" className="display text-[30px]">Capabilities.</h2>
           <div className="panel mt-4 relative overflow-x-auto">
             <table className="w-full min-w-[420px] text-left text-[14px]">
@@ -150,8 +175,8 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             </>
           ) : null}
         </section>
-        <section aria-labelledby="setup-title">
-          <h2 id="setup-title" className="display text-[30px]">Setup.</h2>
+        <section aria-labelledby="setup-title" className="min-w-0">
+          <h2 id="setup-title" className="display scroll-mt-28 text-[30px]">Setup.</h2>
           <div className="mt-4">
             {planned ? (
               <EmptyState icon={CalendarClock} title="Planned, not usable yet">
@@ -183,5 +208,6 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
         )}
       </section>
     </div>
+    </>
   );
 }
