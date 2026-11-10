@@ -18,6 +18,21 @@ interface ProofGroup {
   runtimes: string[];
   checks: string;
   ranAt: string;
+  /** SCRIPT//GO's own conformance probe, not a package anyone installs. */
+  probe: boolean;
+}
+
+/**
+ * SCRIPT//GO's own test probes (sdk/conformance: sg_probe, sg_probe_net, sg_probe_ts, sg_xlang_*):
+ * they exercise the runtime itself and are never published as packages.
+ */
+export function isTestProbe(pkg: string): boolean {
+  return /^sg_probe(_|$)/.test(pkg) || /^sg_xlang_/.test(pkg);
+}
+
+/** Real packages first, then the probes; the newest run first within each. */
+function sortProof(groups: ProofGroup[]): ProofGroup[] {
+  return [...groups].sort((a, b) => Number(a.probe) - Number(b.probe) || b.ranAt.localeCompare(a.ranAt) || a.pkg.localeCompare(b.pkg));
 }
 
 /** One row per package version: its runtimes side by side (standalone runs three interpreters). */
@@ -37,6 +52,7 @@ function groupProof(proof: ProofRun[]): ProofGroup[] {
       runtimes: runs.map((r) => (r.lua && !r.runtime.includes(r.lua) ? `${r.runtime} · ${r.lua}` : r.runtime)),
       checks: counts.length === 1 && runs.length > 1 ? `${counts[0]} each` : counts.join(", "),
       ranAt: runs.map((r) => r.ranAt).sort().pop()!,
+      probe: isTestProbe(first.package),
     };
   });
 }
@@ -88,8 +104,8 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
                 {
                   label: "Platform's rules",
                   value: (
-                    <a href="#platform-rule-title" className="inline-flex" title={platformRulesInfo(e).note}>
-                      <StatusBadge meta={platformRulesInfo(e).meta} size="sm" />
+                    <a href="#platform-rule-title" className="inline-flex min-w-0 max-w-full" title={platformRulesInfo(e).note}>
+                      <StatusBadge meta={platformRulesInfo(e).meta} size="sm" className="max-w-full" />
                     </a>
                   ),
                 },
@@ -101,22 +117,31 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
             <h3 className="font-display text-[20px] font-extrabold">Proven on a real runtime</h3>
             {e.proof.length > 0 ? (
               <>
+                <p className="mt-1.5 max-w-[62ch] text-[14.5px] text-ink-2">
+                  Each row is a script SCRIPT//GO ran on {e.name} itself, not a simulation
+                  {e.proof.every((r) => r.checksPassed === r.checks) ? ": every test it ships passed there." : ", with how many of the tests it ships passed there."}
+                </p>
                 <div className="panel relative mt-3 overflow-x-auto">
                   <table className="w-full min-w-[460px] text-left text-[13.5px]">
-                    <caption className="sr-only">Verified runs of {e.name}</caption>
+                    <caption className="sr-only">Scripts run on {e.name} itself</caption>
                     <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
                       <tr>
-                        <th scope="col" className="px-3 py-2.5">Package</th>
-                        <th scope="col" className="px-3 py-2.5">Runtime</th>
-                        <th scope="col" className="px-3 py-2.5">Checks</th>
-                        <th scope="col" className="px-3 py-2.5">Ran</th>
+                        <th scope="col" className="px-3 py-2.5">Script</th>
+                        <th scope="col" className="px-3 py-2.5">Ran on</th>
+                        <th scope="col" className="px-3 py-2.5">Tests passed</th>
+                        <th scope="col" className="px-3 py-2.5">Date</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {groupProof(e.proof).map((g) => (
+                      {sortProof(groupProof(e.proof)).map((g) => (
                         <tr key={`${g.pkg}@${g.version}`} className="border-t border-line-soft align-top">
                           <th scope="row" className="px-3 py-2 font-mono text-[12.5px] font-semibold">
                             {g.pkg} <span className="font-normal text-ink-3">{g.version}</span>
+                            {g.probe ? (
+                              <span className="mt-1 block">
+                                <Tag title="SCRIPT//GO's own script that exercises the runtime itself. Not a package you install.">test probe</Tag>
+                              </span>
+                            ) : null}
                           </th>
                           <td className="px-3 py-2">
                             <ul className="space-y-0.5">
