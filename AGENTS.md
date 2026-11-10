@@ -8,7 +8,7 @@ this file, read it too.
 
 | Repository | What it holds |
 |---|---|
-| `scriptgo-hq/scriptgo-web` (this one, private) | The website: pages, dashboards, staff console. Deployed on Vercel |
+| `scriptgo-hq/scriptgo-web` (this one, public; proprietary licence) | The website: pages, dashboards, staff console. Deployed on Vercel |
 | `scriptgo-hq/scriptgo-api` (private) | The API, the worker, the database. The website's only data source |
 | `scriptgo-hq/scriptgo-sdk` (public, MIT) | The SDK, the API contract (`@scriptgo/shared`) and the documentation pages this site renders |
 | `scriptgo-hq/.github` (public) | The organisation's profile page |
