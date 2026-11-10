@@ -123,7 +123,7 @@ export function WorldName() {
 export function WorldPlugLine() {
   const { current } = useWorld();
   return (
-    <p className="text-[14px]">
+    <p className="text-[14px] [overflow-wrap:anywhere]">
       <Link href={envHref(current)} className="font-bold underline underline-offset-2">
         {current.name}
       </Link>

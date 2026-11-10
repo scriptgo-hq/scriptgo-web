@@ -126,7 +126,7 @@ export default function DevelopersPage() {
         <div className="mt-10 border-[2.5px] border-dashed border-line-soft p-4 text-[14.5px] text-ink-2">
           The <code className="font-mono">scriptgo</code> CLI is in preview and ships as <code className="font-mono">@scriptgo/cli</code>. Sign it in with a
           personal access token from{" "}
-          <Link href="/dashboard/settings" className="font-semibold text-cobalt-ink underline">
+          <Link href="/dashboard/settings" prefetch={false} className="font-semibold text-cobalt-ink underline">
             Dashboard → Settings
           </Link>
           . Details on the <Link href="/docs/cli" className="font-semibold text-cobalt-ink underline">CLI page</Link>.

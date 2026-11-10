@@ -352,7 +352,7 @@ export default function ProtectPage() {
               on the site. A published release cannot change; to rotate a key, publish a new version.
             </p>
             <div className="cta-row mt-6 items-center">
-              <ButtonLink href="/dashboard/packages" variant="sun" arrow>
+              <ButtonLink href="/dashboard/packages" variant="sun" arrow prefetch={false}>
                 Open your packages
               </ButtonLink>
               <ButtonLink href="/docs/protect-your-work" variant="secondary">

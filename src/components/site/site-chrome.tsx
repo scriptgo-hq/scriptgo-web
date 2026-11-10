@@ -94,7 +94,10 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
       <ul>
         {links.map(([href, label]) => (
           <li key={href}>
-            <Link href={href}>{label}</Link>
+            {/* Account pages redirect a signed-out visitor: never prefetch them, or the redirect is what the router remembers after sign-in. */}
+            <Link href={href} prefetch={href.startsWith("/dashboard") ? false : undefined}>
+              {label}
+            </Link>
           </li>
         ))}
       </ul>
