@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
-import { EnvironmentArt } from "@/components/illustrations";
+import { Ridge } from "@/components/site/ink";
+import { EnvironmentCardArt } from "@/components/site/world-art";
+import { worldArt, worldSrc, WORLD_SIZE } from "@/lib/worlds";
 import { IntegrationSection, ProtectionSection } from "@/components/site/integration-section";
 import { StatusBadge } from "@/components/ui/badge";
 import { Breadcrumb, KeyValue } from "@/components/ui/data";
@@ -39,22 +41,29 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
   const planned = e.status === "planned";
   const setup = !planned && e.setupMarkdown ? await renderMarkdown(e.setupMarkdown, { trusted: true }) : null;
   const capKeys = Array.from(new Set([...CAPABILITIES, ...Object.keys(e.capabilities)]));
+  const art = worldArt(e.slug);
 
   return (
-    <div className="container-page py-8">
+    <>
+    <div className={art ? "page-head has-art g-night" : "page-head g-night"}>
+      {art ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="page-head-art" src={worldSrc(art.art)} width={WORLD_SIZE.width} height={WORLD_SIZE.height} alt="" fetchPriority="high" decoding="async" />
+      ) : null}
+      <div className="container-page pb-8 pt-8">
       <Breadcrumb items={[{ label: "Environments", href: "/environments" }, { label: e.slug }]} />
-      <header className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_320px] md:items-center">
+      <header className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-center">
         <div className="min-w-0">
-          <h1 className="display text-[48px] sm:text-[64px]">{e.name}.</h1>
+          <h1 className="display">{e.name}.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
             {e.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, e.sales)} /> : null}
             {e.protection.tier !== "none" ? (
-              <a href="#protection-title" className="rounded-full">
+              <a href="#protection-title">
                 <StatusBadge meta={protectionMeta(e.protection)} />
               </a>
             ) : null}
-            <span className="text-[13px] font-bold uppercase tracking-wide text-ink-3">{envKind(e.kind).singular}</span>
+            <span className="label">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
           <KeyValue
@@ -88,10 +97,16 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             ]}
           />
         </div>
-        <div className="sticker overflow-hidden">
-          <EnvironmentArt slug={e.slug} name={e.name} className="aspect-[5/3] w-full" />
-        </div>
+        {art ? null : (
+          <div className="sticker hidden aspect-[5/3] overflow-hidden md:block">
+            <EnvironmentCardArt slug={e.slug} name={e.name} large />
+          </div>
+        )}
       </header>
+      </div>
+      <Ridge from="transparent" to="paper" ink="cobalt" n={1} small className="relative z-[1]" />
+    </div>
+    <div className="container-page pb-16 pt-2">
 
       {e.sales !== "allowed" ? (
         <Banner
@@ -186,5 +201,6 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
         )}
       </section>
     </div>
+    </>
   );
 }

@@ -20,7 +20,7 @@ const SECTIONS = [
 
 function DraftTag() {
   return (
-    <span className="ml-2 inline-flex items-center rounded-full border-2 border-line bg-sun px-2 py-0.5 align-middle font-mono text-[11px] font-bold uppercase text-on-sun">
+    <span className="stamp stamp-sm stamp-accent ml-3 align-middle">
       Draft · pending legal review
     </span>
   );
@@ -28,8 +28,8 @@ function DraftTag() {
 
 function Section({ id, title, draft = true, children }: { id: string; title: string; draft?: boolean; children: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className="scroll-mt-24 border-t-2 border-line-soft pt-8">
-      <h2 id={`${id}-h`} className="font-display text-[28px] font-extrabold tracking-[-0.02em]">
+    <section id={id} aria-labelledby={`${id}-h`} className="scroll-mt-28 border-t-2 border-dashed border-line-soft pt-9">
+      <h2 id={`${id}-h`} className="font-display text-[30px] font-black tracking-[-0.025em]" style={{ fontStretch: "114%" }}>
         {title}
         {draft ? <DraftTag /> : null}
       </h2>
@@ -40,13 +40,13 @@ function Section({ id, title, draft = true, children }: { id: string; title: str
 
 export default function LegalPage() {
   return (
-    <div className="container-page grid gap-10 py-10 lg:grid-cols-[230px_minmax(0,1fr)]">
-      <nav aria-label="Legal sections" className="lg:sticky lg:top-24 lg:self-start">
-        <p className="eyebrow">{"// legal"}</p>
+    <div className="container-page grid gap-10 pb-16 pt-10 lg:grid-cols-[230px_minmax(0,1fr)]">
+      <nav aria-label="Legal sections" className="lg:sticky lg:top-28 lg:self-start">
+        <p className="eyebrow">Legal</p>
         <ul className="mt-2 space-y-1 text-[14px]">
           {SECTIONS.map((s) => (
             <li key={s.id}>
-              <a href={`#${s.id}`} className="block rounded-md px-2 py-1 text-ink-2 hover:bg-surface-2 hover:text-ink">
+              <a href={`#${s.id}`} className="block border-l-[5px] border-transparent px-2.5 py-1 text-ink-2 hover:border-line hover:text-ink">
                 {s.title}
               </a>
             </li>
@@ -55,9 +55,9 @@ export default function LegalPage() {
       </nav>
       <div className="min-w-0 space-y-10">
         <div>
-          <Eyebrow>legal</Eyebrow>
-          <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[64px]">
-            Legal.
+          <Eyebrow className="mb-4">Trust</Eyebrow>
+          <DisplayTitle as="h1" className="text-[52px] sm:text-[64px]">
+            Legal<em>.</em>
           </DisplayTitle>
           <Banner tone="warning" title="These documents are drafts pending legal review." className="mt-6">
             They describe how SCRIPT//GO intends to operate. They are not yet binding terms, and they will change before the

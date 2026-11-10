@@ -51,7 +51,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <main id="main" className="container-page py-16">
         <div className="sticker mx-auto max-w-[560px] p-8 text-center">
           <ShieldAlert aria-hidden="true" size={36} strokeWidth={2} className="mx-auto text-bad" />
-          <p className="eyebrow mt-3">{"// "}403</p>
+          <p className="eyebrow mt-3">403</p>
           <h1 className="display mt-1 text-[36px]">Staff only.</h1>
           <p className="mt-3 text-[15px] text-ink-2">
             This area is for SCRIPT//GO administrators and moderators. Your account ({me.data.user.email}) does not have either role.

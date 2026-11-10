@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Check, Minus } from "lucide-react";
-import { CreatorBoxArt } from "@/components/illustrations";
+import { Art, PageHead, Ridge, SCENES } from "@/components/site/ink";
 import { ProtectionTierTable } from "@/components/site/integration-section";
 import { ButtonLink } from "@/components/ui/button";
 import { CommandLine } from "@/components/ui/code-block";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
-import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 
@@ -22,9 +22,10 @@ const OWNED = [
   "The assets you created yourself: interface, images, sounds.",
 ];
 
-const CASES: { eyebrow: string; title: string; body: string[]; sold: string }[] = [
+const CASES: { eyebrow: string; art: "stall" | "pass"; title: string; body: string[]; sold: string }[] = [
   {
     eyebrow: "a script studio",
+    art: "stall",
     title: "Ready-made scripts, sold to server owners.",
     body: [
       "A studio writes a job system and sells it to the people who run servers. Each buyer gets a licence for their own servers.",
@@ -34,6 +35,7 @@ const CASES: { eyebrow: string; title: string; body: string[]; sold: string }[] 
   },
   {
     eyebrow: "a server operator",
+    art: "pass",
     title: "A perk on their own server.",
     body: [
       "An operator sells a monthly VIP pass to their players. The pass unlocks a feature of the script the operator wrote for their server.",
@@ -116,50 +118,46 @@ async function Tiers() {
 export default function ProtectPage() {
   return (
     <div>
-      <section className="border-b-2 border-line-soft">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] lg:items-center">
-          <div>
-            <Eyebrow>protect</Eyebrow>
-            <DisplayTitle as="h1" className="mt-2 text-[44px] sm:text-[60px]">
-              You wrote it.
-              <br />
-              <span className="display-italic text-cobalt-ink">You own it.</span>
-              <br />
-              Keep it that way.
-            </DisplayTitle>
-            <p className="mt-5 max-w-[58ch] text-[17px] text-ink-2">
+      <PageHead
+        id="protect-h1"
+        tag="Protect"
+        art={{ ...SCENES.strongbox, position: "78% 45%" }}
+        title={
+          <>
+            You wrote it. <em>You own it.</em> Keep it that way.
+          </>
+        }
+      >
+            <p className="lede mt-5 !max-w-[58ch] text-[#e6e2f3]">
               SCRIPT//GO sells and protects work that belongs to its creator: the scripts you wrote and the content you made for
               them. Every release is signed. A paid package runs only on servers that hold a licence. And a release can be
               delivered encrypted, with its key released to one licensed server at a time.
             </p>
-            <p className="mt-3 max-w-[58ch] text-[15px] text-ink-2">
+            <p className="mt-3 max-w-[58ch] text-[15.5px] text-ink-2">
               We never sell, ship, decrypt or redistribute a game&rsquo;s own files. And we say plainly what protection does not
               do.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="#how-title" size="lg" arrow>
+            <div className="cta-row mt-8 items-center">
+              <ButtonLink href="#how-title" variant="sun" size="lg" arrow>
                 How it works
               </ButtonLink>
               <ButtonLink href="/docs/protect-your-work" variant="secondary" size="lg">
                 Read the guide
               </ButtonLink>
-              <Link href="#limits-title" className="inline-flex h-12 items-center px-2 font-bold text-ink underline-offset-4 hover:underline">
+              <Link href="#limits-title" className="ink-link">
                 What it does not do
               </Link>
             </div>
-          </div>
-          <CreatorBoxArt className="mx-auto hidden w-full max-w-[260px] lg:block" />
-        </div>
-      </section>
+      </PageHead>
 
-      <section aria-labelledby="owned-title" className="container-page py-12">
-        <DisplayTitle id="owned-title" className="text-[38px] sm:text-[44px]">
-          What is protected.
+      <section aria-labelledby="owned-title" className="sec g-paper bleed sec-sweeps container-page !pt-12">
+        <Eyebrow className="mb-[18px]">Ownership</Eyebrow>
+        <DisplayTitle id="owned-title" className="text-[38px] sm:text-[48px]">
+          What is <em>protected.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
         <div className="mt-8 grid gap-10 lg:grid-cols-2">
           <div className="min-w-0">
-            <h3 className="font-display text-[22px] font-extrabold leading-tight">Your work.</h3>
+            <h3 className="font-display text-[24px] font-black leading-tight tracking-[-0.02em]">Your work.</h3>
             <ul className="mt-3 space-y-2 text-[15.5px]">
               {OWNED.map((t) => (
                 <li key={t} className="flex gap-2.5">
@@ -174,7 +172,7 @@ export default function ProtectPage() {
             </p>
           </div>
           <div className="min-w-0">
-            <h3 className="font-display text-[22px] font-extrabold leading-tight">On someone else&rsquo;s game.</h3>
+            <h3 className="font-display text-[24px] font-black leading-tight tracking-[-0.02em]">On someone else&rsquo;s game.</h3>
             <p className="mt-3 max-w-[60ch] text-[15.5px] text-ink-2">
               Take a multiplayer platform built on a AAA open-world game. The game belongs to its publisher. A server operator
               on that platform still owns every script they write for their server. They can license it, protect it and sell it
@@ -188,44 +186,49 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <section aria-labelledby="cases-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page py-12">
-          <DisplayTitle id="cases-title" className="text-[38px] sm:text-[44px]">
-            Two ways creators sell.
+      <Ridge from="paper" to="cobalt" ink="violet" n={1} />
+      <section aria-labelledby="cases-title" className="sec g-cobalt sec-sweeps !pt-10">
+        <div className="container-page">
+          <Eyebrow className="mb-[18px]">Monetize</Eyebrow>
+          <DisplayTitle id="cases-title" className="text-[38px] sm:text-[48px]">
+            Two ways <em>creators sell.</em>
           </DisplayTitle>
-          <Stroke className="mt-1" />
-          <ul className="mt-8 grid gap-5 md:grid-cols-2">
+          <ul className="ways mt-9">
             {CASES.map((c) => (
-              <li key={c.eyebrow} className="sticker flex flex-col gap-3 p-5">
-                <Eyebrow>{c.eyebrow}</Eyebrow>
-                <h3 className="font-display text-[23px] font-extrabold leading-tight">{c.title}</h3>
-                {c.body.map((p) => (
-                  <p key={p} className="text-[15px] text-ink-2">
-                    {p}
-                  </p>
-                ))}
-                <p className="mt-auto border-t-2 border-line-soft pt-3 text-[14.5px] font-semibold">{c.sold}</p>
+              <li key={c.eyebrow} className="way">
+                <Art src={SCENES[c.art].src} width={SCENES[c.art].width} height={SCENES[c.art].height} />
+                <div className="way-body">
+                  <span className="label">{c.eyebrow}</span>
+                  <h3 className="font-display text-[26px] font-black leading-[1.05] tracking-[-0.025em]">{c.title}</h3>
+                  {c.body.map((p) => (
+                    <p key={p} className="text-[15.5px] text-ink-2">
+                      {p}
+                    </p>
+                  ))}
+                  <p className="way-sold">{c.sold}</p>
+                </div>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section aria-labelledby="how-title" className="container-page scroll-mt-24 py-12">
-        <DisplayTitle id="how-title" className="scroll-mt-24 text-[38px] sm:text-[44px]">
-          How escrow works.
+      <Ridge from="cobalt" to="paper" ink="sun" n={2} />
+      <section aria-labelledby="how-title" className="sec g-paper bleed sec-sweeps container-page scroll-mt-24 !pt-10">
+        <Eyebrow className="mb-[18px]">Escrow</Eyebrow>
+        <DisplayTitle id="how-title" className="scroll-mt-28 text-[38px] sm:text-[48px]">
+          How escrow <em>works.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
         <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
           Escrow means the release is delivered encrypted and SCRIPT//GO holds the key. Five steps take a payment to a running
           server.
         </p>
-        <ol className="mt-8 grid gap-5 lg:grid-cols-5">
+        <ol className="mt-12 grid gap-x-5 gap-y-10 lg:grid-cols-5">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="sticker flex flex-col gap-2 p-4">
+            <li key={s.title} className="step !pt-9">
               <span
                 aria-hidden="true"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-line bg-sun font-display text-[18px] font-black text-on-sun"
+                className="step-n"
               >
                 {i + 1}
               </span>
@@ -237,7 +240,7 @@ export default function ProtectPage() {
             </li>
           ))}
         </ol>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           <div className="panel p-4">
             <h3 className="font-display text-[18px] font-extrabold">Every release is signed.</h3>
             <p className="mt-1 text-[14.5px] text-ink-2">
@@ -262,12 +265,13 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <section aria-labelledby="tiers-title" className="scroll-mt-24 border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page py-12">
-          <DisplayTitle id="tiers-title" className="scroll-mt-24 text-[38px] sm:text-[44px]">
-            Where it applies.
+      <Ridge from="paper" to="paper2" ink="sand" n={3} />
+      <section aria-labelledby="tiers-title" className="sec g-paper2 sec-sweeps scroll-mt-24 !pt-10">
+        <div className="container-page">
+          <Eyebrow className="mb-[18px]">By host</Eyebrow>
+          <DisplayTitle id="tiers-title" className="scroll-mt-28 text-[38px] sm:text-[48px]">
+            Where it <em>applies.</em>
           </DisplayTitle>
-          <Stroke className="mt-1" />
           <p className="mt-4 max-w-[68ch] text-[16px] text-ink-2">
             What a buyer&rsquo;s server gets depends on the host. Decrypting in memory needs a host that runs compiled code and
             can hold a key. A host that runs plain script gets the licence check and the signature. Where the game&rsquo;s rights
@@ -286,13 +290,14 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <section aria-labelledby="claims-title" className="container-page py-12">
-        <div className="grid gap-10 lg:grid-cols-2">
+      <Ridge from="paper2" to="night" ink="cobalt" n={0} />
+      <section aria-labelledby="claims-title" className="sec g-night bleed sec-sweeps container-page !pt-10">
+        <div className="grid gap-12 lg:grid-cols-2">
           <div className="min-w-0">
-            <DisplayTitle id="claims-title" className="text-[34px] sm:text-[40px]">
-              What we claim.
+            <Eyebrow className="mb-[18px]">The promise</Eyebrow>
+            <DisplayTitle id="claims-title" className="text-[34px] sm:text-[42px]">
+              What we <em>claim.</em>
             </DisplayTitle>
-            <Stroke className="mt-1" />
             <ul className="mt-6 space-y-2.5 text-[15.5px]">
               {CLAIMS.map((t) => (
                 <li key={t} className="flex gap-2.5">
@@ -303,10 +308,10 @@ export default function ProtectPage() {
             </ul>
           </div>
           <div className="min-w-0">
-            <DisplayTitle id="limits-title" className="scroll-mt-24 text-[34px] sm:text-[40px]">
-              What this does not do.
+            <Eyebrow className="mb-[18px]">The limits</Eyebrow>
+            <DisplayTitle id="limits-title" className="scroll-mt-28 text-[34px] sm:text-[42px]">
+              What this <em>does not do.</em>
             </DisplayTitle>
-            <Stroke className="mt-1" />
             <ul className="mt-6 space-y-4">
               {LIMITS.map((l) => (
                 <li key={l.title} className="flex gap-2.5">
@@ -322,13 +327,14 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <section aria-labelledby="game-ip-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+      <Ridge from="night" to="sun" ink="cobalt" n={1} />
+      <section aria-labelledby="game-ip-title" className="sec g-sun sec-sweeps !pt-10">
+        <div className="container-page grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
           <div>
-            <DisplayTitle id="game-ip-title" className="text-[38px] sm:text-[44px]">
-              What we never touch: the game&rsquo;s IP.
+            <Eyebrow className="mb-[18px]">The game&rsquo;s IP</Eyebrow>
+            <DisplayTitle id="game-ip-title" className="text-[38px] sm:text-[46px]">
+              What we never touch: <em>the game&rsquo;s IP.</em>
             </DisplayTitle>
-            <Stroke className="mt-1" />
             <p className="mt-4 max-w-[52ch] text-[16px] text-ink-2">
               A game belongs to its publisher. A script written for it belongs to its author. SCRIPT//GO deals only in the
               second.
@@ -359,8 +365,9 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <section aria-labelledby="start-title" className="container-page py-12">
-        <div className="sticker grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
+      <Ridge from="sun" to="paper" ink="orange" n={2} />
+      <section aria-labelledby="start-title" className="sec g-paper bleed container-page !pt-10">
+        <div className="sticker grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
           <div className="min-w-0">
             <DisplayTitle id="start-title" className="text-[32px] sm:text-[38px]">
               Protect a release.
@@ -369,19 +376,19 @@ export default function ProtectPage() {
               From the command line, or with the &ldquo;Protect this release (escrow)&rdquo; option when you upload a new release
               on the site. A published release cannot change; to rotate a key, publish a new version.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <ButtonLink href="/dashboard/packages" arrow>
+            <div className="cta-row mt-6 items-center">
+              <ButtonLink href="/dashboard/packages" variant="sun" arrow>
                 Open your packages
               </ButtonLink>
               <ButtonLink href="/docs/protect-your-work" variant="secondary">
                 Read the guide
               </ButtonLink>
-              <Link href="/legal#protection" className="inline-flex h-10 items-center px-2 font-bold text-ink underline-offset-4 hover:underline">
+              <Link href="/legal#protection" className="ink-link">
                 The terms
               </Link>
             </div>
           </div>
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0 space-y-4">
             <CommandLine command="scriptgo publish --escrow" />
             <CommandLine command={'scriptgo publish --escrow --escrow-ignore "config.lua"'} />
             <p className="text-[13px] text-ink-3">

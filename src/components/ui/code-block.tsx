@@ -38,7 +38,7 @@ export function CommandLine({ command, className }: { command: string; className
   return (
     <div className={cn("codeblock flex items-center gap-2 py-1.5 pl-3 pr-1.5", className)}>
       <code className="min-w-0 flex-1 whitespace-pre-wrap [overflow-wrap:anywhere] py-1 font-mono text-[13px]">
-        <span aria-hidden="true" className="select-none text-[#a39b8b]">
+        <span aria-hidden="true" className="select-none font-semibold text-[#ffc83d]">
           ${" "}
         </span>
         {command}

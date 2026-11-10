@@ -8,7 +8,7 @@ export function InlineCodeText({ text }: { text: string }) {
     <>
       {parts.map((p, i) =>
         p.startsWith("`") && p.endsWith("`") && p.length > 2 ? (
-          <code key={i} className="rounded bg-surface-2 px-1 py-[1px] font-mono text-[0.88em]">
+          <code key={i} className="border border-line-soft bg-surface-2 px-1 py-[1px] font-mono text-[0.88em]">
             {p.slice(1, -1)}
           </code>
         ) : (

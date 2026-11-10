@@ -23,18 +23,18 @@ export default async function StatusPage() {
   const apiMeta = health.ok ? (health.data.ok ? UP : DEGRADED) : health.kind === "unreachable" ? DOWN : DEGRADED;
 
   return (
-    <div className="container-page py-10">
-      <Eyebrow>status</Eyebrow>
-      <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[64px]">
-        Status.
+    <div className="container-page pb-16 pt-10">
+      <Eyebrow className="mb-4">Platform</Eyebrow>
+      <DisplayTitle as="h1" className="text-[52px] sm:text-[64px]">
+        Status<em>.</em>
       </DisplayTitle>
       <p className="mt-3 text-[14px] text-ink-3">
         Checked <time dateTime={checkedAt}>{formatDateTime(checkedAt)}</time>, when this page was rendered. Reload to check again.
       </p>
 
       <section aria-labelledby="svc-title" className="mt-8">
-        <h2 id="svc-title" className="font-display text-[24px] font-extrabold">Services</h2>
-        <ul className="panel mt-3 divide-y divide-line-soft">
+        <h2 id="svc-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Services</h2>
+        <ul className="sticker mt-4 divide-y-[1.5px] divide-line-soft">
           <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
             <div>
               <p className="font-bold">API</p>
@@ -66,7 +66,7 @@ export default async function StatusPage() {
       </section>
 
       <section aria-labelledby="ci-title" className="mt-10">
-        <h2 id="ci-title" className="font-display text-[24px] font-extrabold">Latest conformance run per environment</h2>
+        <h2 id="ci-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Latest conformance run per environment</h2>
         <div className="mt-3">
           {!envs.ok ? (
             <ApiError failure={envs} compact />

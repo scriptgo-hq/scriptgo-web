@@ -35,7 +35,7 @@ export function ApiError({
     <div
       role="alert"
       className={cn(
-        "rounded-[10px] border-2 border-dashed border-bad/60 bg-bad-soft/60 text-ink",
+        "sheet border-[2.5px] border-dashed border-bad bg-bad-soft text-ink",
         compact ? "p-3 text-[13.5px]" : "p-5",
         className,
       )}
@@ -43,7 +43,7 @@ export function ApiError({
       <div className="flex items-start gap-3">
         <Icon aria-hidden="true" className="mt-0.5 shrink-0 text-bad" size={compact ? 18 : 22} strokeWidth={2.25} />
         <div className="min-w-0">
-          <p className={cn("font-bold", compact ? "text-[14px]" : "text-[16px]")}>{heading}</p>
+          <p className={cn("font-display font-extrabold", compact ? "text-[14.5px]" : "text-[17px]")}>{heading}</p>
           <p className="mt-1 text-ink-2">
             {unreachable
               ? "Nothing is shown instead of real data. The service may be starting or down; try again in a moment."
@@ -85,9 +85,9 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-[10px] border-2 border-dashed border-line-soft px-5 py-8 text-center", className)}>
+    <div className={cn("border-[2.5px] border-dashed border-line-soft px-5 py-8 text-center", className)}>
       <Icon aria-hidden="true" className="mx-auto text-ink-3" size={26} strokeWidth={1.75} />
-      <p className="mt-2 font-bold">{title}</p>
+      <p className="mt-2 font-display text-[17px] font-extrabold">{title}</p>
       {children ? <div className="mx-auto mt-1 max-w-prose text-[14.5px] text-ink-2">{children}</div> : null}
       {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
     </div>
@@ -95,9 +95,9 @@ export function EmptyState({
 }
 
 const BANNER_TONES = {
-  info: { cls: "bg-info-soft border-info/50", icon: Info, iconCls: "text-info" },
-  warning: { cls: "bg-warn-soft border-warn/50", icon: TriangleAlert, iconCls: "text-warn" },
-  danger: { cls: "bg-bad-soft border-bad/50", icon: CircleAlert, iconCls: "text-bad" },
+  info: { cls: "bg-info-soft border-info", icon: Info, iconCls: "text-info" },
+  warning: { cls: "bg-sun-soft border-line", icon: TriangleAlert, iconCls: "text-warn" },
+  danger: { cls: "bg-bad-soft border-bad", icon: CircleAlert, iconCls: "text-bad" },
 } as const;
 
 /** Page-level banner: restricted listing, checkout off, grace period, drafts pending review. */
@@ -117,11 +117,11 @@ export function Banner({
   const t = BANNER_TONES[tone];
   const Icon = t.icon;
   return (
-    <div role={tone === "danger" ? "alert" : "status"} className={cn("rounded-[10px] border-2 p-4", t.cls, className)}>
+    <div role={tone === "danger" ? "alert" : "status"} className={cn("sheet border-[2.5px] p-4", t.cls, className)}>
       <div className="flex flex-wrap items-start gap-3">
         <Icon aria-hidden="true" className={cn("mt-0.5 shrink-0", t.iconCls)} size={20} strokeWidth={2.25} />
         <div className="min-w-0 flex-1">
-          <p className="font-bold">{title}</p>
+          <p className="font-display text-[16px] font-extrabold">{title}</p>
           {children ? <div className="mt-0.5 text-[14.5px] text-ink-2">{children}</div> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}

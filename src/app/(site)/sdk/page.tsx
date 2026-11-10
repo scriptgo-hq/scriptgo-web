@@ -4,7 +4,10 @@ import { ArrowRight } from "lucide-react";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/code-block";
-import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { Suspense } from "react";
+import { PageHead, Ridge, SCENES } from "@/components/site/ink";
+import { ProofBlock } from "@/components/site/proof-block";
+import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 import { escrowAdapterGuideHref } from "@/lib/docs";
@@ -340,12 +343,12 @@ async function AdapterCounts() {
     { n: count("none"), meta: adapterMeta.none, text: "planned environments with no adapter code yet" },
   ];
   return (
-    <ul className="mt-8 grid gap-3 sm:grid-cols-3">
+    <ul className="mt-9 grid max-w-[760px] gap-5 sm:grid-cols-3">
       {tiles.map((t) => (
         <li key={t.meta.label}>
           <Link href="/environments" className="sticker sticker-hover flex h-full flex-col gap-2 p-4">
             <StatusBadge meta={t.meta} size="sm" className="self-start" />
-            <span className="font-display text-[30px] font-black leading-none tabular">{t.n}</span>
+            <span className="display tabular text-[40px] leading-none">{t.n}</span>
             <span className="text-[14px] text-ink-2">{t.text}</span>
           </Link>
         </li>
@@ -388,11 +391,11 @@ const ESCROW_HOST_STEPS: { title: string; body: React.ReactNode }[] = [
 function ProtectSection() {
   const guide = escrowAdapterGuideHref();
   return (
-    <section aria-labelledby="protect-title" className="container-page py-12">
-      <DisplayTitle id="protect-title" className="text-[38px] sm:text-[44px]">
-        Protect your work.
+    <section aria-labelledby="protect-title" className="sec g-night bleed sec-sweeps container-page">
+      <Eyebrow className="mb-[18px]">Protection</Eyebrow>
+      <DisplayTitle id="protect-title" className="scroll-mt-28 text-[38px] sm:text-[48px]">
+        Protect <em>your work.</em>
       </DisplayTitle>
-      <Stroke className="mt-1" />
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div className="min-w-0">
           <p className="max-w-[60ch] text-[16px] text-ink-2">
@@ -407,7 +410,7 @@ function ProtectSection() {
             impossible.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <ButtonLink href="/protect" arrow>
+            <ButtonLink href="/protect" variant="sun" arrow>
               How protection works
             </ButtonLink>
             <ButtonLink href={guide ?? "/docs/protect-your-work"} variant="secondary">
@@ -432,14 +435,14 @@ function ProtectSection() {
           </p>
         </div>
         <div className="min-w-0">
-          <Eyebrow>for a platform that wants escrow</Eyebrow>
-          <h3 className="mt-1 font-display text-[22px] font-extrabold leading-tight">What a host needs.</h3>
+          <p className="label">For a platform that wants escrow</p>
+          <h3 className="mt-1 font-display text-[24px] font-extrabold leading-tight">What a host needs.</h3>
           <ol className="mt-4 space-y-4">
             {ESCROW_HOST_STEPS.map((s, i) => (
               <li key={s.title} className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-line bg-sun font-display text-[16px] font-black text-on-sun"
+                  className="num-slab"
                 >
                   {i + 1}
                 </span>
@@ -466,40 +469,45 @@ function ProtectSection() {
 export default function SdkPage() {
   return (
     <div>
-      <section className="border-b-2 border-line-soft">
-        <div className="container-page py-12">
-          <Eyebrow>sdk</Eyebrow>
-          <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[68px]">
-            The SDK.
-          </DisplayTitle>
-          <p className="mt-5 max-w-[64ch] text-[17px] text-ink-2">
+      <PageHead
+        id="sdk-title"
+        tag="SDK"
+        art={{ ...SCENES.signpost, position: "62% 40%" }}
+        title={
+          <>
+            The <em>SDK.</em>
+          </>
+        }
+        lede={
+          <>
             Packages are written once, against one API. The SDK is what runs that API on each host: a Lua core, one adapter per
             host, a host kit for engines that do not run Lua, a CLI, and the specs that tie them together. This page says what
             exists, how an engine integrates it, and what is not built yet.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <ButtonLink href="/docs/create-adapter" size="lg" arrow>
+          </>
+        }
+      >
+          <div className="cta-row mt-8 items-center">
+            <ButtonLink href="/docs/create-adapter" variant="sun" size="lg" arrow>
               Write an adapter
             </ButtonLink>
             <ButtonLink href="/docs/dotnet-kit" variant="secondary" size="lg">
               Embed the .NET kit
             </ButtonLink>
-            <Link href="/docs/sdk" className="inline-flex h-12 items-center px-2 font-bold text-ink underline-offset-4 hover:underline">
+            <Link href="/docs/sdk" className="ink-link">
               Read the SDK guide
             </Link>
           </div>
           <AdapterCounts />
-        </div>
-      </section>
+      </PageHead>
 
-      <section aria-labelledby="pieces-title" className="container-page py-12">
-        <DisplayTitle id="pieces-title" className="text-[38px] sm:text-[44px]">
-          What is in it.
+      <section aria-labelledby="pieces-title" className="sec g-paper bleed sec-sweeps container-page !pt-12">
+        <Eyebrow className="mb-[18px]">The pieces</Eyebrow>
+        <DisplayTitle id="pieces-title" className="text-[38px] sm:text-[48px]">
+          What is <em>in it.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
-        <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-9 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
           {PIECES.map((p) => (
-            <li key={p.title} className="sticker flex flex-col gap-2 p-5">
+            <li key={p.title} className="sticker flex flex-col gap-2.5 p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="font-display text-[21px] font-extrabold leading-tight">{p.title}</h3>
                 {p.badge ? <StatusBadge meta={p.badge} size="sm" /> : null}
@@ -514,16 +522,17 @@ export default function SdkPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="paths-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page py-12">
-          <DisplayTitle id="paths-title" className="text-[38px] sm:text-[44px]">
-            Two ways to integrate.
+      <Ridge from="paper" to="paper2" ink="sun" n={1} />
+      <section aria-labelledby="paths-title" className="sec g-paper2 sec-sweeps !pt-10">
+        <div className="container-page">
+          <Eyebrow className="mb-[18px]">Integrate</Eyebrow>
+          <DisplayTitle id="paths-title" className="text-[38px] sm:text-[48px]">
+            Two ways to <em>integrate.</em>
           </DisplayTitle>
-          <Stroke className="mt-1" />
           <div className="mt-8 grid gap-10 lg:grid-cols-2">
             <div className="min-w-0">
-              <Eyebrow>for a host that runs Lua</Eyebrow>
-              <h3 className="mt-1 font-display text-[26px] font-extrabold leading-tight">Write an adapter.</h3>
+              <p className="label !text-cobalt-ink">For a host that runs Lua</p>
+              <h3 className="mt-1 font-display text-[28px] font-black leading-tight tracking-[-0.02em]">Write an adapter.</h3>
               <p className="mt-3 max-w-[60ch] text-[15px] text-ink-2">
                 Engines, mod frameworks and game servers that already embed Lua keep their own VM. The core runs in it
                 unchanged: you write one adapter table and tick the host from your loop. A host that already runs this resource
@@ -534,7 +543,7 @@ export default function SdkPage() {
                   <Tag key={t}>{t}</Tag>
                 ))}
               </div>
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-5">
                 <CodeBlock code={ADAPTER} lang="lua" filename="adapters/myengine.lua" />
                 <CodeBlock code={HOST} lang="lua" filename="your engine" />
               </div>
@@ -547,8 +556,8 @@ export default function SdkPage() {
               </p>
             </div>
             <div className="min-w-0">
-              <Eyebrow>for an engine without Lua</Eyebrow>
-              <h3 className="mt-1 font-display text-[26px] font-extrabold leading-tight">Embed a host kit.</h3>
+              <p className="label !text-cobalt-ink">For an engine without Lua</p>
+              <h3 className="mt-1 font-display text-[28px] font-black leading-tight tracking-[-0.02em]">Embed a host kit.</h3>
               <p className="mt-3 max-w-[60ch] text-[15px] text-ink-2">
                 A C# engine or server references <code className="font-mono text-[0.9em]">ScriptGo.Host</code>, supplies its
                 services (storage, players, permissions, config, notifications, HTTP) and describes its natives once. Its users
@@ -574,12 +583,13 @@ export default function SdkPage() {
         </div>
       </section>
 
-      <section aria-labelledby="languages-title" className="container-page py-12">
-        <DisplayTitle id="languages-title" className="text-[38px] sm:text-[44px]">
-          Languages.
+      <Ridge from="paper2" to="sun" ink="orange" n={2} />
+      <section aria-labelledby="languages-title" className="sec g-sun bleed sec-sweeps container-page !pt-10">
+        <Eyebrow className="mb-[18px]">Languages</Eyebrow>
+        <DisplayTitle id="languages-title" className="text-[38px] sm:text-[48px]">
+          One API, <em>every language.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
-        <ul className="mt-8 grid gap-5 md:grid-cols-3">
+        <ul className="mt-9 grid gap-7 md:grid-cols-3">
           {LANGUAGES.map((l) => (
             <li key={l.name} className="sticker flex flex-col gap-2 p-5">
               <h3 className="font-display text-[21px] font-extrabold leading-tight">{l.name}</h3>
@@ -588,23 +598,24 @@ export default function SdkPage() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[13.5px] text-ink-3">
+        <p className="mt-6 text-[14px] text-ink-2">
           One API in every language, defined by the runtime IDL: <code className="font-mono">nil, reason</code> in Lua, errors and
           promises in JavaScript. How values cross between languages is fixed in{" "}
           <code className="font-mono">docs/spec/multi-language.md</code>.
         </p>
       </section>
 
-      <section aria-labelledby="platform-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page py-12">
-          <DisplayTitle id="platform-title" className="text-[38px] sm:text-[44px]">
-            On top of the SDK.
+      <Ridge from="sun" to="cobalt" ink="violet" n={3} />
+      <section aria-labelledby="platform-title" className="sec g-cobalt sec-sweeps !pt-10">
+        <div className="container-page">
+          <Eyebrow className="mb-[18px]">The platform</Eyebrow>
+          <DisplayTitle id="platform-title" className="text-[38px] sm:text-[48px]">
+            On top of <em>the SDK.</em>
           </DisplayTitle>
-          <Stroke className="mt-1" />
           <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
             The SDK runs packages. The platform around it is what creators and server owners use it for.
           </p>
-          <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-9 grid gap-7 md:grid-cols-2 lg:grid-cols-4">
             {PLATFORM.map((p) => (
               <li key={p.title} className="sticker flex flex-col gap-2 p-5">
                 <h3 className="font-display text-[19px] font-extrabold leading-tight">{p.title}</h3>
@@ -618,13 +629,39 @@ export default function SdkPage() {
         </div>
       </section>
 
+      <Ridge from="cobalt" to="night" ink="deep" n={0} />
       <ProtectSection />
 
-      <section aria-labelledby="roadmap-title" className="container-page border-t-2 border-line-soft py-12">
-        <DisplayTitle id="roadmap-title" className="text-[38px] sm:text-[44px]">
-          Not built yet.
+      <Ridge from="night" to="paper2" ink="cobalt" n={1} />
+      <section aria-labelledby="proof-title" className="sec g-paper2 bleed sec-sweeps container-page !pt-10">
+        <Eyebrow className="mb-[18px]">One module, every runtime</Eyebrow>
+        <DisplayTitle id="proof-title" className="text-[38px] sm:text-[48px]">
+          Same code. <em>Real output.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
+        <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
+          A package&rsquo;s README example on the left, and what each environment printed when{" "}
+          <code className="font-mono text-[14px]">scriptgo verify</code> ran it next to the package. Every line on the right comes
+          from a recorded compatibility run.
+        </p>
+        <div className="mt-8">
+          <Suspense
+            fallback={
+              <div className="h-[340px] animate-pulse border-[2.5px] border-dashed border-line-soft" aria-busy="true">
+                <span className="sr-only">Loading…</span>
+              </div>
+            }
+          >
+            <ProofBlock />
+          </Suspense>
+        </div>
+      </section>
+
+      <Ridge from="paper2" to="paper" ink="sand" n={2} />
+      <section aria-labelledby="roadmap-title" className="sec g-paper bleed sec-sweeps container-page !pt-10">
+        <Eyebrow className="mb-[18px]">Roadmap</Eyebrow>
+        <DisplayTitle id="roadmap-title" className="text-[38px] sm:text-[48px]">
+          Not built <em>yet.</em>
+        </DisplayTitle>
         <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
           The plan, in the order it is meant to land. Nothing here is usable today; each item is listed only once it passes
           real runs.

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { CommandLine } from "@/components/ui/code-block";
-import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { DOCS, DOC_GROUPS, loadDoc } from "@/lib/docs";
 
 export const dynamic = "force-static";
@@ -16,11 +16,10 @@ export default async function DocsHome() {
   const entries = await Promise.all(DOCS.map(async (d) => ({ entry: d, doc: await loadDoc(d) })));
   return (
     <div>
-      <Eyebrow>docs</Eyebrow>
-      <DisplayTitle as="h1" className="mt-2 text-[48px] sm:text-[60px]">
-        Docs.
+      <Eyebrow className="mb-4">Docs</Eyebrow>
+      <DisplayTitle as="h1" className="text-[48px] sm:text-[64px]">
+        The <em>docs.</em>
       </DisplayTitle>
-      <Stroke className="mt-1" />
       <p className="mt-4 max-w-[62ch] text-[17px] text-ink-2">
         A SCRIPT//GO package is a resource: a declarative manifest (<code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
         or <code className="font-mono text-[0.9em]">scriptgo.json</code>) plus shared, server and client scripts. Write it once
@@ -31,14 +30,13 @@ export default async function DocsHome() {
         <CommandLine command="scriptgo init my_resource" />
         <p className="mt-2 text-[13px] text-ink-3">The CLI is in preview; see the CLI page for what is available today.</p>
       </div>
-      <div className="mt-10 space-y-10">
+      <div className="mt-12 space-y-12">
         {DOC_GROUPS.map((g) => (
           <section key={g} aria-labelledby={`g-${g}`}>
-            <h2 id={`g-${g}`} className="eyebrow text-[13px]">
-              {"// "}
+            <h2 id={`g-${g}`} className="font-display text-[24px] font-black tracking-[-0.02em]">
               {g}
             </h2>
-            <ul className="mt-3 grid gap-4 sm:grid-cols-2">
+            <ul className="mt-4 grid gap-x-6 gap-y-7 sm:grid-cols-2">
               {entries
                 .filter(({ entry }) => entry.group === g)
                 .map(({ entry, doc }) => (

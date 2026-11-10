@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 
 /** Shared form styling. Labels are always visible; hints and errors are wired with aria-describedby. */
 export const inputClass =
-  "mt-1 block w-full rounded-lg border-2 border-line-soft bg-surface px-3 py-2 text-[14.5px] text-ink placeholder:text-ink-3 focus:border-line aria-[invalid=true]:border-bad";
+  "mt-1 block w-full border-[2.5px] border-line bg-surface px-3 py-2 text-[15px] text-ink placeholder:text-ink-3 focus:bg-sun-soft aria-[invalid=true]:border-bad";
 export const selectClass = cn(inputClass, "h-[42px] py-0");
 export const textareaClass = cn(inputClass, "min-h-[110px] leading-relaxed");
 
@@ -25,7 +25,7 @@ export function Field({
 }) {
   return (
     <div className={className}>
-      <label htmlFor={id} className="block text-[14px] font-bold">
+      <label htmlFor={id} className="block font-display text-[14.5px] font-bold">
         {label}
         {optional ? <span className="ml-1 font-normal text-ink-3">(optional)</span> : null}
       </label>
@@ -54,7 +54,7 @@ export function FormMessage({ tone, children }: { tone: "error" | "success"; chi
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={cn("rounded-lg border-2 px-3 py-2 text-[14px] font-semibold", tone === "error" ? "border-bad/50 bg-bad-soft text-ink" : "border-ok/50 bg-ok-soft text-ink")}
+      className={cn("sheet border-[2.5px] px-3 py-2 text-[14px] font-semibold", tone === "error" ? "border-bad bg-bad-soft text-ink" : "border-ok bg-ok-soft text-ink")}
     >
       {children}
     </p>

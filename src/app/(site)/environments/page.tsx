@@ -5,7 +5,7 @@ import { ProtectionTierTable } from "@/components/site/integration-section";
 import { EnvironmentSlotTile, EnvironmentTile } from "@/components/ui/environment";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/tabs";
-import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
+import { PageHead, SCENES } from "@/components/site/ink";
 import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 /** Section header row inside a table: the group name across every column. */
 function GroupRow({ title, span }: { title: string; span: number }) {
   return (
-    <tr className="border-t border-line-soft bg-surface-2">
-      <th scope="colgroup" colSpan={span} className="px-3 py-2 text-[12px] font-bold uppercase tracking-wide text-ink-3">
+    <tr className="border-t-[2.5px] border-line bg-paper-2">
+      <th scope="colgroup" colSpan={span} className="px-3 py-2 text-[12.5px] font-bold uppercase tracking-wide text-ink">
         {title}
       </th>
     </tr>
@@ -43,12 +43,18 @@ export default async function EnvironmentsPage() {
   const capKeys = Array.from(new Set([...CAPABILITIES, ...envs.flatMap((e) => Object.keys(e.capabilities))]));
 
   return (
-    <div className="container-page py-10">
-      <Eyebrow>environments</Eyebrow>
-      <DisplayTitle as="h1" className="mt-2 text-[52px] sm:text-[64px]">
-        Environments.
-      </DisplayTitle>
-      <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">
+    <>
+    <PageHead
+      id="envs-h1"
+      tag="Platforms"
+      art={{ ...SCENES.signpost, position: "60% 45%" }}
+      title={
+        <>
+          Environ&shy;ments, <em>by real status.</em>
+        </>
+      }
+    >
+      <p className="lede mt-5 !max-w-[64ch] !text-[17px] text-[#e6e2f3]">
         Where packages run: engines and runtimes that run scripts themselves, and mod platforms that add scripting on top of an
         existing game. Every environment runs Lua; the .NET kit also runs TypeScript and JavaScript. Every environment is a
         peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance runs, never from a form.
@@ -58,7 +64,9 @@ export default async function EnvironmentsPage() {
         </a>{" "}
         view says what a buyer&rsquo;s server gets in each one.
       </p>
-      <div className="mt-8">
+    </PageHead>
+    <div className="container-page pb-16 pt-10">
+      <div>
         {!res.ok ? (
           <ApiError failure={res} title="Environments could not be loaded." />
         ) : envs.length === 0 ? (
@@ -72,7 +80,7 @@ export default async function EnvironmentsPage() {
                 id: "directory",
                 label: "Directory",
                 content: (
-                  <div className="space-y-10 pt-6">
+                  <div className="space-y-12 pt-8">
                     {groups.map((g) => (
                       <section key={g.kind} aria-labelledby={`kind-${g.kind}`}>
                         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
@@ -81,7 +89,7 @@ export default async function EnvironmentsPage() {
                           </h2>
                           <p className="max-w-[70ch] text-[14.5px] text-ink-2">{g.blurb}</p>
                         </div>
-                        <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                        <ul className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
                           {g.envs.map((e) => (
                             <li key={e.slug}>
                               <EnvironmentTile env={e} className="h-full" />
@@ -224,7 +232,7 @@ export default async function EnvironmentsPage() {
                                   return (
                                     <td key={c} className="px-2 py-2" title={meta ? `${e.name} · ${c}: ${meta.label}${note ? ` — ${note}` : ""}` : undefined}>
                                       {meta ? (
-                                        <span className={cn("inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11.5px] font-semibold", TONE_CLASSES[meta.tone])}>
+                                        <span className={cn("tok", TONE_CLASSES[meta.tone])}>
                                           <StatusIcon name={meta.icon} size={11} />
                                           {meta.label}
                                         </span>
@@ -249,5 +257,6 @@ export default async function EnvironmentsPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

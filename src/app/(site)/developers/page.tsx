@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
-import { StepAdaptArt, StepBuildArt, StepMonetizeArt } from "@/components/illustrations";
+import { PageHead, Ridge, SCENES } from "@/components/site/ink";
 import { ButtonLink } from "@/components/ui/button";
 import { CodeBlock, CommandLine } from "@/components/ui/code-block";
-import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
+import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Developers",
@@ -64,56 +64,48 @@ const steps = [
 export default function DevelopersPage() {
   return (
     <div>
-      <section className="border-b-2 border-line-soft">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center">
-          <div>
-            <Eyebrow>developers</Eyebrow>
-            <DisplayTitle as="h1" className="mt-2 text-[44px] sm:text-[58px]">
-              Build once.
-              <br />
-              <span className="display-italic text-cobalt-ink">Protect your work.</span>
-              <br />
-              Monetize it.
-            </DisplayTitle>
-            <p className="mt-5 max-w-[56ch] text-[17px] text-ink-2">
+      <PageHead
+        id="developers-h1"
+        tag="Monetize"
+        art={{ ...SCENES.stall, position: "80% 40%" }}
+        title={
+          <>
+            Build once. <em>Protect your work.</em> Monetize it.
+          </>
+        }
+      >
+            <p className="lede mt-5 !max-w-[58ch] text-[#e6e2f3]">
               Write a resource against standard capabilities: in Lua for every environment, or in TypeScript for the .NET kit.
               SCRIPT//GO runs it in each environment you declare, shows only the results that real runs proved, and issues
               licenses when your customers pay through your own Tebex store.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ButtonLink href="/docs/quickstart" size="lg" arrow>
-                Read the quickstart
-              </ButtonLink>
-              <ButtonLink href="/sign-up" variant="secondary" size="lg">
+            <div className="cta-row mt-8">
+              <ButtonLink href="/sign-up" variant="sun" size="lg" arrow>
                 Create an account
               </ButtonLink>
+              <ButtonLink href="/docs/quickstart" variant="secondary" size="lg">
+                Read the quickstart
+              </ButtonLink>
             </div>
-          </div>
-          <div className="grid grid-cols-3 items-end gap-3">
-            <StepBuildArt className="w-full" />
-            <StepAdaptArt className="w-full" />
-            <StepMonetizeArt className="w-full" />
-          </div>
-        </div>
-      </section>
+      </PageHead>
 
-      <section aria-labelledby="creators-title" className="container-page py-12">
-        <DisplayTitle id="creators-title" className="text-[38px] sm:text-[44px]">
-          For creators.
+      <section aria-labelledby="creators-title" className="sec g-paper bleed sec-sweeps container-page !pt-12">
+        <Eyebrow className="mb-[18px]">From folder to store</Eyebrow>
+        <DisplayTitle id="creators-title" className="text-[38px] sm:text-[48px]">
+          For <em>creators.</em>
         </DisplayTitle>
-        <Stroke className="mt-1" />
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <ol className="space-y-6">
             {steps.map((s) => (
               <li key={s.n} className="flex gap-4">
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-line bg-sun font-display text-[18px] font-black text-on-sun"
+                  className="num-slab mt-0.5"
                 >
                   {s.n}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-[20px] font-extrabold">
+                  <h3 className="font-display text-[21px] font-extrabold tracking-[-0.015em]">
                     <span className="sr-only">Step {s.n}: </span>
                     {s.title}
                   </h3>
@@ -131,7 +123,7 @@ export default function DevelopersPage() {
             </p>
           </div>
         </div>
-        <div className="mt-8 rounded-[10px] border-2 border-dashed border-line-soft p-4 text-[14px] text-ink-2">
+        <div className="mt-10 border-[2.5px] border-dashed border-line-soft p-4 text-[14.5px] text-ink-2">
           The <code className="font-mono">scriptgo</code> CLI is in preview and ships as <code className="font-mono">@scriptgo/cli</code>. Sign it in with a
           personal access token from{" "}
           <Link href="/dashboard/settings" className="font-semibold text-cobalt-ink underline">
@@ -141,11 +133,13 @@ export default function DevelopersPage() {
         </div>
       </section>
 
-      <section aria-labelledby="builders-title" className="border-t-2 border-line-soft bg-paper-2/60">
-        <div className="container-page grid gap-8 py-12 lg:grid-cols-2">
+      <Ridge from="paper" to="cobalt" ink="violet" n={1} />
+      <section aria-labelledby="selling-title" className="sec g-cobalt sec-sweeps !pt-10">
+        <div className="container-page grid gap-12 lg:grid-cols-2">
           <div>
-            <DisplayTitle id="builders-title" className="text-[38px] sm:text-[44px]">
-              For platform builders.
+            <Eyebrow className="mb-[18px]">For platforms</Eyebrow>
+            <DisplayTitle id="builders-title" className="text-[38px] sm:text-[46px]">
+              For <em>platform builders.</em>
             </DisplayTitle>
             <p className="mt-4 max-w-[56ch] text-[16px] text-ink-2">
               Two ways in. A host that runs Lua writes one adapter: a clock and a tick, persistence, players, privileges,
@@ -163,18 +157,19 @@ export default function DevelopersPage() {
                 ["/environments", "Current environments and their status"],
               ].map(([href, label]) => (
                 <li key={href}>
-                  <Link href={href!} className="inline-flex items-center gap-1.5 font-bold text-cobalt-ink hover:underline">
+                  <Link href={href!} className="inline-flex items-center gap-1.5 font-bold text-cobalt-ink underline-offset-4 hover:underline">
                     {label} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.5} />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-          <div>
-            <DisplayTitle as="h2" className="text-[38px] sm:text-[44px]">
-              Selling, plainly.
+          <div className="sticker p-6 sm:p-8">
+            <Eyebrow className="mb-[18px]">Monetize</Eyebrow>
+            <DisplayTitle as="h2" id="selling-title" className="text-[34px] sm:text-[40px]">
+              Selling, <em>plainly.</em>
             </DisplayTitle>
-            <ul className="mt-4 space-y-3 text-[15px] text-ink-2">
+            <ul className="mt-5 space-y-3 text-[15px] text-ink-2">
               <li>
                 <strong className="text-ink">You sell.</strong> Offers belong to you: free, monthly, annual or perpetual.
               </li>

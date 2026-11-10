@@ -1,36 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-type Theme = "system" | "light" | "dark";
-const ORDER: Theme[] = ["system", "light", "dark"];
-const LABEL: Record<Theme, string> = { system: "System", light: "Light", dark: "Dark" };
+type Theme = "light" | "dark";
+const LABEL: Record<Theme, string> = { light: "Paper", dark: "Night" };
 
 function apply(theme: Theme) {
   const root = document.documentElement;
-  if (theme === "system") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", theme);
+  if (theme === "dark") root.setAttribute("data-theme", "dark");
+  else root.removeAttribute("data-theme");
   try {
-    if (theme === "system") localStorage.removeItem("sg-theme");
-    else localStorage.setItem("sg-theme", theme);
+    if (theme === "dark") localStorage.setItem("sg-theme", "dark");
+    else localStorage.removeItem("sg-theme");
   } catch {
     // Storage blocked: the theme still applies to this page view.
   }
 }
 
-/** Cycles System → Light → Dark. The label states the current theme and the next one. */
-export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>("system");
+/**
+ * Paper (the printed poster, the default) or Night. The site does not follow the OS setting: it
+ * is paper until someone asks for night. With `label`, the name of the current theme is shown.
+ */
+export function ThemeToggle({ className, label = false }: { className?: string; label?: boolean }) {
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const attr = document.documentElement.getAttribute("data-theme");
-    setTheme(attr === "light" || attr === "dark" ? attr : "system");
+    setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
   }, []);
 
-  const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length]!;
-  const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+  const next: Theme = theme === "light" ? "dark" : "light";
+  const Icon = theme === "light" ? Sun : Moon;
 
   return (
     <button
@@ -42,11 +43,13 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={`Theme: ${LABEL[theme]}. Switch to ${LABEL[next]}.`}
       title={`Theme: ${LABEL[theme]}`}
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-transparent text-ink hover:border-line-soft hover:bg-surface-2",
+        "inline-flex h-9 items-center justify-center gap-2 border-2 border-current font-display text-[13px] font-bold hover:bg-[#ffc83d] hover:text-[#0b0b1e]",
+        label ? "px-3" : "w-9",
         className,
       )}
     >
-      <Icon aria-hidden="true" size={18} strokeWidth={2.25} />
+      <Icon aria-hidden="true" size={17} strokeWidth={2.5} />
+      {label ? <span>{LABEL[theme]}</span> : null}
     </button>
   );
 }

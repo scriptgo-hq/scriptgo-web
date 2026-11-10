@@ -31,7 +31,7 @@ export default async function CreatorPage({ params }: { params: Promise<Params> 
   const c = res.data;
   const envs = Array.from(new Set(c.packages.flatMap((p) => p.environments.filter((e) => e.status === "verified").map((e) => e.slug)))).sort();
   return (
-    <div className="container-page py-8">
+    <div className="container-page pb-16 pt-8">
       <Breadcrumb items={[{ label: "Explore", href: "/explore" }, { label: "creators" }, { label: c.username }]} />
       <header className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start">
         <Avatar name={c.displayName || c.username} size={88} className="border-[3px] shadow-[4px_4px_0_0_var(--shadow)]" />
@@ -39,12 +39,12 @@ export default async function CreatorPage({ params }: { params: Promise<Params> 
           <h1 className="display flex flex-wrap items-center gap-3 text-[44px] sm:text-[56px]">
             {c.displayName || c.username}.
             {c.firstParty ? (
-              <span className="inline-flex items-center gap-1 rounded-full border-2 border-line bg-cobalt px-2.5 py-1 font-sans text-[13px] font-bold tracking-normal text-on-cobalt">
+              <span className="stamp stamp-info">
                 <BadgeCheck aria-hidden="true" size={15} /> First party
               </span>
             ) : null}
           </h1>
-          <p className="mt-1 font-mono text-[14px] text-ink-3">@{c.username} · member since {formatDate(c.joinedAt)}</p>
+          <p className="mt-2 font-mono text-[14px] text-ink-3">@{c.username} · member since {formatDate(c.joinedAt)}</p>
           {c.bio ? <p className="mt-3 max-w-[64ch] whitespace-pre-line text-[16px] text-ink-2">{c.bio}</p> : null}
           {c.links.length ? (
             <ul className="mt-3 flex flex-wrap gap-3 text-[14px]">
@@ -75,7 +75,7 @@ export default async function CreatorPage({ params }: { params: Promise<Params> 
         {c.packages.length === 0 ? (
           <EmptyState icon={Package} title="No public packages yet" className="mt-4" />
         ) : (
-          <ul className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-6 grid gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
             {c.packages.map((p) => (
               <li key={p.id}>
                 <PackageCard pkg={p} showSummary className="h-full" />
