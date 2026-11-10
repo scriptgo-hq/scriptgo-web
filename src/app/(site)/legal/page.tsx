@@ -207,6 +207,12 @@ export default function LegalPage() {
             game&rsquo;s own files, which do not belong in a package.
           </p>
           <p>
+            <strong>Who can read a protected release.</strong> SCRIPT//GO checks a protected release when it is uploaded, as it
+            checks any release, and its staff can read it when a report is being reviewed: a moderation decision must rest on
+            what the package contains. Each such access is recorded. The creator can download their own plain archive. A
+            buyer never can.
+          </p>
+          <p>
             <Link href="/protect">How protection works, in plain words</Link>.
           </p>
         </Section>
