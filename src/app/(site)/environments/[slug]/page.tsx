@@ -6,6 +6,7 @@ import { EnvironmentCardArt } from "@/components/site/world-art";
 import { worldArt, worldSrc, WORLD_SIZE } from "@/lib/worlds";
 import { IntegrationSection, ProtectionSection } from "@/components/site/integration-section";
 import { StatusBadge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
 import { Breadcrumb, KeyValue } from "@/components/ui/data";
 import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
 import { PackageCard } from "@/components/ui/package";
@@ -14,6 +15,7 @@ import { api } from "@/lib/api";
 import { CAPABILITIES, type EnvironmentDetail } from "@/lib/contract";
 import { envKind, languageLabels } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
+import { guideHref } from "@/lib/guides";
 import { renderMarkdown } from "@/lib/markdown";
 import { protectionMeta } from "@/lib/protection";
 import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
@@ -44,6 +46,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
   const capKeys = Array.from(new Set([...CAPABILITIES, ...Object.keys(e.capabilities)]));
   const art = worldArt(e.slug);
   const rule = platformRulesInfo(e);
+  const guide = guideHref(e.slug);
 
   return (
     <>
@@ -67,6 +70,13 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             <span className="label">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
+          {guide ? (
+            <div className="cta-row mt-6">
+              <ButtonLink href={guide} variant="sun" size="lg" arrow>
+                Sell on {e.name}: step by step
+              </ButtonLink>
+            </div>
+          ) : null}
           <KeyValue
             className="mt-5 max-w-xl"
             items={[
@@ -82,7 +92,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
                     <time dateTime={e.lastRun.ranAt} title={formatDateTime(e.lastRun.ranAt)}>
                       {relativeTime(e.lastRun.ranAt)}
                     </time>
-                    <span className="font-mono text-[12.5px] text-ink-3">run {e.lastRun.runId}</span>
+                    <span className="break-all font-mono text-[12.5px] text-ink-3">run {e.lastRun.runId}</span>
                   </span>
                 ) : e.proof.length > 0 ? (
                   <>
