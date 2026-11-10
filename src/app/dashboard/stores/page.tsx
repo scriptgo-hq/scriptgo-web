@@ -1,12 +1,13 @@
 import { CircleCheck, CircleX } from "lucide-react";
 import { ConnectStoreForm, TestEventButton } from "@/components/dashboard/store-forms";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { TebexNotConnected, TebexStoreReadiness } from "@/components/dashboard/tebex-readiness";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
 import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
-import { api } from "@/lib/api";
-import type { Store } from "@/lib/contract";
+import { api, type ApiResult } from "@/lib/api";
+import type { Store, StoreReadiness } from "@/lib/contract";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { getMe } from "@/lib/session";
 import { metaFor, storeMeta } from "@/lib/status";
@@ -19,7 +20,7 @@ const SYNC: Record<string, { label: string; cls: string }> = {
   error: { label: "Missing product id", cls: "text-bad" },
 };
 
-function StoreCard({ s }: { s: Store }) {
+function StoreCard({ s, readiness }: { s: Store; readiness: ApiResult<StoreReadiness> | null }) {
   const name = s.provider === "tebex" ? "Tebex" : "Test provider";
   const testReason =
     s.provider !== "mock" ? "Tebex sends its own validation webhook; use its dashboard." : s.status === "sandbox" || s.status === "needs_attention" ? null : "Only sandbox stores accept test events.";
@@ -78,6 +79,16 @@ function StoreCard({ s }: { s: Store }) {
       <div className="mt-4">
         <TestEventButton storeId={s.id} disabledReason={testReason} />
       </div>
+
+      {readiness ? (
+        <div className="mt-6">
+          {readiness.ok ? (
+            <TebexStoreReadiness readiness={readiness.data} headingId={`readiness-${s.id}`} />
+          ) : (
+            <ApiError compact failure={readiness} title="The readiness check of this store could not be loaded." />
+          )}
+        </div>
+      ) : null}
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
@@ -147,6 +158,14 @@ export default async function StoresPage() {
   }
   const res = await api<Store[]>("/v1/creator/stores", { auth: true });
   const stores = res.ok ? res.data : [];
+  // What is configured and what is missing, per Tebex store, computed by the API (never a secret).
+  const readiness = new Map<string, ApiResult<StoreReadiness>>(
+    await Promise.all(
+      stores
+        .filter((s) => s.provider === "tebex")
+        .map(async (s) => [s.id, await api<StoreReadiness>(`/v1/creator/stores/${encodeURIComponent(s.id)}/readiness`, { auth: true })] as const),
+    ),
+  );
   return (
     <>
       <PageHeader
@@ -161,8 +180,9 @@ export default async function StoresPage() {
           {stores.length === 0 ? (
             <EmptyState title="No store connected">Paid offers need a store. Free offers work without one.</EmptyState>
           ) : (
-            stores.map((s) => <StoreCard key={s.id} s={s} />)
+            stores.map((s) => <StoreCard key={s.id} s={s} readiness={readiness.get(s.id) ?? null} />)
           )}
+          {stores.some((s) => s.provider === "tebex") ? null : <TebexNotConnected />}
           <section aria-labelledby="connect-title" className="panel p-5">
             <h2 id="connect-title" className="font-display text-[22px] font-extrabold">
               {stores.length ? "Connect or update a store." : "Connect a store."}

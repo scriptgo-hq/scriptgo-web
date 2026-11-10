@@ -24,6 +24,7 @@ const GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/audit", label: "Audit log", icon: "audit" },
       { href: "/admin/payments", label: "Payment events", icon: "payments" },
+      { href: "/admin/commerce", label: "Tebex readiness", icon: "stores" },
     ],
   },
   { label: null, items: [{ href: "/dashboard", label: "Back to dashboard", icon: "overview" }] },
