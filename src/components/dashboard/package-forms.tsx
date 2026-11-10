@@ -181,7 +181,7 @@ export function PackageForm({ creator, initial }: { creator: string; initial?: P
 
 const CURRENCIES = ["EUR", "USD", "GBP"] as const;
 
-/** POST /v1/creator/packages/:name/offers. Paid offers need a connected store and start in review. */
+/** POST /v1/creator/packages/:name/offers. Paid offers need a connected store; they stand on the creator's rights declaration, with no review. */
 export function OfferForm({
   packageName,
   environments,
@@ -330,8 +330,11 @@ export function OfferForm({
         />
       </Field>
       <fieldset className="md:col-span-2">
-        <legend className="text-[14px] font-bold">Environments covered</legend>
-        <p className="text-[13px] text-ink-3">Leave all unchecked to cover every environment the package supports.</p>
+        <legend className="text-[14px] font-bold">Runs on</legend>
+        <p className="text-[13px] text-ink-3">
+          The environments this license covers. Leave all unchecked to cover every environment the package lists. An environment is a place where the script
+          runs, never what you sell; a platform&rsquo;s own rules are for the operator who runs it there.
+        </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {environments.map((env) => (
             <label key={env.slug} className="inline-flex items-center gap-2 rounded-full border-2 border-line-soft bg-surface px-3 py-1 text-[14px] has-[:checked]:border-line has-[:checked]:bg-sun-soft">
@@ -343,7 +346,8 @@ export function OfferForm({
       </fieldset>
       {paid ? (
         <p className="text-[13.5px] text-ink-2 md:col-span-2">
-          Paid offers start <strong>under review</strong>. Checkout opens only after a reviewer confirms the offer licenses your own original software.
+          A paid offer can be bought once you have <strong>declared your rights</strong> for a published release. Nobody reviews it first: you decide what you
+          sell and you answer for it, whatever environments it runs on. SCRIPT//GO acts on reports, and can put an offer on hold with a notice you can appeal.
         </p>
       ) : null}
       <div className="flex flex-wrap items-center gap-3 md:col-span-2">

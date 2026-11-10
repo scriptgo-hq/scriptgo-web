@@ -3,9 +3,8 @@
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { describedBy, Field, fieldErrors, FormMessage, selectClass, textareaClass } from "@/components/ui/form";
+import { describedBy, Field, fieldErrors, FormMessage, inputClass, selectClass, textareaClass } from "@/components/ui/form";
 import { callApi } from "@/lib/client-api";
-import { classificationMeta } from "@/lib/status";
 import { MODERATION_ACTIONS, type ModerationActionKey } from "./status";
 
 type Result = { tone: "error" | "success"; text: string } | null;
@@ -50,11 +49,25 @@ export function StartReviewButton({ caseRef }: { caseRef: string }) {
 
 // ---------------------------------------------------------------- offers
 
-const OFFER_CLASSIFICATIONS = ["software_license", "authorized_app_feature", "free", "rejected", "pending_review"] as const;
+/**
+ * What staff can decide on one offer (POST /v1/admin/review/offers/:id/decision, ADR-0037). There is
+ * no approval before sale: "on_hold" and "rejected" act after a report and notify the creator, who
+ * can appeal; "seller_declared" lifts a hold and puts the offer back on what the seller declared.
+ */
+const OFFER_DECISIONS = {
+  on_hold: { label: "Put on hold", effect: "No purchase path until the hold is lifted. The creator is notified with your reasons and can appeal. Existing licenses keep working." },
+  rejected: { label: "Withdraw the offer", effect: "The offer is withdrawn. The creator is notified with your reasons and can appeal. Existing licenses keep working." },
+  seller_declared: { label: "Lift: back on the seller's declaration", effect: "The offer goes back to what the seller declared for the latest release, and can be bought again if they have declared." },
+  authorized_app_feature: { label: "Classify: authorized app feature", effect: "Recorded as a paid feature of an application whose operator holds the commercial rights. It can be bought." },
+} as const;
+type OfferDecisionKey = keyof typeof OFFER_DECISIONS;
 
 export function OfferDecisionForm({ offerId, current }: { offerId: string; current: string }) {
   const uid = useId();
-  const [classification, setClassification] = useState<string>(current === "pending_review" ? "software_license" : current);
+  const stopped = current === "on_hold" || current === "rejected";
+  const options: OfferDecisionKey[] = stopped ? ["seller_declared", "authorized_app_feature", current === "on_hold" ? "rejected" : "on_hold"] : ["on_hold", "rejected"];
+  const [classification, setClassification] = useState<OfferDecisionKey>(options[0]!);
+  const [caseId, setCaseId] = useState("");
   const [reason, setReason] = useState("");
   const [confirming, setConfirming] = useState(false);
   const { busy, result, errors, submit } = useSubmit();
@@ -63,8 +76,8 @@ export function OfferDecisionForm({ offerId, current }: { offerId: string; curre
   async function send() {
     const ok = await submit(
       `/v1/admin/review/offers/${encodeURIComponent(offerId)}/decision`,
-      { classification, reason: reason.trim() },
-      `Recorded as ${classificationMeta[classification as keyof typeof classificationMeta]?.label ?? classification}.`,
+      { classification, reason: reason.trim(), ...(caseId.trim() ? { caseId: caseId.trim() } : {}) },
+      `Recorded: ${OFFER_DECISIONS[classification].label}.`,
     );
     setConfirming(false);
     if (ok) setReason("");
@@ -80,25 +93,36 @@ export function OfferDecisionForm({ offerId, current }: { offerId: string; curre
         void send();
       }}
     >
-      <Field id={`${uid}-cls`} label="Classification" error={errors.classification}>
+      <Field id={`${uid}-cls`} label="Decision" hint={OFFER_DECISIONS[classification].effect} error={errors.classification}>
         <select
           id={`${uid}-cls`}
           value={classification}
           onChange={(e) => {
-            setClassification(e.target.value);
+            setClassification(e.target.value as OfferDecisionKey);
             setConfirming(false);
           }}
           className={selectClass}
-          {...describedBy(`${uid}-cls`, false, errors.classification)}
+          {...describedBy(`${uid}-cls`, true, errors.classification)}
         >
-          {OFFER_CLASSIFICATIONS.map((c) => (
+          {options.map((c) => (
             <option key={c} value={c}>
-              {classificationMeta[c].label}
+              {OFFER_DECISIONS[c].label}
             </option>
           ))}
         </select>
       </Field>
-      <Field id={`${uid}-reason`} label="Reason" hint="Recorded in the audit log and shown to the creator. At least 3 characters." error={errors.reason}>
+      <Field id={`${uid}-case`} label="Report (case id)" hint="The report this decision follows, for example RPT-2026-000012. Leave empty when there is none." error={errors.caseId}>
+        <input
+          id={`${uid}-case`}
+          value={caseId}
+          onChange={(e) => setCaseId(e.target.value)}
+          maxLength={32}
+          placeholder="RPT-"
+          className={inputClass}
+          {...describedBy(`${uid}-case`, true, errors.caseId)}
+        />
+      </Field>
+      <Field id={`${uid}-reason`} label="Reasons" hint="Recorded in the audit log and sent to the creator. At least 3 characters." error={errors.reason}>
         <textarea
           id={`${uid}-reason`}
           value={reason}
@@ -112,11 +136,11 @@ export function OfferDecisionForm({ offerId, current }: { offerId: string; curre
       </Field>
       {confirming ? (
         <div role="alert" className="rounded-lg border-2 border-bad/50 bg-bad-soft p-3 text-[14px]">
-          <p className="font-bold">Reject this offer?</p>
-          <p className="mt-0.5 text-ink-2">It gets no purchase path and the creator is told why. This is recorded in the audit log.</p>
+          <p className="font-bold">Withdraw this offer?</p>
+          <p className="mt-0.5 text-ink-2">It loses its purchase path, and the creator is notified with your reasons and can appeal. This is recorded in the audit log.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Button type="submit" size="sm" variant="danger" disabled={busy}>
-              {busy ? "Recording…" : "Reject offer"}
+              {busy ? "Recording…" : "Withdraw offer"}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
               Cancel

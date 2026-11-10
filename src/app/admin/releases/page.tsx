@@ -19,7 +19,7 @@ export default async function ReleaseReviewPage() {
 
   return (
     <>
-      <PageHeader eyebrow="review" title="Releases." description="Releases flagged by a check, a report or a rights declaration. Approve, restrict, or reinstate a restricted release." />
+      <PageHeader eyebrow="review" title="Releases." description="Nothing is queued for review before sale: a release is not flagged by its rights declaration any more. This page keeps the reviews opened earlier, and lets you reinstate a restricted release. To restrict a release, decide the report about it." />
       {!res.ok ? (
         <ApiError failure={res} title="The release review queue could not be loaded." />
       ) : items.length === 0 ? (

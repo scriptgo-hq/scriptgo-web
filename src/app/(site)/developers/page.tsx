@@ -200,8 +200,8 @@ export default function DevelopersPage() {
                 </Link>
               </li>
               <li>
-                <strong className="text-ink">Third-party game content is reviewed first.</strong> Paid offers that target a
-                proprietary game have no purchase path until a reviewer approves them.
+                <strong className="text-ink">You decide what you sell, and you answer for it.</strong> SCRIPT//GO does not review
+                offers before sale: an offer can be bought once you have declared your rights, and we act on reports.
               </li>
             </ul>
           </div>

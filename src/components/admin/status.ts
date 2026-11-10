@@ -10,8 +10,8 @@ export const paymentEventMeta: Record<"processed" | "deferred" | "ignored" | "fa
 };
 
 export const reviewStatusMeta: Record<"open" | "approved" | "restricted", StatusMeta> = {
-  open: { label: "Open", tone: "warning", icon: "hourglass", hint: "Waiting for a reviewer." },
-  approved: { label: "Approved", tone: "success", icon: "check", hint: "Reviewed and allowed." },
+  open: { label: "Open", tone: "warning", icon: "hourglass", hint: "Opened before ADR-0037. Nothing is queued for review any more." },
+  approved: { label: "Closed", tone: "success", icon: "check", hint: "Closed with no restriction." },
   restricted: { label: "Restricted", tone: "danger", icon: "shield", hint: "Reviewed and restricted." },
 };
 
@@ -43,13 +43,20 @@ export const MODERATION_ACTIONS = {
     label: "Suspend the listing",
     effect: "The package is hidden from the public, downloads and checkout stop. Existing licenses keep working.",
   },
+  suspend_store: {
+    label: "Suspend the seller's store",
+    effect: "Nothing can be bought from this seller, on any of their packages, until the suspension is lifted. Existing licenses keep working.",
+  },
 } as const;
+
+/** Decisions on one offer (taken on the Offers page, not on a report): shown in notices and case history. */
+const OFFER_ACTION_LABELS: Record<string, string> = { hold_offer: "Offer put on hold", reject_offer: "Offer withdrawn" };
 
 export type ModerationActionKey = keyof typeof MODERATION_ACTIONS;
 
 export function moderationActionLabel(action: string | null | undefined): string {
   if (!action) return "—";
-  return (MODERATION_ACTIONS as Record<string, { label: string }>)[action]?.label ?? action.replace(/_/g, " ");
+  return (MODERATION_ACTIONS as Record<string, { label: string }>)[action]?.label ?? OFFER_ACTION_LABELS[action] ?? action.replace(/_/g, " ");
 }
 
 export const ACTOR_LABELS: Record<string, string> = { user: "User", admin: "Staff", system: "System", provider: "Provider" };

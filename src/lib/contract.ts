@@ -29,7 +29,7 @@ export type {
   Classification,
   CompatibilityStatus,
   EnvironmentKind,
-  EnvironmentSales,
+  PlatformRules,
   EnvironmentStatus,
   LicenseStatus,
   ListingStatus,

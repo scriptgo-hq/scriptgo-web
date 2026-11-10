@@ -22,10 +22,10 @@ export const tierMeta: Record<ProtectionTier, StatusMeta> = {
     hint: "Licence check per server and signed releases. The host runs plain script, so its operator can read what it loads: no code-secrecy claim.",
   },
   none: {
-    label: "Nothing sold",
+    label: "No licence check",
     tone: "neutral",
     icon: "minus",
-    hint: "Free packages only here: nothing is sold or licensed. Releases are still signed.",
+    hint: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
   },
 };
 
@@ -40,7 +40,7 @@ export function protectionMeta(p: EnvironmentProtection): StatusMeta {
 
 /** Short heading for a tier, used in tables. */
 export function tierHeading(tier: ProtectionTier): string {
-  return tier === "escrow" ? "Code escrow" : tier === "license" ? "Licence and signing" : "Nothing sold";
+  return tier === "escrow" ? "Code escrow" : tier === "license" ? "Licence and signing" : "No licence check";
 }
 
 /**
@@ -49,7 +49,7 @@ export function tierHeading(tier: ProtectionTier): string {
  */
 export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { label: string; sentence: string } {
   if (p.tier === "none") {
-    return { label: "Free only", sentence: "Nothing is sold in this environment. The release is signed, so you can check it was not altered." };
+    return { label: "No licence check", sentence: "The adapter there has no licence check, so nothing verifies a licence at run time. The release is signed, so you can check it was not altered." };
   }
   if (!escrowed) {
     return {
@@ -77,7 +77,7 @@ export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { 
   };
 }
 
-/** Tiers in the order the site lists them: the strongest first, "nothing sold" last. */
+/** Tiers in the order the site lists them: the strongest first, "no licence check" last. */
 export const TIER_ORDER: ProtectionTier[] = ["escrow", "license", "none"];
 
 /** One plain sentence per tier, for the tier tables. The per-environment note says the rest. */
@@ -86,13 +86,13 @@ export const tierBlurb: Record<ProtectionTier, string> = {
     "The host runs compiled code outside the script VM, so it can hold a key. An encrypted release is decrypted in memory, for a licensed and bound server only.",
   license:
     "The host runs plain script. Your server checks its licence and the release is signed, but the operator can read what the host loads. We make no code-secrecy claim here.",
-  none: "The rights holder allows free packages only, so nothing is sold or licensed. Releases are still signed.",
+  none: "The adapter has no licence check, so a package runs there without one. Releases are still signed.",
 };
 
 /**
  * The state of a tier in one environment, as a short lead before its note. Read from the registry
  * fields only: `state` decides "available" or "planned", and `optIn` says the tier is a feature the
- * server operator switches on. A free-only environment has nothing to wait for, so it gets no lead.
+ * server operator switches on. An environment with no licence check has nothing to wait for, so it gets no lead.
  */
 export function protectionLead(p: EnvironmentProtection): string | null {
   if (p.tier === "none") return null;

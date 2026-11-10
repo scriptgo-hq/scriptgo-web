@@ -73,7 +73,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const blockedDownload = d.listingStatus !== "active" || viewingRow?.restricted || viewingRow?.status === "yanked";
   const installCmd = `scriptgo add ${d.identifier}${viewing && viewing !== d.latestVersion ? `@${viewing}` : ""}`;
   const escrowed = Boolean(viewingRow?.escrow);
-  const protectionEnvs = envDetails.map(({ slug, detail }) => ({ slug, name: envLongName(slug, detail?.name), protection: detail?.protection ?? null }));
+  const protectionEnvs = envDetails.map(({ slug, detail }) => ({ slug, name: envLongName(slug, detail?.name), protection: detail?.protection ?? null, platformRules: detail?.platformRules ?? null, platformRulesNote: detail?.platformRulesNote ?? "" }));
   const downloadPath = viewing ? `/v1/packages/${encodeURIComponent(d.creator.username)}/${encodeURIComponent(d.name)}/versions/${encodeURIComponent(viewing)}/download` : null;
 
   return (
@@ -456,7 +456,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                                 </th>
                                 <td className="tabular px-3 py-2.5">{o.price ? `${formatMoney(o.price)}${intervalSuffix(o.interval)}` : "Free"}</td>
                                 <td className="px-3 py-2.5"><StatusBadge meta={metaFor(classificationMeta, o.classification)} size="sm" /></td>
-                                <td className="px-3 py-2.5">{o.environments.length ? o.environments.map((e) => envLongName(e)).join(", ") : "All declared environments"}</td>
+                                <td className="px-3 py-2.5">{o.environments.length ? `Runs on ${o.environments.map((e) => envLongName(e)).join(", ")}` : "Runs on every environment the release lists"}</td>
                                 <td className="tabular px-3 py-2.5">{o.deployments}</td>
                               </tr>
                             ))}
@@ -493,7 +493,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                             {
                               label: "Third-party game",
                               value: d.rights.targetsProprietaryGame
-                                ? "Targets or includes content from a proprietary third-party game. Paid offers are held for review."
+                                ? "The seller declares that it targets a third-party game platform. It is sold on that declaration: SCRIPT//GO does not review offers before sale, and acts on reports."
                                 : "Does not target or include proprietary third-party game content.",
                             },
                           ]}

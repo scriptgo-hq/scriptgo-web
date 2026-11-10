@@ -12,9 +12,9 @@ export const metadata: Metadata = { title: { default: "Admin", template: "%s · 
 const GROUPS: NavGroup[] = [
   { label: null, items: [{ href: "/admin", label: "Overview", icon: "admin" }] },
   {
-    label: "Review",
+    label: "Holds",
     items: [
-      { href: "/admin/offers", label: "Offers", icon: "offers" },
+      { href: "/admin/offers", label: "Offers on hold", icon: "offers" },
       { href: "/admin/releases", label: "Releases", icon: "releases" },
     ],
   },

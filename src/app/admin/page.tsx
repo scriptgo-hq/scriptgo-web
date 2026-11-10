@@ -34,12 +34,12 @@ export default async function AdminOverview() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <CountTile
-            label="Offers waiting for review"
+            label="Offers on hold"
             href="/admin/offers"
-            hint="Classification is pending: no purchase path yet."
-            {...count(offers, (o) => o.classification === "pending_review")}
+            hint="Held by staff after a report. Nothing arrives here by itself: offers are not reviewed before sale."
+            {...count(offers, (o) => o.classification === "on_hold")}
           />
-          <CountTile label="Open release reviews" href="/admin/releases" hint="Releases flagged for a reviewer." {...count(releases, (r) => r.review.status === "open")} />
+          <CountTile label="Restricted releases" href="/admin/releases" hint="Releases a moderation decision restricted." {...count(releases, (r) => r.review.status === "restricted")} />
           <CountTile label="Reports not closed" href="/admin/reports" hint="Received, under review, escalated or in appeal." {...count(reports, (c) => OPEN_CASES.has(c.status))} />
           <CountTile label="Failed payment events" href="/admin/payments" hint="In the events the API returned." {...count(payments, (p) => p.status === "failed")} />
         </div>

@@ -2,8 +2,9 @@ import Link from "next/link";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { KeyValue } from "@/components/ui/data";
 import { Banner } from "@/components/ui/feedback";
-import type { EnvironmentProtection, PackageVersion } from "@/lib/contract";
+import type { EnvironmentProtection, PackageVersion, PlatformRules } from "@/lib/contract";
 import { countOf, formatDate } from "@/lib/format";
+import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
 import { buyerProtection, formatFingerprint, protectionLead, tierMeta } from "@/lib/protection";
 import type { StatusMeta } from "@/lib/status";
 
@@ -49,7 +50,8 @@ export function ProtectionPanel({
   paid,
 }: {
   version: PackageVersion | null;
-  environments: { slug: string; name: string; protection: EnvironmentProtection | null }[];
+  /** `platformRules` is the platform's own terms on paid scripts (lib/platform-rules.ts); null when the environment could not be read. */
+  environments: { slug: string; name: string; protection: EnvironmentProtection | null; platformRules?: PlatformRules | null; platformRulesNote?: string }[];
   /** The package has at least one paid offer, so a licence exists to check. */
   paid: boolean;
 }) {
@@ -222,6 +224,26 @@ export function ProtectionPanel({
           </div>
         )}
       </section>
+
+      {environments.some((e) => e.platformRules && platformRulesInfo({ platformRules: e.platformRules, platformRulesNote: e.platformRulesNote }).notable) ? (
+        <section aria-labelledby="prot-platform-rules">
+          <h3 id="prot-platform-rules" className="font-display text-[19px] font-extrabold">
+            The platforms&rsquo; own rules
+          </h3>
+          <p className="mt-1 max-w-[72ch] text-[13.5px] text-ink-2">{PLATFORM_RULES_LEAD}</p>
+          <ul className="mt-2 space-y-1.5 text-[14px]">
+            {environments.map((e) => {
+              if (!e.platformRules) return null;
+              const info = platformRulesInfo({ platformRules: e.platformRules, platformRulesNote: e.platformRulesNote });
+              return info.notable ? (
+                <li key={e.slug}>
+                  <span className="font-semibold">{e.name}:</span> <span className="text-ink-2">{info.note}</span>
+                </li>
+              ) : null;
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       {!sig ? (
         <Banner tone="info" title="This release carries no registry signature.">

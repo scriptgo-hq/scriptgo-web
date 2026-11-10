@@ -77,22 +77,7 @@ export const environmentMeta: Record<EnvironmentStatus, StatusMeta> = {
   planned: { label: "Planned", tone: "muted", icon: "calendar", hint: "Not usable yet. No install instructions." },
 };
 
-/** Whether paid packages are possible on an environment (the underlying game's rule on selling mods). */
-export const salesMeta: Record<"allowed" | "free_only" | "review", StatusMeta> = {
-  allowed: { label: "Paid allowed", tone: "success", icon: "check", hint: "Creators may sell packages for this environment." },
-  free_only: {
-    label: "Free only",
-    tone: "neutral",
-    icon: "lock",
-    hint: "The game's rights holder does not allow selling mods: packages here are free.",
-  },
-  review: {
-    label: "Paid: review",
-    tone: "warning",
-    icon: "scale",
-    hint: "Paid packages need a review of the rights holder's terms first.",
-  },
-};
+// An environment's own rules on paid scripts are worded in one place: lib/platform-rules.ts.
 
 export const capabilityMeta: Record<CapabilitySupport, StatusMeta> = {
   supported: { label: "Supported", tone: "success", icon: "check", hint: "Fully provided by the adapter." },
@@ -134,7 +119,13 @@ export const classificationMeta: Record<Classification, StatusMeta> = {
     label: "Software license",
     tone: "info",
     icon: "scale",
-    hint: "A license to original, independent software.",
+    hint: "A license to software the seller declares as their own, independent work. SCRIPT//GO does not review offers before sale.",
+  },
+  seller_declared: {
+    label: "Sold on the seller's declaration",
+    tone: "info",
+    icon: "scale",
+    hint: "The seller declares that they own this code and that it targets a third-party game platform. SCRIPT//GO does not review offers before sale; it acts on reports.",
   },
   authorized_app_feature: {
     label: "Authorized app feature",
@@ -142,13 +133,19 @@ export const classificationMeta: Record<Classification, StatusMeta> = {
     icon: "shield",
     hint: "Paid features in an application whose operator holds the commercial rights.",
   },
-  pending_review: {
-    label: "Under review",
+  undeclared: {
+    label: "Rights not declared",
     tone: "warning",
     icon: "hourglass",
-    hint: "No purchase path until a reviewer approves the classification.",
+    hint: "No purchase path yet: the seller has not declared their rights for a published release. It is the seller's step; no reviewer is involved.",
   },
-  rejected: { label: "Rejected", tone: "danger", icon: "ban", hint: "Not allowed on SCRIPT//GO." },
+  on_hold: {
+    label: "On hold",
+    tone: "warning",
+    icon: "shield",
+    hint: "Put on hold by SCRIPT//GO staff after a report. No purchase path; the seller was notified and can appeal.",
+  },
+  rejected: { label: "Withdrawn by staff", tone: "danger", icon: "ban", hint: "Withdrawn by a moderation decision after a report. The seller was notified and can appeal." },
 };
 
 export const licenseMeta: Record<LicenseStatus, StatusMeta> = {
@@ -184,6 +181,7 @@ export const storeMeta: Record<StoreStatus, StatusMeta> = {
   },
   live: { label: "Live", tone: "success", icon: "check", hint: "Taking real payments." },
   needs_attention: { label: "Needs attention", tone: "danger", icon: "alert", hint: "Webhook deliveries are failing." },
+  suspended: { label: "Suspended", tone: "danger", icon: "ban", hint: "Suspended by SCRIPT//GO staff after a report. Nothing can be bought through it; the seller can appeal." },
 };
 
 export const caseMeta: Record<CaseStatus, StatusMeta> = {

@@ -45,7 +45,7 @@ export function ConnectStoreForm({ connected, mockAvailable }: { connected: Prov
         <div className="mt-2 flex flex-wrap gap-2">
           {(
             [
-              ["tebex", "Tebex", "Real payments, once approved."],
+              ["tebex", "Tebex", "Real payments, once Tebex has approved SCRIPT//GO. No approval of your store by staff."],
               ["mock", "Test provider", mockAvailable ? "Sandbox: simulated payments and webhooks." : "Disabled on this server."],
             ] as const
           ).map(([v, label, hint]) => (

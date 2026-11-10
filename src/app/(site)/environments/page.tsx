@@ -11,7 +11,8 @@ import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
 import { ENV_KINDS, envKind, languageLabels } from "@/lib/env";
 import { formatDate, relativeTime } from "@/lib/format";
-import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
+import { platformRulesInfo } from "@/lib/platform-rules";
+import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
 import { cn } from "@/lib/cn";
 import { adapterMetaFor } from "@/lib/integration";
 import { protectionMeta } from "@/lib/protection";
@@ -107,7 +108,7 @@ export default async function EnvironmentsPage() {
                           <tr>
                             <th scope="col" className="px-3 py-2.5">Environment</th>
                             <th scope="col" className="px-3 py-2.5">Status</th>
-                            <th scope="col" className="px-3 py-2.5">Selling</th>
+                            <th scope="col" className="px-3 py-2.5">Platform&rsquo;s own rules</th>
                             <th scope="col" className="px-3 py-2.5">Protection</th>
                             <th scope="col" className="px-3 py-2.5">Languages</th>
                             <th scope="col" className="px-3 py-2.5">Runtime</th>
@@ -136,7 +137,7 @@ export default async function EnvironmentsPage() {
                                       </span>
                                     ) : null}
                                   </td>
-                                  <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
+                                  <td className="px-3 py-2.5" title={platformRulesInfo(e).note}><StatusBadge meta={platformRulesInfo(e).meta} size="sm" /></td>
                                   <td className="px-3 py-2.5"><StatusBadge meta={protectionMeta(e.protection)} size="sm" /></td>
                                   <td className="px-3 py-2.5">{languageLabels(e).join(" · ")}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>

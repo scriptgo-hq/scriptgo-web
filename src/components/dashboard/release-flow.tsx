@@ -569,7 +569,7 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
             <li>{r.rights.ownsCode ? "You declared that you wrote this code or have the right to distribute it." : "You did not confirm ownership of the code: publishing stays blocked."}</li>
             <li>
               {r.rights.targetsProprietaryGame
-                ? "It targets a proprietary third-party game: paid offers go to review before checkout."
+                ? "It targets a third-party game platform: paid offers are sold on your declaration, with no review before sale."
                 : "It does not target a proprietary third-party game."}
             </li>
             <li className="tabular">
@@ -597,7 +597,9 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
           </label>
           <fieldset>
             <legend className="text-[15px] font-bold">Does it target a proprietary third-party game or its assets?</legend>
-            <p className="text-[13.5px] text-ink-2">For example a script that only works inside a commercial game you don&rsquo;t own. Paid offers for such resources are reviewed.</p>
+            <p className="text-[13.5px] text-ink-2">For example a script that only works inside a commercial game you don&rsquo;t own. Your answer is shown on the package page. It does not hold a sale:
+              paid offers are sold on your declaration, and you answer for it. Running the script on a platform is then the server operator&rsquo;s responsibility
+              towards that platform&rsquo;s rights holder.</p>
             <div className="mt-2 flex flex-wrap gap-3">
               {(["no", "yes"] as const).map((v) => (
                 <label key={v} className="inline-flex items-center gap-2 rounded-full border-2 border-line-soft bg-surface px-3 py-1.5 text-[14px] has-[:checked]:border-line has-[:checked]:bg-sun-soft">

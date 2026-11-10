@@ -326,6 +326,15 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
         ) : null}
         <div className="sticker mt-3 p-5">
           <ReportDecisionForm caseRef={c.id} caseLabel={c.caseId} targetsPackage={Boolean(c.package)} disabledReason={disabledReason} />
+          {c.package ? (
+            <p className="mt-3 text-[13.5px] text-ink-2">
+              To hold or withdraw one offer only, rather than all sales of the package:{" "}
+              <Link href={`/admin/offers?package=${encodeURIComponent(c.package.identifier)}`} className="font-semibold text-cobalt-ink underline">
+                the offers of {c.package.identifier}
+              </Link>
+              . Quote {c.caseId} in the decision.
+            </p>
+          ) : null}
         </div>
       </section>
 

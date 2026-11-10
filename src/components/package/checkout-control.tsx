@@ -52,14 +52,12 @@ export function CheckoutControl({
     }
   }
 
-  const blockedReason =
-    offer?.classification === "pending_review"
-      ? "This offer is under review. There is no purchase path until a reviewer approves its classification."
-      : offer?.classification === "rejected"
-        ? "This offer is not allowed on SCRIPT//GO."
-        : offer && !offer.checkoutEnabled
-          ? (offer.checkoutDisabledReason ?? "The creator's store is not approved for checkout yet.")
-          : null;
+  // The API states the reason for every closed purchase path (packages/commerce gating.ts): the
+  // seller has not declared their rights yet, a moderation decision holds the offer, the listing or
+  // the store, or the payment provider is not open. Nothing here waits for a reviewer (ADR-0037).
+  const held = offer?.classification === "on_hold" || offer?.classification === "rejected";
+  const undeclared = offer?.classification === "undeclared";
+  const blockedReason = offer && !offer.checkoutEnabled ? (offer.checkoutDisabledReason ?? "Checkout is not available for this offer.") : null;
 
   return (
     <div className="space-y-3">
@@ -86,7 +84,7 @@ export function CheckoutControl({
                   <span className="block font-bold leading-tight">{o.name}</span>
                   <span className="block text-[12.5px] text-ink-3">
                     {intervalLabel(o.interval)} · {o.deployments} {o.deployments === 1 ? "deployment" : "deployments"}
-                    {o.classification === "pending_review" ? " · under review" : ""}
+                    {o.classification === "on_hold" ? " · on hold" : o.classification === "undeclared" ? " · rights not declared yet" : ""}
                   </span>
                 </span>
                 <span className="tabular whitespace-nowrap font-display text-[17px] font-extrabold">
@@ -102,12 +100,8 @@ export function CheckoutControl({
       {blockedReason ? (
         <div className="space-y-2">
           <button type="button" disabled aria-describedby="checkout-reason" className={buttonClass("primary", "lg", "w-full")}>
-            {offer?.classification === "pending_review" ? (
-              <Hourglass aria-hidden="true" size={17} />
-            ) : (
-              <Lock aria-hidden="true" size={17} />
-            )}
-            {offer?.classification === "pending_review" ? "Under review" : "Checkout not available yet"}
+            {undeclared ? <Hourglass aria-hidden="true" size={17} /> : <Lock aria-hidden="true" size={17} />}
+            {undeclared ? "Not on sale yet" : held ? "On hold" : "Checkout not available yet"}
           </button>
           <p id="checkout-reason" className="text-[13px] text-ink-2">
             {blockedReason}

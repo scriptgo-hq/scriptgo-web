@@ -1,12 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { CircleCheck, CircleX, Hourglass, TriangleAlert, type LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
-import { Field, FormMessage, inputClass } from "@/components/ui/form";
-import { callApi } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 import type { ReadinessCheck, ReadinessStatus, ReadinessSummary, StoreReadiness } from "@/lib/contract";
 
@@ -116,7 +111,8 @@ export function TebexNotConnected() {
     ["Connect the store below", "Paste the webhook secret (Tebex > Developers > Webhooks) and the public token (Tebex > Integrations > Headless API). Both are stored sealed and never shown again."],
     ["Add the webhook endpoint in Tebex", "After connecting, this page shows the URL to paste in Tebex > Developers > Webhooks > Endpoints. Tebex validates it at once."],
     ["Map each paid offer to its Tebex package id", "The id goes in the offer's provider product when you create the offer."],
-    ["Wait for the approvals", "SCRIPT//GO staff approve the store, and checkout opens once Tebex has approved SCRIPT//GO in writing. Until then nothing can be bought."],
+    ["Declare your rights and publish", "An offer can be bought once you have declared your rights for a published release. SCRIPT//GO does not review offers before sale: you decide what you sell, and you answer for it."],
+    ["Wait for Tebex", "Your store needs no approval by SCRIPT//GO staff. Checkout through Tebex opens for everyone once Tebex has approved SCRIPT//GO in writing; until then nothing can be bought through Tebex."],
   ];
   return (
     <section aria-labelledby="tebex-steps-title" className="panel p-5">
@@ -142,57 +138,23 @@ export function TebexNotConnected() {
 }
 
 /**
- * Staff: approve a Tebex store, or withdraw the approval (POST /v1/admin/stores/:id/approval, audited
- * with the reason). Approval alone opens nothing: COMMERCE_CHECKOUT_ENABLED must be true as well.
+ * Staff view of one store on the readiness page. A store needs no staff approval (ADR-0037), so there
+ * is nothing to switch here: the note says how a store is suspended after a report, and that it is.
  */
-export function StoreApprovalControl({ storeId, creator, approved }: { storeId: string; creator: string; approved: boolean }) {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const next = !approved;
-  const fieldId = `approval-reason-${storeId}`;
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (reason.trim().length < 3) return setError("Give the reason (3 characters or more). It is written to the audit log.");
-    setBusy(true);
-    setError(null);
-    const res = await callApi<unknown>("POST", `/v1/admin/stores/${encodeURIComponent(storeId)}/approval`, { approved: next, reason: reason.trim() });
-    setBusy(false);
-    if (!res.ok) return setError(res.message);
-    setOpen(false);
-    setReason("");
-    router.refresh();
-  }
-
-  if (!open) {
-    return (
-      <div className="flex flex-wrap items-center gap-3">
-        <Button size="sm" variant={next ? "primary" : "danger"} onClick={() => setOpen(true)}>
-          {next ? "Approve this store…" : "Withdraw the approval…"}
-        </Button>
-        <span className="text-[13px] text-ink-3">
-          {approved ? "Approved. Withdrawing closes its checkout; existing licenses keep working." : "Approve only after Tebex's written approval of SCRIPT//GO."}
-        </span>
-      </div>
-    );
-  }
+export function StoreStaffNote({ creator, suspended }: { creator: string; suspended: boolean }) {
   return (
-    <form onSubmit={submit} className="grid grid-cols-1 gap-3 rounded-[10px] border-2 border-line bg-surface p-3">
-      <Field id={fieldId} label={next ? `Why is ${creator}'s store approved?` : `Why is the approval of ${creator}'s store withdrawn?`} hint="Recorded in the audit log with your account.">
-        <input id={fieldId} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={5000} className={inputClass} aria-describedby={`${fieldId}-hint`} />
-      </Field>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" size="sm" variant={next ? "primary" : "danger"} disabled={busy}>
-          {busy ? "Saving…" : next ? "Approve store" : "Withdraw approval"}
-        </Button>
-        <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
-        {error ? <FormMessage tone="error">{error}</FormMessage> : null}
-      </div>
-    </form>
+    <p className="text-[13.5px] text-ink-2" data-store-suspended={suspended ? "true" : "false"}>
+      {suspended ? (
+        <>
+          <strong className="text-bad">Suspended.</strong> A moderation decision suspended {creator}&rsquo;s store: nothing can be bought through it. The creator was
+          notified and can appeal; an appeal that reverses the decision lifts the suspension.
+        </>
+      ) : (
+        <>
+          This store needs no approval. To suspend it after a report, decide the report about one of {creator}&rsquo;s packages with &ldquo;Suspend the seller&rsquo;s
+          store&rdquo;: the decision is audited, and the creator is notified and can appeal.
+        </>
+      )}
+    </p>
   );
 }

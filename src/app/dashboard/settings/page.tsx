@@ -122,8 +122,8 @@ export default async function SettingsPage() {
           ) : (
             <div className="mt-4 space-y-4">
               <p className="max-w-prose text-[15px] text-ink-2">
-                A creator profile lets you publish packages under your own namespace and connect a store. It&rsquo;s free; paid offers go
-                through review before checkout opens.
+                A creator profile lets you publish packages under your own namespace and connect a store. It&rsquo;s free. Nothing you sell
+                waits for a review: you declare your rights and answer for what you sell, and SCRIPT//GO acts on reports.
               </p>
               <div className="sticker p-5">
                 <CreatorProfileForm suggestedName={user.name} />

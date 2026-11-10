@@ -8,7 +8,8 @@ import type { Environment, EnvironmentDetail, EnvironmentProtection, ProofRun } 
 import { formatDate } from "@/lib/format";
 import { integrationTypeLabel, sidesLabel } from "@/lib/integration";
 import { groupByTier, protectionLead, tierBlurb, tierMeta } from "@/lib/protection";
-import { metaFor, salesMeta, type StatusMeta } from "@/lib/status";
+import { platformRulesInfo } from "@/lib/platform-rules";
+import type { StatusMeta } from "@/lib/status";
 
 interface ProofGroup {
   pkg: string;
@@ -69,11 +70,11 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
                 { label: "Runtime", value: <InlineCodeText text={i.runtime} /> },
                 { label: "Sides", value: sidesLabel(e.sides) },
                 {
-                  label: "Selling",
+                  label: "Platform's rules",
                   value: (
                     <span className="inline-flex flex-wrap items-center gap-2">
-                      <StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" />
-                      {e.salesNote ? <span className="text-ink-2">{e.salesNote}</span> : null}
+                      <StatusBadge meta={platformRulesInfo(e).meta} size="sm" />
+                      <span className="text-ink-2">{platformRulesInfo(e).note}</span>
                     </span>
                   ),
                 },
@@ -216,7 +217,7 @@ export function ProtectionTierTable({ envs, caption = "Protection tier by enviro
                     {e.name}
                   </Link>
                 </th>
-                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">Free only</span> : <StateBadge p={e.protection} />}</td>
+                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">No licence check</span> : <StateBadge p={e.protection} />}</td>
                 <td className="px-3 py-2.5 text-ink-2">{e.protection.note || tierBlurb[e.protection.tier]}</td>
               </tr>
             ))}

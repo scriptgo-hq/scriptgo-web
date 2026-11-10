@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CircleCheck, CircleX } from "lucide-react";
 import { ConnectStoreForm, TestEventButton } from "@/components/dashboard/store-forms";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -33,6 +34,14 @@ function StoreCard({ s, readiness }: { s: Store; readiness: ApiResult<StoreReadi
         <StatusBadge meta={metaFor(storeMeta, s.status)} />
       </div>
 
+      {s.suspended ? (
+        <Banner tone="danger" className="mt-4" title="This store is suspended.">
+          SCRIPT//GO staff suspended it after a report: nothing can be bought through it. {s.suspendedReason ? <>Reasons: {s.suspendedReason} </> : null}
+          The decision is in your <Link href="/dashboard/notices" className="font-semibold underline">notices</Link>, where you can appeal; a different reviewer decides.
+          Licenses already sold keep working.
+        </Banner>
+      ) : null}
+
       {s.status === "needs_attention" ? (
         <Banner tone="danger" className="mt-4" title="Webhook deliveries are failing.">
           Payments may not turn into licenses until this is fixed. Check the webhook URL and secret in your provider dashboard, then compare with
@@ -54,8 +63,8 @@ function StoreCard({ s, readiness }: { s: Store; readiness: ApiResult<StoreReadi
             </span>
           )}
         </dd>
-        <dt className="font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink-3">Approved</dt>
-        <dd>{s.provider === "mock" ? "Not needed for the sandbox" : s.approved ? "Yes" : "Not yet"}</dd>
+        <dt className="font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink-3">Staff approval</dt>
+        <dd>Not needed: your store sells as soon as its own setup is complete.</dd>
         <dt className="font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink-3">Webhook URL</dt>
         <dd className="flex min-w-0 flex-wrap items-center gap-2">
           <code className="min-w-0 break-all rounded-md border-2 border-line-soft bg-surface-2 px-2 py-1 font-mono text-[12.5px]">{s.webhookUrl}</code>
@@ -188,7 +197,8 @@ export default async function StoresPage() {
               {stores.length ? "Connect or update a store." : "Connect a store."}
             </h2>
             <p className="mt-1 max-w-prose text-[14px] text-ink-2">
-              Tebex checkout stays off until Tebex approves SCRIPT//GO in writing; until then you can prepare products and test with the sandbox.
+              Your store needs no approval by SCRIPT//GO staff. Tebex checkout stays off for everyone until Tebex approves SCRIPT//GO in writing; until then you can
+              prepare products and test with the sandbox.
             </p>
             <div className="mt-4">
               {/* The API refuses mock stores with provider_disabled when the server turns the test provider off; the form shows that message. */}

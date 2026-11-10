@@ -14,7 +14,8 @@ import { envKind, languageLabels } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
 import { protectionMeta } from "@/lib/protection";
-import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
+import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
+import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
 
 type Params = { slug: string };
 
@@ -48,7 +49,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           <h1 className="display text-[48px] sm:text-[64px]">{e.name}.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
-            {e.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, e.sales)} /> : null}
+            {platformRulesInfo(e).notable ? <StatusBadge meta={platformRulesInfo(e).meta} /> : null}
             {e.protection.tier !== "none" ? (
               <a href="#protection-title" className="rounded-full">
                 <StatusBadge meta={protectionMeta(e.protection)} />
@@ -93,13 +94,9 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
         </div>
       </header>
 
-      {e.sales !== "allowed" ? (
-        <Banner
-          tone={e.sales === "review" ? "warning" : "info"}
-          title={e.sales === "review" ? "Paid packages are reviewed first." : "Free packages only."}
-          className="mt-8"
-        >
-          {e.salesNote || metaFor(salesMeta, e.sales).hint}
+      {platformRulesInfo(e).notable ? (
+        <Banner tone="info" title="This platform&rsquo;s own rules on paid scripts." className="mt-8">
+          {platformRulesInfo(e).note} {PLATFORM_RULES_LEAD}
         </Banner>
       ) : null}
 

@@ -177,8 +177,9 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
         <section aria-labelledby="off-title">
           <H2 id="off-title">Offers</H2>
           <p className="mt-2 max-w-prose text-[14px] text-ink-2">
-            What people can get. Free offers need no checkout. Paid offers license your own original software, go through review, and are
-            sold through your connected store.
+            What people can get. Free offers need no checkout. A paid offer can be bought as soon as you have declared your rights for a published release:
+            SCRIPT//GO does not review offers before sale. You decide what you sell and you answer for it; staff act on reports. Paid offers are sold through your
+            connected store.
           </p>
           {!storeRes.ok ? <ApiError compact className="mt-3" failure={storeRes} title="Your stores couldn't be checked." /> : null}
           {p.offers.length === 0 ? (
@@ -192,7 +193,7 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
                     <th scope="col" className="px-3 py-2.5">Offer</th>
                     <th scope="col" className="px-3 py-2.5">Price</th>
                     <th scope="col" className="px-3 py-2.5">Classification</th>
-                    <th scope="col" className="px-3 py-2.5">Covers</th>
+                    <th scope="col" className="px-3 py-2.5">Runs on</th>
                     <th scope="col" className="px-3 py-2.5">Checkout</th>
                     <th scope="col" className="px-3 py-2.5"><span className="sr-only">Action</span></th>
                   </tr>
