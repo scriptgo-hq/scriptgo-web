@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn";
 import type { CheckStage, Release, ReleaseCheck, ThirdPartyAsset } from "@/lib/contract";
 import { envName } from "@/lib/env";
 import { formatBytes, formatDateTime, formatDuration, shortHash } from "@/lib/format";
+import { formatFingerprint, tierMeta } from "@/lib/protection";
 import { checkMeta, metaFor, releaseMeta } from "@/lib/status";
 
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -24,6 +25,8 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
   const [drag, setDrag] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [protect, setProtect] = useState(false);
+  const [allowlist, setAllowlist] = useState("");
 
   function pick(f: File | null | undefined) {
     setError(null);
@@ -36,6 +39,11 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
   function upload() {
     if (!file) return;
     const fd = new FormData();
+    // Text fields first: the API reads the form in order and needs them with the archive.
+    if (protect) {
+      fd.append("escrow", "true");
+      if (allowlist.trim()) fd.append("allowlist", allowlist);
+    }
     fd.append("archive", file, file.name);
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `/v1/creator/packages/${encodeURIComponent(packageName)}/releases`);
@@ -95,6 +103,56 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
           {file ? "Choose another file" : "Choose a file"}
         </Button>
       </div>
+      <fieldset className="rounded-[12px] border-2 border-line-soft bg-surface p-4" disabled={busy}>
+        <legend className="sr-only">Protection</legend>
+        <label className="flex items-start gap-3 text-[15px]">
+          <input
+            id="protect-release"
+            type="checkbox"
+            checked={protect}
+            onChange={(e) => setProtect(e.target.checked)}
+            className="mt-1 h-5 w-5 shrink-0 accent-[var(--cobalt)]"
+            aria-describedby="protect-hint"
+          />
+          <span>
+            <strong>Protect this release (escrow)</strong>
+            <span id="protect-hint" className="mt-0.5 block text-[13.5px] text-ink-2">
+              SCRIPT//GO encrypts your scripts before they are stored. Buyers download the encrypted bundle, and a server gets the key only
+              while it is licensed and bound. The archive you upload is checked in memory and is not kept.
+            </span>
+          </span>
+        </label>
+        {protect ? (
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-line-soft pt-4">
+            <Field
+              id="allowlist"
+              label="Files left readable"
+              hint="One pattern per line. The manifest, README, CHANGELOG and LICENSE are always readable. Add what an operator must be able to read or edit, for example config.lua or locales/*.json. Everything else is encrypted."
+            >
+              <textarea
+                id="allowlist"
+                value={allowlist}
+                onChange={(e) => setAllowlist(e.target.value)}
+                rows={3}
+                spellCheck={false}
+                placeholder={"config.lua\nlocales/*.json"}
+                className={`${textareaClass} min-h-[84px] font-mono text-[13px]`}
+                aria-describedby="allowlist-hint"
+              />
+            </Field>
+            <ul className="list-disc space-y-1 pl-5 text-[13.5px] text-ink-2">
+              <li>The key is created here, sealed on the master, and never shown, to you or to anyone.</li>
+              <li>The bundle is signed with a key SCRIPT//GO holds for your account; its fingerprint is on the release page.</li>
+              <li>
+                This is deterrence and traceability, not DRM. A licensed operator can still read what their own host decrypts.{" "}
+                <a href="/protect" className="font-semibold text-cobalt-ink underline">
+                  What it does and does not do
+                </a>
+              </li>
+            </ul>
+          </div>
+        ) : null}
+      </fieldset>
       {busy ? (
         <div>
           <div
@@ -115,7 +173,7 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
       {error ? <FormMessage tone="error">{error}</FormMessage> : null}
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={upload} disabled={!file || busy} aria-describedby={!file ? "upload-reason" : undefined}>
-          <Upload aria-hidden="true" size={16} /> Upload to {identifier}
+          <Upload aria-hidden="true" size={16} /> {protect ? "Upload and protect" : `Upload to ${identifier}`}
         </Button>
         {!file ? (
           <span id="upload-reason" className="text-[13px] text-ink-3">
@@ -167,7 +225,116 @@ function CheckRow({ c }: { c: ReleaseCheck }) {
   );
 }
 
-export function ReleaseView({ initial }: { initial: Release }) {
+/**
+ * What is protected in this release and what is not. Everything shown is public metadata of the
+ * bundle; the content key is never fetched by this page, only whether the master holds it sealed.
+ */
+function ProtectionSection({ release: r, creator }: { release: Release; creator: string | null }) {
+  const e = r.escrow;
+  const published = DONE.has(r.status);
+  if (!e) {
+    return (
+      <section aria-labelledby="prot-title">
+        <h2 id="prot-title" className="font-display text-[24px] font-extrabold tracking-[-0.02em]">
+          Protection
+        </h2>
+        <div className="panel mt-4 p-4 text-[14.5px]" data-escrow-state="plain">
+          <p>
+            <strong>Not encrypted.</strong> People download the archive as you uploaded it. A paid offer still checks a licence per server,
+            and the published release is signed, so a changed copy is detected.
+          </p>
+          <p className="mt-2 text-[13.5px] text-ink-2">
+            Protection is chosen at upload and a release can&rsquo;t change afterwards. To protect this code, upload a higher version with
+            &ldquo;Protect this release (escrow)&rdquo;, or run <span className="font-mono">scriptgo publish --escrow</span>.
+          </p>
+          {r.signature ? <p className="tabular mt-2 text-[13px] text-ink-3">Release signature: registry key {formatFingerprint(r.signature.keyId)}</p> : null}
+        </div>
+      </section>
+    );
+  }
+  const plainHref =
+    creator && published ? `/v1/packages/${encodeURIComponent(creator)}/${encodeURIComponent(r.packageName)}/versions/${encodeURIComponent(r.version)}/download?variant=plain` : null;
+  return (
+    <section aria-labelledby="prot-title">
+      <h2 id="prot-title" className="font-display text-[24px] font-extrabold tracking-[-0.02em]">
+        Protection
+      </h2>
+      <div className="panel mt-4 p-4" data-escrow-state="escrow">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusBadge meta={tierMeta.escrow} />
+          <span className="text-[14.5px] font-semibold">Encrypted bundle. Buyers never get the plain archive.</span>
+        </div>
+        <dl className="mt-3 grid grid-cols-1 gap-y-1.5 text-[14px] sm:grid-cols-[11rem_minmax(0,1fr)]">
+          <dt className="text-ink-3">Cipher</dt>
+          <dd className="font-mono text-[13px]">{e.cipher}</dd>
+          <dt className="text-ink-3">Key wrapping</dt>
+          <dd className="font-mono text-[13px]">{e.kdf}, per server</dd>
+          <dt className="text-ink-3">Signed by</dt>
+          <dd>
+            <span className="font-mono text-[13px]" data-signer-fingerprint={e.signerKeyId}>
+              {formatFingerprint(e.signerKeyId)}
+            </span>{" "}
+            <span className="text-ink-2">
+              {e.signerOrigin === "master" ? "(the key SCRIPT//GO holds sealed for your account)" : e.signerOrigin === "creator" ? "(your own key, from the CLI)" : null}
+            </span>
+          </dd>
+          <dt className="text-ink-3">Content key</dt>
+          <dd data-sealed-key={e.sealedKeyPresent ? "yes" : "no"}>
+            {e.sealedKeyPresent ? "Sealed on the master: yes." : "Sealed on the master: no. Servers cannot get a key for this release."}{" "}
+            <span className="text-ink-2">It is never shown, here or anywhere. A server gets it wrapped to its own key.</span>
+          </dd>
+          <dt className="text-ink-3">Left readable</dt>
+          <dd>
+            <span className="flex flex-wrap gap-1">
+              {e.clearFiles.map((f) => (
+                <Tag key={f} mono>
+                  {f}
+                </Tag>
+              ))}
+            </span>
+            <span className="mt-1 block text-[12.5px] text-ink-3">Allowlist: {e.allowlist.join(", ")}</span>
+          </dd>
+          <dt className="text-ink-3">Encrypted</dt>
+          <dd>
+            <details>
+              <summary className="cursor-pointer">
+                <span className="tabular">{e.encryptedFiles.length}</span> {e.encryptedFiles.length === 1 ? "file" : "files"}
+              </summary>
+              <ul className="mt-1 space-y-0.5 font-mono text-[12.5px] text-ink-2">
+                {e.encryptedFiles.map((f) => (
+                  <li key={f} className="break-all">
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </dd>
+          <dt className="text-ink-3">Watermark</dt>
+          <dd>{e.watermarked ? "In the signed manifest. Each delivery also gets its own marker. Traceability, not prevention." : "None in the manifest. Each delivery still gets its own marker."}</dd>
+          <dt className="text-ink-3">Release signature</dt>
+          <dd className="tabular">{r.signature ? `Registry key ${formatFingerprint(r.signature.keyId)}` : "Added when you publish."}</dd>
+        </dl>
+        <p className="mt-3 text-[13px] text-ink-2">
+          A key goes out only to a licensed, bound server, for a paid offer or a licence granted by staff. This is deterrence and
+          traceability: a licensed operator can still read what their own host decrypts.{" "}
+          <a href="/protect" className="font-semibold text-cobalt-ink underline">
+            How it works
+          </a>
+        </p>
+        {plainHref ? (
+          <p className="mt-2 text-[13px]">
+            <a href={plainHref} className="font-semibold text-cobalt-ink underline">
+              Download the plain archive
+            </a>{" "}
+            <span className="text-ink-3">(you only; the download is recorded)</span>
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+export function ReleaseView({ initial, creator = null }: { initial: Release; creator?: string | null }) {
   const router = useRouter();
   const [r, setR] = useState<Release>(initial);
   const [pollError, setPollError] = useState<string | null>(null);
@@ -313,6 +480,8 @@ export function ReleaseView({ initial }: { initial: Release }) {
           {r.checks.length === 0 ? <p className="text-[14px] text-ink-3">No checks reported yet.</p> : null}
         </div>
       </section>
+
+      <ProtectionSection release={r} creator={creator} />
 
       <RightsSection release={r} onChange={setR} />
 

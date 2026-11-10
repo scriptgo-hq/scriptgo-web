@@ -201,6 +201,60 @@ export function AddDeploymentForm({
   );
 }
 
+/**
+ * Unbinds the deployment's server key so a moved or re-installed server can bind its new one. The
+ * API audits each reset and allows three per deployment per day.
+ */
+export function ResetServerKeyButton({ licenseId, activationId, name }: { licenseId: string; activationId: string; name: string }) {
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+  const router = useRouter();
+
+  async function run() {
+    setBusy(true);
+    setError(null);
+    const res = await callApi<unknown>("POST", `/v1/me/licenses/${encodeURIComponent(licenseId)}/deployments/${encodeURIComponent(activationId)}/reset-server-key`);
+    setBusy(false);
+    setConfirming(false);
+    if (!res.ok) return setError(res.message);
+    setDone(true);
+    router.refresh();
+  }
+
+  if (!confirming)
+    return (
+      <span className="inline-flex flex-col items-end">
+        <Button size="sm" variant="secondary" onClick={() => setConfirming(true)}>
+          Reset server key
+        </Button>
+        {done ? (
+          <span role="status" className="mt-1 text-[12px] text-ink-2">
+            Reset. The next key request binds the server that makes it.
+          </span>
+        ) : null}
+        {error ? (
+          <span role="alert" className="mt-1 max-w-[260px] text-right text-[12px] text-bad">
+            {error}
+          </span>
+        ) : null}
+      </span>
+    );
+  return (
+    <span className="inline-flex max-w-[300px] flex-wrap items-center justify-end gap-1.5 text-right text-[12.5px]">
+      Unbind {name} from its server key? Do it after moving or re-installing that server. The next server to ask with this deployment&rsquo;s
+      token is bound. Recorded; 3 per day.
+      <Button size="sm" variant="primary" onClick={run} disabled={busy}>
+        {busy ? "…" : "Reset key"}
+      </Button>
+      <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
+        Keep
+      </Button>
+    </span>
+  );
+}
+
 export function DeactivateButton({ licenseId, activationId, name }: { licenseId: string; activationId: string; name: string }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);

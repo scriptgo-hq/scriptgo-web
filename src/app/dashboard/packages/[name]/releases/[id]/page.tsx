@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/ui/data";
 import { ApiError } from "@/components/ui/feedback";
 import { api } from "@/lib/api";
 import type { Release } from "@/lib/contract";
+import { getMe } from "@/lib/session";
 
 export const metadata = { title: "Release" };
 
@@ -17,6 +18,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
   }
   const r = res.data;
   if (r.packageName !== name) notFound();
+  // The creator's username builds the link to the plain archive of a protected release.
+  const me = await getMe();
+  const creator = me.ok ? (me.data.creatorProfile?.username ?? null) : null;
   return (
     <>
       <PageHeader
@@ -32,7 +36,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ name: 
         eyebrow="release"
         title={`${r.packageName} ${r.version}.`}
       />
-      <ReleaseView initial={r} />
+      <ReleaseView initial={r} creator={creator} />
     </>
   );
 }

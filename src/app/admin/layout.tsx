@@ -18,7 +18,13 @@ const GROUPS: NavGroup[] = [
       { href: "/admin/releases", label: "Releases", icon: "releases" },
     ],
   },
-  { label: "Trust & safety", items: [{ href: "/admin/reports", label: "Reports", icon: "reports" }] },
+  {
+    label: "Trust & safety",
+    items: [
+      { href: "/admin/reports", label: "Reports", icon: "reports" },
+      { href: "/admin/escrow", label: "Escrow", icon: "licenses" },
+    ],
+  },
   {
     label: "Operations",
     items: [

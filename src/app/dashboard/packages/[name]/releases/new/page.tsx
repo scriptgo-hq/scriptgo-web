@@ -47,6 +47,9 @@ export default async function NewReleasePage({ params }: { params: Promise<{ nam
           <p className="font-bold text-ink">From the command line</p>
           <p>The CLI zips the folder, uploads it and shows the same checks.</p>
           <CommandLine command="scriptgo publish" />
+          <p className="pt-2 font-bold text-ink">Protected, from the command line</p>
+          <p>The CLI encrypts on your machine and signs the bundle with your own key. The key is handed to SCRIPT//GO once, in the upload.</p>
+          <CommandLine command="scriptgo publish --escrow --escrow-ignore config.lua" />
         </aside>
       </div>
     </>

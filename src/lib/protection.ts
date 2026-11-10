@@ -91,12 +91,12 @@ export const tierBlurb: Record<ProtectionTier, string> = {
 
 /**
  * The state of a tier in one environment, as a short lead before its note. Read from the registry
- * fields only: the state decides "available" or "planned", and a note that names an opt-in feature
- * is led as one. A free-only environment has nothing to wait for, so it gets no lead.
+ * fields only: `state` decides "available" or "planned", and `optIn` says the tier is a feature the
+ * server operator switches on. A free-only environment has nothing to wait for, so it gets no lead.
  */
 export function protectionLead(p: EnvironmentProtection): string | null {
   if (p.tier === "none") return null;
-  const optIn = /\bopt-in\b/i.test(p.note);
+  const optIn = p.optIn === true;
   if (p.state === "available") return optIn ? "Available as an opt-in server feature." : "Available today.";
   return optIn ? "Planned as an opt-in server feature." : "Planned, not available yet.";
 }
@@ -115,4 +115,26 @@ export function groupByTier<T extends { name: string; protection: EnvironmentPro
 export function formatFingerprint(fp: string | null | undefined): string {
   if (!fp) return "—";
   return fp.replace(/(.{4})(?=.)/g, "$1 ");
+}
+
+/**
+ * The key endpoint's refusal reasons (docs/spec/escrow.md), in plain words. Stable: loaders switch
+ * on the reason, people read the sentence.
+ */
+export const REFUSAL_MEANING: Record<string, string> = {
+  unknown_key: "No licence matches the key or token sent for this package.",
+  expired: "The licence expired (the subscription ended or the paid period is over).",
+  revoked: "The licence was revoked (a lost payment dispute, or a staff decision).",
+  refunded: "The payment was refunded.",
+  deactivated: "The deployment was deactivated by its owner.",
+  environment_not_covered: "The licence does not cover the environment the server runs.",
+  deployment_limit: "More deployments are active than the licence allows.",
+  unbound: "The request named no server key, so there was nothing to wrap the key to.",
+  server_key_mismatch: "Another server key than the one bound to the deployment: a copy on another machine, or a server that was moved without a reset.",
+  not_escrowed: "The package has no protected release for the version asked.",
+};
+
+export function refusalMeaning(reason: string | null | undefined): string {
+  if (!reason) return "";
+  return REFUSAL_MEANING[reason] ?? reason.split("_").join(" ");
 }

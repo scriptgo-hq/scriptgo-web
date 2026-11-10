@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AddDeploymentForm, DeactivateButton, LicenseKeyField } from "@/components/dashboard/license-actions";
+import { AddDeploymentForm, DeactivateButton, LicenseKeyField, ResetServerKeyButton } from "@/components/dashboard/license-actions";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { SellerLine } from "@/components/package/seller-line";
 import { StatusBadge, Tag } from "@/components/ui/badge";
+import { buttonClass } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/code-block";
 import { Breadcrumb, Meter } from "@/components/ui/data";
 import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/tabs";
 import { Identifier } from "@/components/ui/typography";
-import { api } from "@/lib/api";
-import type { LicenseDetail } from "@/lib/contract";
+import { api, asList } from "@/lib/api";
+import type { Environment, LicenseDetail, PackageDetail } from "@/lib/contract";
 import { envLongName } from "@/lib/env";
 import { formatDate, formatDateTime, intervalLabel, relativeTime } from "@/lib/format";
+import { buyerProtection, formatFingerprint, protectionMeta } from "@/lib/protection";
 import { activationMeta, licenseMeta, metaFor } from "@/lib/status";
 
 export const metadata = { title: "License" };
@@ -36,6 +38,47 @@ export default async function LicenseDetailPage({ params }: { params: Promise<{ 
       : null;
   const ident = l.package.identifier;
   const env = l.environments[0] ?? "standalone";
+
+  // The protected release this license opens, if the package has one, and what each environment gives.
+  const [creatorName, packageName] = ident.split("//");
+  const [pkgRes, envRes] = await Promise.all([
+    api<PackageDetail>(`/v1/packages/${encodeURIComponent(creatorName ?? "")}/${encodeURIComponent(packageName ?? "")}`, { auth: true }),
+    api<Environment[]>("/v1/environments"),
+  ]);
+  const version = pkgRes.ok ? (pkgRes.data.versions.find((v) => v.version === pkgRes.data.latestVersion) ?? null) : null;
+  const escrow = version?.escrow ?? null;
+  const allEnvs = envRes.ok ? asList(envRes.data) : [];
+  const covered = (l.environments.length ? l.environments : (pkgRes.ok ? (pkgRes.data.manifest?.environments ?? []) : [])).map((slug) => allEnvs.find((e) => e.slug === slug)).filter((e): e is Environment => Boolean(e));
+  const bundleHref = version ? `/v1/packages/${encodeURIComponent(creatorName ?? "")}/${encodeURIComponent(packageName ?? "")}/versions/${encodeURIComponent(version.version)}/download` : null;
+  const bundleFile = `resources/${l.package.resourceName}-${version?.version ?? "x.y.z"}.escrow.zip`;
+  const loaderSnippet = (e: Environment): { code: string; filename: string } => {
+    const inMemory = e.protection.tier === "escrow" && e.protection.state === "available";
+    const common = [`scriptgo add ${ident}        # saves ${bundleFile}, signature checked`, ""];
+    if (inMemory && e.slug === "dotnet") {
+      return {
+        filename: "on the server: the .NET kit decrypts in memory",
+        code: [
+          ...common,
+          "# The kit's example host. Your own host calls ScriptGo.Host.Escrow.EscrowLoader.LoadAsync the same way.",
+          "dotnet run --project sdk/examples/custom-adapter-dotnet -- \\",
+          `  --bundle ${bundleFile} --master "$SCRIPTGO_API" \\`,
+          `  --deployment-token "$SCRIPTGO_DEPLOYMENT_TOKEN" --package ${ident} --environment ${e.slug} \\`,
+          `  --trusted-signer ${escrow?.signerPublicKey ?? "<signer key>"} --identity ./server-identity.json`,
+        ].join("\n"),
+      };
+    }
+    return {
+      filename: "on the server: reference loader, licence-only (the copy is written to disk)",
+      code: [
+        ...common,
+        "# Reference loader, not a compiled host: it writes the decrypted copy to disk on this server.",
+        "scriptgo escrow load \\",
+        `  --bundle ${bundleFile} --package ${ident} --environment ${e.slug} \\`,
+        `  --deployment-token "$SCRIPTGO_DEPLOYMENT_TOKEN" --identity ./server-identity.json \\`,
+        `  --trusted-signer ${escrow?.signerPublicKey ?? "<signer key>"} --once --out resources/${l.package.resourceName}`,
+      ].join("\n"),
+    };
+  };
 
   const lua = `-- server/license.lua  (server side only; keep the key out of client scripts)
 CreateThread(function()
@@ -154,7 +197,7 @@ end)`;
             </EmptyState>
           ) : (
             <div className="panel mt-3 relative overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-[14px]">
+              <table className="w-full min-w-[980px] text-left text-[14px]">
                 <caption className="sr-only">Deployments of this license</caption>
                 <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
                   <tr>
@@ -162,6 +205,7 @@ end)`;
                     <th scope="col" className="px-3 py-2.5">Environment</th>
                     <th scope="col" className="px-3 py-2.5">Adapter</th>
                     <th scope="col" className="px-3 py-2.5">Last verified</th>
+                    <th scope="col" className="px-3 py-2.5">Server key</th>
                     <th scope="col" className="px-3 py-2.5">Status</th>
                     <th scope="col" className="px-3 py-2.5"><span className="sr-only">Action</span></th>
                   </tr>
@@ -186,11 +230,43 @@ end)`;
                             "never"
                           )}
                         </td>
+                        <td className="px-3 py-2.5" data-binding={a.binding.bound ? "bound" : "unbound"}>
+                          {a.binding.bound ? (
+                            <>
+                              <span className="font-mono text-[13px]" title="Fingerprint of the server key this deployment is bound to">
+                                {formatFingerprint(a.binding.serverKeyFingerprint)}
+                              </span>
+                              <span className="tabular block text-[12.5px] text-ink-3">
+                                bound {a.binding.boundAt ? formatDate(a.binding.boundAt) : "at activation"}
+                                {a.binding.lastKeyReleaseAt ? (
+                                  <>
+                                    {" · "}key released{" "}
+                                    <time dateTime={a.binding.lastKeyReleaseAt} title={formatDateTime(a.binding.lastKeyReleaseAt)}>
+                                      {relativeTime(a.binding.lastKeyReleaseAt)}
+                                    </time>
+                                  </>
+                                ) : (
+                                  " · no key released yet"
+                                )}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-ink-3">
+                              Not bound yet
+                              {a.binding.resets > 0 ? <span className="block text-[12.5px]">reset {a.binding.lastResetAt ? relativeTime(a.binding.lastResetAt) : ""}</span> : null}
+                            </span>
+                          )}
+                        </td>
                         <td className="px-3 py-2.5">
                           <StatusBadge meta={metaFor(activationMeta, a.status)} size="sm" suffix={graceLeft} />
                         </td>
                         <td className="px-3 py-2.5 text-right">
-                          {a.status !== "deactivated" ? <DeactivateButton licenseId={l.id} activationId={a.id} name={a.name} /> : null}
+                          {a.status !== "deactivated" ? (
+                            <span className="inline-flex flex-col items-end gap-1.5">
+                              {a.binding.bound ? <ResetServerKeyButton licenseId={l.id} activationId={a.id} name={a.name} /> : null}
+                              <DeactivateButton licenseId={l.id} activationId={a.id} name={a.name} />
+                            </span>
+                          ) : null}
                         </td>
                       </tr>
                     );
@@ -200,6 +276,72 @@ end)`;
             </div>
           )}
         </section>
+
+        {escrow && version ? (
+          <section aria-labelledby="escrow-title" data-protected-release={version.version}>
+            <h2 id="escrow-title" className="font-mono text-[12px] font-bold uppercase tracking-wider text-ink-3">
+              Protected release
+            </h2>
+            <div className="panel mt-3 space-y-3 p-4 text-[14.5px]">
+              <p>
+                <strong className="font-mono">{version.version}</strong> is delivered as an encrypted bundle. It opens only on a server that
+                holds one of the deployment tokens above and the key pair bound to it. The key is released for a short time and asked for
+                again; after a refund or a revocation the next request is refused and the server stops when its offline grace ends.
+              </p>
+              <dl className="grid grid-cols-1 gap-y-1 text-[14px] sm:grid-cols-[10rem_minmax(0,1fr)]">
+                <dt className="text-ink-3">Signed by</dt>
+                <dd>
+                  <span className="font-mono text-[13px]">{formatFingerprint(escrow.signerKeyId)}</span>{" "}
+                  <span className="text-ink-2">({l.seller.creator}&rsquo;s escrow key)</span>
+                </dd>
+                <dt className="text-ink-3">Readable files</dt>
+                <dd className="font-mono text-[13px]">{escrow.clearFiles.join(", ")}</dd>
+                <dt className="text-ink-3">Encrypted</dt>
+                <dd className="tabular">
+                  {escrow.encryptedFiles.length} {escrow.encryptedFiles.length === 1 ? "file" : "files"} ({escrow.cipher})
+                </dd>
+              </dl>
+              <div className="flex flex-wrap items-center gap-3">
+                {live && bundleHref ? (
+                  <a href={bundleHref} className={buttonClass("secondary", "sm")} data-bundle-download>
+                    Download the encrypted bundle
+                  </a>
+                ) : (
+                  <span className="text-[13.5px] text-ink-3">The bundle is delivered while the license is active.</span>
+                )}
+                <span className="text-[13px] text-ink-3">The plain archive is never delivered. The bundle is useless without your server&rsquo;s key.</span>
+              </div>
+              <p className="text-[13px] text-ink-2">
+                A copy that leaves your server carries a marker tied to this license and deployment. Moving or re-installing a server changes
+                its key: use &ldquo;Reset server key&rdquo; on its row, then start it again.
+              </p>
+            </div>
+            {covered.length > 0 ? (
+              <Tabs
+                className="mt-4"
+                variant="pill"
+                label="Loader per environment"
+                items={covered.map((e) => {
+                  const what = buyerProtection(e.protection, true);
+                  const snip = loaderSnippet(e);
+                  return {
+                    id: `loader-${e.slug}`,
+                    label: envLongName(e.slug),
+                    content: (
+                      <div className="mt-3 space-y-3">
+                        <p className="flex flex-wrap items-center gap-2 text-[14px]">
+                          <StatusBadge meta={protectionMeta(e.protection)} size="sm" />
+                          <span>{what.sentence}</span>
+                        </p>
+                        {e.protection.tier === "none" ? null : <CodeBlock code={snip.code} lang="bash" filename={snip.filename} />}
+                      </div>
+                    ),
+                  };
+                })}
+              />
+            ) : null}
+          </section>
+        ) : null}
 
         <section aria-labelledby="verify-title">
           <h2 id="verify-title" className="font-mono text-[12px] font-bold uppercase tracking-wider text-ink-3">

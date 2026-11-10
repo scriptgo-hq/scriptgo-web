@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Upload } from "lucide-react";
+import { KeyActivityPanel } from "@/components/dashboard/key-activity";
 import { OfferForm, PackageForm, WithdrawOfferButton } from "@/components/dashboard/package-forms";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatusBadge, Tag } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { api, asList } from "@/lib/api";
 import type { CreatorPackageDetail, Environment, Provider, Store } from "@/lib/contract";
 import { envName } from "@/lib/env";
 import { formatBytes, formatDate, formatMoney, intervalLabel, shortHash } from "@/lib/format";
+import { tierMeta } from "@/lib/protection";
 import { classificationMeta, listingMeta, metaFor, releaseMeta, visibilityMeta } from "@/lib/status";
 
 export async function generateMetadata({ params }: { params: Promise<{ name: string }> }) {
@@ -48,6 +50,7 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
   const published = p.releases.some((r) => r.status === "published" || r.status === "deprecated");
   const publicHref = `/packages/${encodeURIComponent(p.creator.username)}/${encodeURIComponent(p.name)}`;
   const newRelease = `/dashboard/packages/${encodeURIComponent(p.name)}/releases/new`;
+  const protectedReleases = p.releases.filter((r) => r.escrow);
 
   return (
     <>
@@ -133,6 +136,7 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
                           <span className="flex flex-wrap gap-1">
                             <StatusBadge meta={metaFor(releaseMeta, r.status)} size="sm" />
                             {r.restricted ? <StatusBadge meta={listingMeta.restricted} size="sm" /> : null}
+                            {r.escrow ? <StatusBadge meta={{ ...tierMeta.escrow, label: "Protected" }} size="sm" /> : null}
                           </span>
                         </td>
                         <td className="tabular px-3 py-2.5">
@@ -157,6 +161,17 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
             </div>
           )}
         </section>
+
+        {protectedReleases.length > 0 ? (
+          <section aria-labelledby="keys-title">
+            <H2 id="keys-title">Key releases</H2>
+            <p className="mt-2 max-w-prose text-[14px] text-ink-2">
+              {protectedReleases.length === 1 ? "One release is" : `${protectedReleases.length} releases are`} protected. A server asks for the
+              key when it loads the package and again before each answer expires. This is what the key endpoint answered.
+            </p>
+            <KeyActivityPanel packageName={p.name} />
+          </section>
+        ) : null}
 
         <section aria-labelledby="off-title">
           <H2 id="off-title">Offers</H2>
