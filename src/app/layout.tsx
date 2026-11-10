@@ -5,11 +5,18 @@ import "@fontsource-variable/hanken-grotesk/wght.css";
 import "@fontsource-variable/jetbrains-mono/wght.css";
 import "./globals.css";
 
+const DESCRIPTION =
+  "A scripting sandbox you plug into a game engine, a mod platform or a multiplayer server. Build on top of it, protect what you wrote, and sell it from your own Tebex store. Compatibility is shown only when a real run passed.";
+
+/** Link previews (Discord, X, Slack) take the image from opengraph-image.jpg / twitter-image.jpg next to this file; they need absolute URLs, hence metadataBase. */
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL ?? "https://scriptgo.dev"),
   title: { default: "SCRIPT//GO — Scripts for every world you run.", template: "%s · SCRIPT//GO" },
-  description:
-    "A scripting sandbox you plug into a game engine, a mod platform or a multiplayer server. Build on top of it, protect what you wrote, and sell it from your own Tebex store. Compatibility is shown only when a real run passed.",
+  description: DESCRIPTION,
   applicationName: "SCRIPT//GO",
+  // No title or description here: previews then fall back to each page's own <title> and description.
+  openGraph: { type: "website", siteName: "SCRIPT//GO" },
+  twitter: { card: "summary_large_image" },
   icons: { icon: "/favicon.png", apple: "/apple-touch-icon.png" },
 };
 
