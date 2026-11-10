@@ -83,6 +83,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
             links={[
               ["/explore", "Explore"],
               ["/environments", "Environments"],
+              ["/protect", "Protect your work"],
               ["/sdk", "SDK"],
               ["/docs", "Docs"],
               ["/developers", "Developers"],
@@ -102,6 +103,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
             links={[
               ["/legal", "Legal"],
               ["/legal#ip-policy", "IP policy"],
+              ["/legal#protection", "Code protection terms"],
               ["/legal#privacy", "Privacy"],
               ["/report", "Report a package"],
             ]}

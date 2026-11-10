@@ -5,7 +5,7 @@ import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Legal",
-  description: "Terms, privacy, IP policy, creator agreement and the operator. Drafts pending legal review.",
+  description: "Terms, privacy, IP policy, code protection, creator agreement and the operator. Drafts pending legal review.",
 };
 
 const SECTIONS = [
@@ -13,6 +13,7 @@ const SECTIONS = [
   { id: "terms", title: "Terms of service" },
   { id: "privacy", title: "Privacy policy" },
   { id: "ip-policy", title: "IP policy" },
+  { id: "protection", title: "Code protection and escrow" },
   { id: "creator-agreement", title: "Creator agreement" },
   { id: "commerce", title: "Who sells, who charges, who licenses" },
 ];
@@ -77,6 +78,19 @@ export default function LegalPage() {
           <ul>
             <li>Accounts, access tokens and acceptable use of the registry, the API and the licensing service.</li>
             <li>What SCRIPT//GO hosts, validates and displays, and what it does not guarantee.</li>
+            <li>
+              What SCRIPT//GO is for: creator-owned work. A creator owns the scripts they wrote and the content they made for
+              them, and may license, protect and sell them. SCRIPT//GO does not sell, ship, decrypt or redistribute any game&rsquo;s
+              own code or assets.
+            </li>
+            <li>
+              Code protection as <a href="#protection">described below</a>: deterrence and traceability, not DRM, with no promise
+              to stop all copying.
+            </li>
+            <li>
+              What a buyer may do with a licensed package: run it on the servers the licence covers. Not copy it to other
+              servers, not remove its delivery marker, not redistribute it.
+            </li>
             <li>Suspension and restriction of listings, with notices, reasons and an appeal path.</li>
             <li>Limits of liability and the governing law, to be set by counsel.</li>
           </ul>
@@ -91,6 +105,11 @@ export default function LegalPage() {
             <li>
               Licensing data: deployment names, environments, adapter versions and verification times recorded when your server
               calls the licensing API.
+            </li>
+            <li>
+              Protection data: the public key your server registers for a deployment, a record of each content-key release or
+              refusal with its reason, and the delivery marker tied to that licence and deployment. Staff can resolve a marker
+              found in a leaked copy to a licence and a deployment; each lookup is recorded with its reason.
             </li>
             <li>Report data: reporter contact details and evidence, shared with moderators and, where required, with the creator.</li>
             <li>Payment data: handled by the payment provider. SCRIPT//GO receives signed payment events, not card details.</li>
@@ -124,12 +143,92 @@ export default function LegalPage() {
             Creators declare that they own their code or are authorized to distribute it, list third-party assets with their
             licenses, and state whether the package targets a proprietary third-party game.
           </p>
+          <p>
+            <strong>A game&rsquo;s intellectual property is not ours to sell, and not a creator&rsquo;s.</strong> A package holds
+            what its creator wrote and made. It does not hold a game&rsquo;s code, models, textures, audio, maps or other files,
+            whether plain or encrypted. A script written for a platform built on a commercial game stays its author&rsquo;s work;
+            the game stays its publisher&rsquo;s. Where a rights holder does not allow paid mods, packages for that environment
+            are free only, and paid offers that target a proprietary game are reviewed before any purchase path opens.
+          </p>
+          <p>
+            Encryption never shields a package from this process. A report against an encrypted release is handled like any
+            other, and a decision applies to it in the same way.
+          </p>
+        </Section>
+
+        <Section id="protection" title="Code protection and escrow">
+          <p>
+            SCRIPT//GO offers three protections for creator-owned work: every published release is signed, a paid package checks
+            a licence per server, and a creator may publish a release encrypted (escrow). The terms will state them as follows.
+          </p>
+          <p>
+            <strong>What we provide.</strong>
+          </p>
+          <ul>
+            <li>An encrypted release is encrypted at rest and in transit.</li>
+            <li>Its key is never shipped with the file. SCRIPT//GO holds it sealed and does not show it to anyone.</li>
+            <li>
+              The key is released only to a licensed server, wrapped to a key that server holds. A copy of the files on another
+              server does not open.
+            </li>
+            <li>
+              A refund, a lost payment dispute, an ended subscription or a revocation stops the next key release. A server that is
+              already running stops when its offline grace ends.
+            </li>
+            <li>Releases are signed, so a modified file is detected.</li>
+            <li>Each delivery is marked, so a leaked copy can be traced to the licence and the deployment it was delivered to.</li>
+          </ul>
+          <p>
+            <strong>What we do not promise.</strong>
+          </p>
+          <ul>
+            <li>
+              This is deterrence and traceability. It is not digital rights management, and SCRIPT//GO does not promise to stop
+              all copying or theft.
+            </li>
+            <li>
+              Whoever operates a machine that decrypts and runs code can inspect that machine. Defeating the protection takes real
+              effort and leaves traces; it is not impossible.
+            </li>
+            <li>
+              On a host that runs plain script, the operator can read what the host loads. There the protection is the licence
+              check and the signature, and no code secrecy is claimed.
+            </li>
+            <li>SCRIPT//GO does not obfuscate code. Obfuscation is at most a speed bump.</li>
+            <li>A delivery marker shows where a copy was delivered. It does not by itself establish who disclosed it.</li>
+            <li>
+              Availability of the key service is not guaranteed without interruption. The offline grace exists so that a short
+              outage does not stop a licensed server.
+            </li>
+          </ul>
+          <p>
+            <strong>What protection is for.</strong> It protects the creator&rsquo;s own scripts and the content derived from
+            them. It must not be used to hide content the creator has no right to distribute, and it never applies to a
+            game&rsquo;s own files, which do not belong in a package.
+          </p>
+          <p>
+            <Link href="/protect">How protection works, in plain words</Link>.
+          </p>
         </Section>
 
         <Section id="creator-agreement" title="Creator agreement">
           <p>Placeholder. The agreement will cover:</p>
           <ul>
             <li>The rights declaration you make for each release, and its accuracy.</li>
+            <li>
+              What you warrant for each release: that you wrote the code or hold the rights to distribute and sell it; that it
+              contains no code or assets of a game or of a third party beyond what you declared and are licensed to include; that
+              an encrypted release holds the same kind of content you could publish in the clear; and that you may grant your
+              buyers the licence you sell.
+            </li>
+            <li>
+              Ownership stays with you. Publishing, protecting or selling a package through SCRIPT//GO transfers no ownership of
+              your work to SCRIPT//GO, and gives you no right in the game or platform it runs on.
+            </li>
+            <li>
+              For an encrypted release, SCRIPT//GO holds the content key sealed and, when it builds the bundle for you, a signing
+              key in your name. Both are used only to deliver and verify your releases.
+            </li>
             <li>Immutability of published releases: a published version can&rsquo;t be changed, only deprecated or yanked.</li>
             <li>Commercial classification of offers, and review of offers that touch proprietary third-party game content.</li>
             <li>Your relationship with your payment provider, which is yours, and any platform fee, to be stated before checkout opens.</li>
@@ -152,6 +251,10 @@ export default function LegalPage() {
             </li>
           </ul>
           <p>Checkout is off by default and stays off until the provider approves the creator&rsquo;s store.</p>
+          <p>
+            What is sold is always the creator&rsquo;s own work: a script, or a feature of the seller&rsquo;s own server script, such
+            as a monthly pass that unlocks it. Never a game, its content, or access to it.
+          </p>
         </Section>
       </div>
     </div>

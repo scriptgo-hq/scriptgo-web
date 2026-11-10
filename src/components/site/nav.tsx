@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 export const NAV_LINKS = [
   { href: "/explore", label: "Explore" },
   { href: "/environments", label: "Environments" },
+  { href: "/protect", label: "Protect" },
   { href: "/sdk", label: "SDK" },
   { href: "/docs", label: "Docs" },
   { href: "/developers", label: "Developers" },

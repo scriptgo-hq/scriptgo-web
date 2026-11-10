@@ -1,24 +1,42 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parseFrontMatter } from "./markdown";
 
 /**
  * Docs registry. Spec pages are read from the repository's docs/spec at build time; guides live in
- * src/content/docs. Pages using this module are statically generated.
+ * src/content/docs. Pages using this module are statically generated. A few guides live in the
+ * repository's docs/guides, next to the code they describe: each is listed only when its file exists
+ * at build time, so the site never links to a page it cannot render.
  */
 export interface DocEntry {
   slug: string;
   title: string;
   description: string;
   group: "Start" | "Reference" | "Licensing" | "Platform builders" | "Help";
-  source: { kind: "spec" | "guide"; file: string };
+  source: { kind: "spec" | "guide" | "repo-guide"; file: string };
 }
 
 const ROOT = process.cwd();
 const SPEC_DIR = path.resolve(ROOT, "../../docs/spec");
 const GUIDE_DIR = path.resolve(ROOT, "src/content/docs");
+const REPO_GUIDE_DIR = path.resolve(ROOT, "../../docs/guides");
 
-export const DOCS: DocEntry[] = [
+/** The adapter guide for escrow, written next to the SDK. Listed only when the file is there. */
+export const ESCROW_ADAPTER_GUIDE_SLUG = "guides/bring-escrow-to-your-platform";
+const ESCROW_ADAPTER_GUIDE_FILE = "bring-escrow-to-your-platform.md";
+
+const REPO_GUIDES: DocEntry[] = [
+  {
+    slug: ESCROW_ADAPTER_GUIDE_SLUG,
+    title: "Bring escrow to your platform",
+    description: "What a host needs to load encrypted releases: a server key, the key endpoint, and a loader in compiled code.",
+    group: "Platform builders",
+    source: { kind: "repo-guide", file: ESCROW_ADAPTER_GUIDE_FILE },
+  },
+];
+
+const BUILT_IN_DOCS: DocEntry[] = [
   {
     slug: "quickstart",
     title: "Quickstart",
@@ -62,6 +80,13 @@ export const DOCS: DocEntry[] = [
     source: { kind: "guide", file: "licensing-api.md" },
   },
   {
+    slug: "protect-your-work",
+    title: "Protect your work",
+    description: "Signed releases, per-server licences and encrypted releases: how to publish them, run them, and what they do not do.",
+    group: "Licensing",
+    source: { kind: "guide", file: "protect-your-work.md" },
+  },
+  {
     slug: "api",
     title: "HTTP API reference",
     description: "The v1 HTTP contract between the API, the website and the CLI.",
@@ -98,6 +123,20 @@ export const DOCS: DocEntry[] = [
   },
 ];
 
+export const DOCS: DocEntry[] = (() => {
+  const present = REPO_GUIDES.filter((g) => existsSync(path.join(REPO_GUIDE_DIR, g.source.file)));
+  if (present.length === 0) return BUILT_IN_DOCS;
+  // Repository guides sit at the end of their group, before the Help pages.
+  const help = BUILT_IN_DOCS.findIndex((d) => d.group === "Help");
+  const at = help < 0 ? BUILT_IN_DOCS.length : help;
+  return [...BUILT_IN_DOCS.slice(0, at), ...present, ...BUILT_IN_DOCS.slice(at)];
+})();
+
+/** Where to send a platform builder who wants escrow on their host: the adapter guide when it is published here. */
+export function escrowAdapterGuideHref(): string | null {
+  return DOCS.some((d) => d.slug === ESCROW_ADAPTER_GUIDE_SLUG) ? `/docs/${ESCROW_ADAPTER_GUIDE_SLUG}` : null;
+}
+
 export const DOC_GROUPS: DocEntry["group"][] = ["Start", "Reference", "Licensing", "Platform builders", "Help"];
 
 export function findDoc(slug: string): DocEntry | undefined {
@@ -109,6 +148,16 @@ export async function loadDoc(entry: DocEntry): Promise<{ markdown: string; repo
     const file = path.join(SPEC_DIR, entry.source.file);
     const markdown = await readFile(file, "utf8");
     return { markdown, repoPath: `docs/spec/${entry.source.file}`, title: entry.title, description: entry.description };
+  }
+  if (entry.source.kind === "repo-guide") {
+    const raw = await readFile(path.join(REPO_GUIDE_DIR, entry.source.file), "utf8");
+    const { data, body } = parseFrontMatter(raw);
+    return {
+      markdown: body,
+      repoPath: `docs/guides/${entry.source.file}`,
+      title: data.title || entry.title,
+      description: data.description || entry.description,
+    };
   }
   const file = path.join(GUIDE_DIR, entry.source.file);
   const raw = await readFile(file, "utf8");

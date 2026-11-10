@@ -5,6 +5,7 @@ import { Download, Flag, ScrollText } from "lucide-react";
 import { CategoryCover, categoryLabel } from "@/components/illustrations";
 import { CheckoutControl } from "@/components/package/checkout-control";
 import { CompatStrip, EvidencePanel, sortCompat } from "@/components/package/compat-strip";
+import { ProtectionPanel, ReleaseProtectionBadges } from "@/components/package/protection-panel";
 import { SellerLine } from "@/components/package/seller-line";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { CommandLine } from "@/components/ui/code-block";
@@ -71,6 +72,8 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const paidOffers = d.offers.filter((o) => !freeOffers.includes(o));
   const blockedDownload = d.listingStatus !== "active" || viewingRow?.restricted || viewingRow?.status === "yanked";
   const installCmd = `scriptgo add ${d.identifier}${viewing && viewing !== d.latestVersion ? `@${viewing}` : ""}`;
+  const escrowed = Boolean(viewingRow?.escrow);
+  const protectionEnvs = envDetails.map(({ slug, detail }) => ({ slug, name: envLongName(slug, detail?.name), protection: detail?.protection ?? null }));
   const downloadPath = viewing ? `/v1/packages/${encodeURIComponent(d.creator.username)}/${encodeURIComponent(d.name)}/versions/${encodeURIComponent(viewing)}/download` : null;
 
   return (
@@ -168,6 +171,14 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                   </p>
                 ) : null}
                 <CommandLine command={installCmd} />
+                {escrowed ? (
+                  <p className="text-[13px] text-ink-2">
+                    Protected release: delivered as an encrypted bundle, to licence holders.{" "}
+                    <Link href="#protection" className="font-semibold text-cobalt-ink underline">
+                      What your server gets
+                    </Link>
+                  </p>
+                ) : null}
               </div>
             )}
             {paidOffers.length > 0 && d.listingStatus === "active" ? (
@@ -270,15 +281,18 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                         <section className="space-y-2">
                           <h3 className="font-display text-[19px] font-extrabold">Manual download</h3>
                           <p className="text-[14.5px] text-ink-2">
-                            Zip of {viewing}
+                            {escrowed ? "Encrypted bundle" : "Zip"} of {viewing}
                             {viewingRow ? ` · ${formatBytes(viewingRow.size)}` : ""}. Check the SHA-256 before unpacking.
+                            {escrowed
+                              ? " The download needs a licence: sign in with the account that holds it. The bundle only opens on a server bound to that licence."
+                              : ""}
                           </p>
                           {downloadPath ? (
                             <a
                               href={downloadPath}
                               className="inline-flex items-center gap-2 rounded-[10px] border-2 border-line bg-surface px-4 py-2 font-bold shadow-[3px_3px_0_0_var(--shadow)]"
                             >
-                              <Download aria-hidden="true" size={16} /> Download {d.resourceName}-{viewing}.zip
+                              <Download aria-hidden="true" size={16} /> Download {d.resourceName}-{viewing}{escrowed ? ".escrow" : ""}.zip
                             </a>
                           ) : null}
                           {viewingRow?.sha256 ? (
@@ -374,6 +388,15 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                 ),
               },
               {
+                id: "protection",
+                label: "Protection",
+                content: (
+                  <div className="pt-6">
+                    <ProtectionPanel version={viewingRow} environments={protectionEnvs} paid={paidOffers.length > 0} />
+                  </div>
+                ),
+              },
+              {
                 id: "versions",
                 label: "Versions",
                 content: (
@@ -390,6 +413,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                               </Link>
                               <StatusBadge meta={metaFor(releaseMeta, v.status)} size="sm" />
                               {v.restricted ? <StatusBadge meta={listingMeta.restricted} size="sm" /> : null}
+                              <ReleaseProtectionBadges version={v} />
                               {v.version === viewing ? <Tag>viewing</Tag> : null}
                               <span className="tabular text-[13px] text-ink-3">{v.publishedAt ? formatDate(v.publishedAt) : "unpublished"} · {formatBytes(v.size)}</span>
                             </div>

@@ -49,6 +49,12 @@ const steps = [
   },
   {
     n: 4,
+    title: "Protect a paid release (optional)",
+    body: "Publish it encrypted. The key is released only to a licensed server bound by its own key, and you choose which files stay readable. The site offers the same option on the new-release page.",
+    cmd: "scriptgo publish --escrow",
+  },
+  {
+    n: 5,
     title: "Connect a store (optional)",
     body: "Free packages need nothing else. To sell, connect your Tebex store in Dashboard → Stores and map its products to your offers. Checkout opens once Tebex approves.",
     cmd: null,
@@ -151,6 +157,7 @@ export default function DevelopersPage() {
               {[
                 ["/sdk", "The SDK: adapters, host kits and what is planned"],
                 ["/docs/create-adapter", "Create an adapter"],
+                ["/sdk#protect-title", "Let your creators protect their work"],
                 ["/environments/dotnet", "The .NET host kit"],
                 ["/docs/runtime", "Runtime API and capabilities"],
                 ["/environments", "Current environments and their status"],
@@ -182,7 +189,15 @@ export default function DevelopersPage() {
               <li>
                 <strong className="text-ink">Licenses guard paid resources.</strong> One key per buyer, activation per server,
                 signed answers with offline grace. A refund, a lost dispute or an ended subscription closes the license.
-                Encrypted releases (escrow) are planned, not built.
+              </li>
+              <li>
+                <strong className="text-ink">Every release is signed. A release can also be encrypted.</strong> The key of an
+                encrypted release goes only to a licensed server bound by its own key, and each delivery is marked. On a host
+                that runs compiled code it is decrypted in memory; on a host that runs plain script the protection is the
+                licence and the signature. It deters copying and makes leaks traceable. It does not make copying impossible.{" "}
+                <Link className="font-semibold text-cobalt-ink underline" href="/protect">
+                  How protection works
+                </Link>
               </li>
               <li>
                 <strong className="text-ink">Third-party game content is reviewed first.</strong> Paid offers that target a

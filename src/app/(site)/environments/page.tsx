@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { StatusBadge } from "@/components/ui/badge";
+import { ProtectionTierTable } from "@/components/site/integration-section";
 import { EnvironmentSlotTile, EnvironmentTile } from "@/components/ui/environment";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/tabs";
@@ -13,6 +14,7 @@ import { formatDate, relativeTime } from "@/lib/format";
 import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 import { cn } from "@/lib/cn";
 import { adapterMetaFor } from "@/lib/integration";
+import { protectionMeta } from "@/lib/protection";
 import { TONE_CLASSES } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
@@ -50,7 +52,11 @@ export default async function EnvironmentsPage() {
         Where packages run: engines and runtimes that run scripts themselves, and mod platforms that add scripting on top of an
         existing game. Every environment runs Lua; the .NET kit also runs TypeScript and JavaScript. Every environment is a
         peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance runs, never from a form.
-        Planned environments have no install steps yet.
+        Planned environments have no install steps yet. The{" "}
+        <a href="#protection" className="font-semibold text-cobalt-ink underline">
+          Protection
+        </a>{" "}
+        view says what a buyer&rsquo;s server gets in each one.
       </p>
       <div className="mt-8">
         {!res.ok ? (
@@ -95,13 +101,14 @@ export default async function EnvironmentsPage() {
                       </section>
                     ))}
                     <div className="panel relative overflow-x-auto">
-                      <table className="w-full min-w-[760px] text-left text-[14px]">
+                      <table className="w-full min-w-[860px] text-left text-[14px]">
                         <caption className="sr-only">Environment directory</caption>
                         <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
                           <tr>
                             <th scope="col" className="px-3 py-2.5">Environment</th>
                             <th scope="col" className="px-3 py-2.5">Status</th>
                             <th scope="col" className="px-3 py-2.5">Selling</th>
+                            <th scope="col" className="px-3 py-2.5">Protection</th>
                             <th scope="col" className="px-3 py-2.5">Languages</th>
                             <th scope="col" className="px-3 py-2.5">Runtime</th>
                             <th scope="col" className="px-3 py-2.5">Capabilities</th>
@@ -111,7 +118,7 @@ export default async function EnvironmentsPage() {
                         </thead>
                         {filled.map((g) => (
                           <tbody key={g.kind}>
-                            <GroupRow title={g.title} span={8} />
+                            <GroupRow title={g.title} span={9} />
                             {g.envs.map((e) => {
                               const supported = Object.values(e.capabilities).filter((s) => s === "supported").length;
                               return (
@@ -130,6 +137,7 @@ export default async function EnvironmentsPage() {
                                     ) : null}
                                   </td>
                                   <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
+                                  <td className="px-3 py-2.5"><StatusBadge meta={protectionMeta(e.protection)} size="sm" /></td>
                                   <td className="px-3 py-2.5">{languageLabels(e).join(" · ")}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>
                                   <td className="tabular px-3 py-2.5">
@@ -155,6 +163,29 @@ export default async function EnvironmentsPage() {
                         ))}
                       </table>
                     </div>
+                  </div>
+                ),
+              },
+              {
+                id: "protection",
+                label: "Protection",
+                content: (
+                  <div className="pt-6">
+                    <p className="max-w-[70ch] text-[15px] text-ink-2">
+                      What a buyer&rsquo;s server gets in each environment. Code escrow needs a host that runs compiled code and can
+                      hold a key. A host that runs plain script gets a licence check and signed releases, and no code-secrecy
+                      claim. Where the rights holder allows free packages only, nothing is sold.
+                    </p>
+                    <div className="mt-4">
+                      <ProtectionTierTable envs={envs} />
+                    </div>
+                    <p className="mt-3 text-[13px] text-ink-3">
+                      Each sentence comes from the adapter registry, as written. Protection is deterrence, traceability and
+                      revocation.{" "}
+                      <Link href="/protect" className="font-semibold text-cobalt-ink underline">
+                        How protection works, and what it does not do
+                      </Link>
+                    </p>
                   </div>
                 ),
               },

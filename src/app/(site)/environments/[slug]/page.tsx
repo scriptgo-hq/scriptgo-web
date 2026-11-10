@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
 import { EnvironmentArt } from "@/components/illustrations";
-import { IntegrationSection } from "@/components/site/integration-section";
+import { IntegrationSection, ProtectionSection } from "@/components/site/integration-section";
 import { StatusBadge } from "@/components/ui/badge";
 import { Breadcrumb, KeyValue } from "@/components/ui/data";
 import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
@@ -13,6 +13,7 @@ import { CAPABILITIES, type EnvironmentDetail } from "@/lib/contract";
 import { envKind, languageLabels } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
+import { protectionMeta } from "@/lib/protection";
 import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
 
 type Params = { slug: string };
@@ -48,6 +49,11 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
             {e.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, e.sales)} /> : null}
+            {e.protection.tier !== "none" ? (
+              <a href="#protection-title" className="rounded-full">
+                <StatusBadge meta={protectionMeta(e.protection)} />
+              </a>
+            ) : null}
             <span className="text-[13px] font-bold uppercase tracking-wide text-ink-3">{envKind(e.kind).singular}</span>
           </div>
           <p className="mt-4 max-w-[62ch] text-[16.5px] text-ink-2">{e.summary}</p>
@@ -104,6 +110,8 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
       ) : null}
 
       <IntegrationSection env={e} />
+
+      <ProtectionSection env={e} />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section aria-labelledby="caps-title">

@@ -257,6 +257,7 @@ function Builders() {
               ["/sdk", "The SDK"],
               ["/docs/create-adapter", "Create an adapter"],
               ["/environments/dotnet", "The .NET host kit"],
+              ["/protect", "How protection works"],
               ["/developers", "For creators"],
             ].map(([href, label]) => (
               <li key={href}>

@@ -77,6 +77,40 @@ export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { 
   };
 }
 
+/** Tiers in the order the site lists them: the strongest first, "nothing sold" last. */
+export const TIER_ORDER: ProtectionTier[] = ["escrow", "license", "none"];
+
+/** One plain sentence per tier, for the tier tables. The per-environment note says the rest. */
+export const tierBlurb: Record<ProtectionTier, string> = {
+  escrow:
+    "The host runs compiled code outside the script VM, so it can hold a key. An encrypted release is decrypted in memory, for a licensed and bound server only.",
+  license:
+    "The host runs plain script. Your server checks its licence and the release is signed, but the operator can read what the host loads. We make no code-secrecy claim here.",
+  none: "The rights holder allows free packages only, so nothing is sold or licensed. Releases are still signed.",
+};
+
+/**
+ * The state of a tier in one environment, as a short lead before its note. Read from the registry
+ * fields only: the state decides "available" or "planned", and a note that names an opt-in feature
+ * is led as one. A free-only environment has nothing to wait for, so it gets no lead.
+ */
+export function protectionLead(p: EnvironmentProtection): string | null {
+  if (p.tier === "none") return null;
+  const optIn = /\bopt-in\b/i.test(p.note);
+  if (p.state === "available") return optIn ? "Available as an opt-in server feature." : "Available today.";
+  return optIn ? "Planned as an opt-in server feature." : "Planned, not available yet.";
+}
+
+/** Environments grouped by tier, in TIER_ORDER; inside a tier, available first, then by name. */
+export function groupByTier<T extends { name: string; protection: EnvironmentProtection }>(envs: T[]): { tier: ProtectionTier; envs: T[] }[] {
+  return TIER_ORDER.map((tier) => ({
+    tier,
+    envs: envs
+      .filter((e) => e.protection.tier === tier)
+      .sort((a, b) => Number(a.protection.state === "planned") - Number(b.protection.state === "planned") || a.name.localeCompare(b.name)),
+  })).filter((g) => g.envs.length > 0);
+}
+
 /** Groups a key fingerprint for reading aloud: "ab12 cd34 ef56 7890". */
 export function formatFingerprint(fp: string | null | undefined): string {
   if (!fp) return "—";

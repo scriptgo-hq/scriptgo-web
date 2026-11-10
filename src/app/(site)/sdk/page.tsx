@@ -7,6 +7,7 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { DisplayTitle, Eyebrow, Stroke } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
+import { escrowAdapterGuideHref } from "@/lib/docs";
 import { LANGUAGE_STATES } from "@/lib/env";
 import { adapterMeta } from "@/lib/integration";
 import type { StatusMeta } from "@/lib/status";
@@ -140,9 +141,10 @@ const PIECES: { title: string; path: string; badge?: StatusMeta; body: React.Rea
         <code className="font-mono text-[0.9em]">validate</code>, <code className="font-mono text-[0.9em]">test</code>,{" "}
         <code className="font-mono text-[0.9em]">run</code>, <code className="font-mono text-[0.9em]">pack --target</code>,{" "}
         <code className="font-mono text-[0.9em]">verify --env</code>, <code className="font-mono text-[0.9em]">publish</code>,{" "}
-        <code className="font-mono text-[0.9em]">add</code> and{" "}
-        <code className="font-mono text-[0.9em]">license activate|verify</code>. It compiles TypeScript at pack and verify
-        time, so hosts never do.
+        <code className="font-mono text-[0.9em]">add</code>,{" "}
+        <code className="font-mono text-[0.9em]">license activate|verify</code> and{" "}
+        <code className="font-mono text-[0.9em]">escrow load</code>. It compiles TypeScript at pack and verify time, so
+        hosts never do.
       </>
     ),
     foot: (
@@ -260,8 +262,8 @@ const PLATFORM: { title: string; body: React.ReactNode; href: string; link: stri
     body: (
       <>
         <code className="font-mono text-[0.9em]">scriptgo add creator//name</code> downloads a release into{" "}
-        <code className="font-mono text-[0.9em]">./resources</code> and checks its SHA-256 against the registry. Packages
-        declare dependencies in their manifest and call each other through exports.
+        <code className="font-mono text-[0.9em]">./resources</code> and checks its SHA-256 and the registry&rsquo;s signature
+        before it writes a file. Packages declare dependencies in their manifest and call each other through exports.
       </>
     ),
     href: "/docs/cli",
@@ -303,12 +305,16 @@ const ROADMAP: { title: string; status: StatusMeta; body: React.ReactNode }[] = 
     body: <>Scripts written in C#. Phase 3, after a spike and a security review. Until then a .cs script is refused.</>,
   },
   {
-    title: "Code protection beyond license keys",
-    status: notStarted("Phase 2 of the plan."),
+    title: "In-memory escrow on more hosts",
+    status: { label: "Planned", tone: "muted", icon: "hourglass", hint: "Each host is listed as planned on the environments page until its loader exists." },
     body: (
       <>
-        Encrypted releases that only a licensed server can open, with a watermark per license. It deters copying and makes
-        leaks traceable; it is not unbreakable DRM. Today the protection is the license check.
+        Signed releases, per-server licences and encrypted releases are built. The loader that decrypts in memory is in the
+        .NET kit today. Other hosts that run compiled code are marked planned on the{" "}
+        <Link href="/environments#protection" className="font-semibold text-cobalt-ink underline">
+          environments page
+        </Link>
+        ; hosts that run plain script stay on licence and signing.
       </>
     ),
   },
@@ -345,6 +351,115 @@ async function AdapterCounts() {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** What a host needs to load an encrypted release. Kept to what docs/spec/escrow.md fixes. */
+const ESCROW_HOST_STEPS: { title: string; body: React.ReactNode }[] = [
+  {
+    title: "A server key",
+    body: (
+      <>
+        The loader creates an X25519 key pair on the server and registers the public half with its deployment. The private
+        half never leaves the machine. Binding follows that key, not the hardware, so an honest move is a reset.
+      </>
+    ),
+  },
+  {
+    title: "The key endpoint",
+    body: (
+      <>
+        <code className="font-mono text-[0.9em]">POST /v1/licenses/key</code> answers a short-lived content key wrapped to
+        that server, or a refusal with a stable reason. A refund or a revocation makes the next answer a refusal.
+      </>
+    ),
+  },
+  {
+    title: "A loader in compiled code",
+    body: (
+      <>
+        It checks the bundle&rsquo;s signature against a pinned key, unwraps the content key, decrypts in memory and hands the
+        files to the host. A loader written in the guest script language cannot keep a key from the operator.
+      </>
+    ),
+  },
+];
+
+function ProtectSection() {
+  const guide = escrowAdapterGuideHref();
+  return (
+    <section aria-labelledby="protect-title" className="container-page py-12">
+      <DisplayTitle id="protect-title" className="text-[38px] sm:text-[44px]">
+        Protect your work.
+      </DisplayTitle>
+      <Stroke className="mt-1" />
+      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+        <div className="min-w-0">
+          <p className="max-w-[60ch] text-[16px] text-ink-2">
+            A creator owns the scripts they write. The platform makes that ownership enforceable in three layers. Every
+            published release is signed. A paid package checks a licence per server. And a creator can publish a release
+            encrypted, so that its key is released only to a licensed server bound by its own key.
+          </p>
+          <p className="mt-3 max-w-[60ch] text-[15px] text-ink-2">
+            How far the third layer goes depends on the host. A host that runs compiled code can hold a key and decrypt in
+            memory. A host that runs plain script cannot hide anything from its operator, so there we claim the licence check
+            and the signature, and nothing more. It deters copying and makes leaks traceable. It does not make copying
+            impossible.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <ButtonLink href="/protect" arrow>
+              How protection works
+            </ButtonLink>
+            <ButtonLink href={guide ?? "/docs/protect-your-work"} variant="secondary">
+              {guide ? "Bring escrow to your platform" : "Read the protection guide"}
+            </ButtonLink>
+          </div>
+          <p className="mt-3 text-[13.5px] text-ink-3">
+            {guide ? (
+              <>
+                For creators and operators:{" "}
+                <Link href="/docs/protect-your-work" className="font-semibold text-cobalt-ink underline">
+                  Protect your work
+                </Link>
+                .{" "}
+              </>
+            ) : null}
+            The tier of each environment is on the{" "}
+            <Link href="/environments#protection" className="font-semibold text-cobalt-ink underline">
+              environments page
+            </Link>
+            .
+          </p>
+        </div>
+        <div className="min-w-0">
+          <Eyebrow>for a platform that wants escrow</Eyebrow>
+          <h3 className="mt-1 font-display text-[22px] font-extrabold leading-tight">What a host needs.</h3>
+          <ol className="mt-4 space-y-4">
+            {ESCROW_HOST_STEPS.map((s, i) => (
+              <li key={s.title} className="flex gap-3">
+                <span
+                  aria-hidden="true"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-line bg-sun font-display text-[16px] font-black text-on-sun"
+                >
+                  {i + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-bold">
+                    <span className="sr-only">Step {i + 1}: </span>
+                    {s.title}
+                  </p>
+                  <p className="mt-0.5 text-[14.5px] text-ink-2">{s.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 text-[13.5px] text-ink-3">
+            The bundle format, the key wrapping and the signature are fixed in <code className="font-mono">docs/spec/escrow.md</code>.
+            Integrating it is the platform&rsquo;s choice: nothing in the SDK turns it on by itself.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -503,7 +618,9 @@ export default function SdkPage() {
         </div>
       </section>
 
-      <section aria-labelledby="roadmap-title" className="container-page py-12">
+      <ProtectSection />
+
+      <section aria-labelledby="roadmap-title" className="container-page border-t-2 border-line-soft py-12">
         <DisplayTitle id="roadmap-title" className="text-[38px] sm:text-[44px]">
           Not built yet.
         </DisplayTitle>

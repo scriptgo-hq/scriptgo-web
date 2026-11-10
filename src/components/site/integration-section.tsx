@@ -4,10 +4,11 @@ import { StatusBadge, Tag } from "@/components/ui/badge";
 import { KeyValue } from "@/components/ui/data";
 import { Banner, EmptyState } from "@/components/ui/feedback";
 import { AdapterStateBadge, InlineCodeText } from "@/components/ui/integration";
-import type { EnvironmentDetail, ProofRun } from "@/lib/contract";
+import type { Environment, EnvironmentDetail, EnvironmentProtection, ProofRun } from "@/lib/contract";
 import { formatDate } from "@/lib/format";
 import { integrationTypeLabel, sidesLabel } from "@/lib/integration";
-import { metaFor, salesMeta } from "@/lib/status";
+import { groupByTier, protectionLead, tierBlurb, tierMeta } from "@/lib/protection";
+import { metaFor, salesMeta, type StatusMeta } from "@/lib/status";
 
 interface ProofGroup {
   pkg: string;
@@ -134,5 +135,94 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
         </div>
       )}
     </section>
+  );
+}
+
+/** State of a tier in one environment: "Available" or "Planned", with its icon. Never colour alone. */
+function StateBadge({ p }: { p: EnvironmentProtection }) {
+  const meta: StatusMeta =
+    p.state === "available"
+      ? { label: "Available", tone: "success", icon: "check", hint: "This tier works in the environment today." }
+      : { label: "Planned", tone: "neutral", icon: "hourglass", hint: "This tier does not work in the environment yet." };
+  return <StatusBadge meta={meta} size="sm" />;
+}
+
+/**
+ * The environment page's "Protection" section: the tier a buyer's server gets there, whether it works
+ * today, and the registry's one honest sentence. Every word of it comes from the registry fields.
+ */
+export function ProtectionSection({ env: e }: { env: Pick<Environment, "name" | "protection"> }) {
+  const p = e.protection;
+  const lead = protectionLead(p);
+  return (
+    <section aria-labelledby="protection-title" className="mt-10">
+      <h2 id="protection-title" className="display text-[30px]">
+        Protection.
+      </h2>
+      <div className="panel mt-4 grid gap-4 p-4 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:items-start">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusBadge meta={tierMeta[p.tier]} />
+          {p.tier !== "none" ? <StateBadge p={p} /> : null}
+        </div>
+        <div className="min-w-0 text-[15px] text-ink-2">
+          <p className="max-w-[70ch]">
+            {lead ? <strong className="text-ink">{lead} </strong> : null}
+            {p.note || tierBlurb[p.tier]}
+          </p>
+          <p className="mt-2 text-[13.5px] text-ink-3">
+            What a buyer&rsquo;s server gets in {e.name}. Protection is deterrence, traceability and revocation, never a promise
+            that code cannot be copied.{" "}
+            <Link href="/protect" className="font-semibold text-cobalt-ink underline">
+              How protection works
+            </Link>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Every environment by protection tier, from the API. Used by the directory and by /protect, so the
+ * two can never disagree. Each row carries the registry's note as written.
+ */
+export function ProtectionTierTable({ envs, caption = "Protection tier by environment" }: { envs: Environment[]; caption?: string }) {
+  const groups = groupByTier(envs);
+  return (
+    <div className="panel relative overflow-x-auto">
+      <table className="w-full min-w-[720px] text-left text-[14px]">
+        <caption className="sr-only">{caption}</caption>
+        <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
+          <tr>
+            <th scope="col" className="px-3 py-2.5">Environment</th>
+            <th scope="col" className="px-3 py-2.5">State</th>
+            <th scope="col" className="px-3 py-2.5">What a buyer&rsquo;s server gets</th>
+          </tr>
+        </thead>
+        {groups.map((g) => (
+          <tbody key={g.tier}>
+            <tr className="border-t border-line-soft bg-surface-2">
+              <th scope="colgroup" colSpan={3} className="px-3 py-2.5">
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <StatusBadge meta={tierMeta[g.tier]} size="sm" />
+                  <span className="text-[13px] font-normal normal-case text-ink-2">{tierBlurb[g.tier]}</span>
+                </span>
+              </th>
+            </tr>
+            {g.envs.map((e) => (
+              <tr key={e.slug} className="border-t border-line-soft align-top">
+                <th scope="row" className="whitespace-nowrap px-3 py-2.5">
+                  <Link href={`/environments/${encodeURIComponent(e.slug)}`} className="font-bold hover:underline">
+                    {e.name}
+                  </Link>
+                </th>
+                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">Free only</span> : <StateBadge p={e.protection} />}</td>
+                <td className="px-3 py-2.5 text-ink-2">{e.protection.note || tierBlurb[e.protection.tier]}</td>
+              </tr>
+            ))}
+          </tbody>
+        ))}
+      </table>
+    </div>
   );
 }
