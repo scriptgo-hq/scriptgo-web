@@ -753,7 +753,9 @@ function PublishSection({ release: r, running, onChange }: { release: Release; r
         Publish.
       </h2>
       <p className="mt-1 max-w-prose text-[14.5px] text-ink-2">
-        Publishing makes {r.version} installable by everyone who can see the package. It can&rsquo;t be edited afterwards.
+        {r.escrow
+          ? `Publishing makes ${r.version} available to licensed customers, as an encrypted bundle. It can’t be edited afterwards.`
+          : `Publishing makes ${r.version} installable by everyone who can see the package. It can’t be edited afterwards.`}
       </p>
       {blocked ? (
         <div className="mt-3" id="publish-blockers">
