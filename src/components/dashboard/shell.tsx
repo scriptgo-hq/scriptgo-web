@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   ChartLine,
+  Crown,
   FileClock,
   Gavel,
   KeyRound,
@@ -45,6 +46,7 @@ const ICONS = {
   packages: Package,
   customers: Users,
   stores: Store,
+  perks: Crown,
   analytics: ChartLine,
   notices: Bell,
   settings: Settings,

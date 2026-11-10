@@ -96,6 +96,15 @@ export type {
   ReadinessSummary,
   StoreReadiness,
   CommerceReadiness,
+  Perk,
+  PerkHolder,
+  PerkInterval,
+  PerkRights,
+  ServerLink,
+  ServerLinkCreated,
+  PerkPurchaseInfo,
+  PerkCheckoutCreated,
+  PerkCheckoutState,
 } from "@scriptgo/shared";
 
 import type { Category } from "@scriptgo/shared";

@@ -87,6 +87,13 @@ const BUILT_IN_DOCS: DocEntry[] = [
     source: { kind: "guide", file: "protect-your-work.md" },
   },
   {
+    slug: "perks",
+    title: "Player perks",
+    description: "Sell a perk to the players of your own server: the server link, the check, the event queue, the purchase link and ScriptGo.perks.",
+    group: "Licensing",
+    source: { kind: "spec", file: "perks.md" },
+  },
+  {
     slug: "api",
     title: "HTTP API reference",
     description: "The v1 HTTP contract between the API, the website and the CLI.",
