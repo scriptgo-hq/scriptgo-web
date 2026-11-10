@@ -114,7 +114,7 @@ const PIECES: { title: string; path: string; badge?: StatusMeta; body: React.Rea
   {
     title: ".NET host kit",
     path: "sdk/dotnet",
-    badge: { label: "Experimental", tone: "warning", icon: "flask", hint: "Measured on Windows x64 only; not published to NuGet." },
+    badge: { label: "Experimental", tone: "warning", icon: "flask", hint: "Measured on Windows x64; its test suite also passes on Linux x64 in a container. Not published to NuGet." },
     body: (
       <>
         <code className="font-mono text-[0.9em]">ScriptGo.Host</code>, a .NET 10 library any C# engine or server can embed,
@@ -125,7 +125,7 @@ const PIECES: { title: string; path: string; badge?: StatusMeta; body: React.Rea
     ),
     foot: (
       <>
-        Measured on Windows x64 only. Not on NuGet yet.{" "}
+        Measured on Windows x64; its test suite also passes on Linux x64 in a container. Not on NuGet yet.{" "}
         <Link href="/docs/dotnet-kit" className="font-semibold text-cobalt-ink underline">
           Embed it
         </Link>
@@ -325,8 +325,8 @@ const ROADMAP: { title: string; status: StatusMeta; body: React.ReactNode }[] = 
   },
   {
     title: "Linux and macOS measurements",
-    status: { label: "Not measured", tone: "muted", icon: "dashed", hint: "No measured run on Linux or macOS for these hosts." },
-    body: <>The .NET kit and the desktop hosts (LÖVE, Godot, Neovim) were measured on Windows only.</>,
+    status: { label: "Partly measured", tone: "muted", icon: "dashed", hint: "No measured run on macOS, and none on Linux for the desktop hosts." },
+    body: <>The desktop hosts (LÖVE, Godot, Neovim) were measured on Windows only. The .NET kit's test suite and the native escrow library also pass on Linux x64, in a container; nothing was measured on macOS.</>,
   },
 ];
 
