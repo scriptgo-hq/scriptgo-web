@@ -139,4 +139,5 @@ export const CAPABILITIES = [
   "ui",
   "http",
   "licensing",
+  "perks",
 ] as const;
