@@ -2,8 +2,7 @@ import Link from "next/link";
 import { LayoutGrid, List, Search, SearchX } from "lucide-react";
 import type { Metadata } from "next";
 import { categoryLabel } from "@/components/illustrations";
-import { Ridge } from "@/components/site/ink";
-import { Eyebrow } from "@/components/ui/typography";
+import { PageHead, SCENES } from "@/components/site/ink";
 import { AutoSubmitCheckbox, AutoSubmitSelect } from "@/components/site/auto-submit";
 import { CreatorCta } from "@/components/site/creator-cta";
 import { Button } from "@/components/ui/button";
@@ -65,23 +64,19 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <section aria-labelledby="explore-title" className="g-sun relative">
-        <div className="container-page pb-6 pt-12">
-          <div>
-            <Eyebrow className="mb-[18px]">Scripts directory</Eyebrow>
-            <h1 id="explore-title" className="display text-[clamp(40px,5vw,68px)]">
-              Explore <em>scripts.</em>
-            </h1>
-            <p className="mt-4 max-w-[52ch] text-[17px] text-ink-2">
-              Discover scripts made by creators. Tools, systems, frameworks and more, with the environments each one has
-              actually been run in.
-            </p>
-          </div>
-        </div>
-        <Ridge from="transparent" to="paper" ink="orange" n={3} small />
-      </section>
+      <PageHead
+        id="explore-title"
+        tag="Scripts directory"
+        art={{ ...SCENES.depot, position: "72% 45%" }}
+        title={
+          <>
+            Explore <em>scripts.</em>
+          </>
+        }
+        lede="Scripts made by creators, with the environments each one has really been run in."
+      />
 
-      <div className="container-page pb-14 pt-6">
+      <div className="container-page pb-14 pt-9">
         <form action="/explore" method="get" role="search" aria-label="Filter scripts" className="space-y-3">
           {view === "list" ? <input type="hidden" name="view" value="list" /> : null}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">

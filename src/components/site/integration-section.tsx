@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReadMore } from "@/components/site/diagrams";
 import { CalendarClock } from "lucide-react";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { KeyValue } from "@/components/ui/data";
@@ -8,7 +9,7 @@ import type { Environment, EnvironmentDetail, EnvironmentProtection, ProofRun } 
 import { formatDate } from "@/lib/format";
 import { integrationTypeLabel, sidesLabel } from "@/lib/integration";
 import { platformRule } from "@/lib/platform-rule";
-import { groupByTier, protectionLead, protectionNote, tierBlurb, tierMeta } from "@/lib/protection";
+import { groupByTier, protectionLead, protectionNote, tierMeta, tierShort } from "@/lib/protection";
 import type { StatusMeta } from "@/lib/status";
 
 interface ProofGroup {
@@ -40,9 +41,17 @@ function groupProof(proof: ProofRun[]): ProofGroup[] {
   });
 }
 
+/** First sentence of a registry text, and what follows it. Backtick spans are never cut. */
+function splitFirstSentence(text: string): [string, string] {
+  const m = /^((?:`[^`]*`|[^`])*?[.!?])\s+(?=[A-Z`])([\s\S]+)$/.exec(text.trim());
+  return m ? [m[1]!, m[2]!] : [text.trim(), ""];
+}
+
 /** The environment page's "Integration" section: how packages run there, and what real runs proved. */
 export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
   const i = e.integration;
+  // The registry writes a paragraph; the page shows its first sentence and keeps the rest one click away.
+  const [first, rest] = splitFirstSentence(i?.summary ?? "");
   return (
     <section aria-labelledby="integration-title" className="mt-10">
       <h2 id="integration-title" className="display text-[30px]">
@@ -50,15 +59,22 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
       </h2>
       {!i ? (
         <EmptyState icon={CalendarClock} title="Not started" className="mt-4">
-          No adapter code has been written for {e.name} yet. The summary above is the intended approach. The page shows the
-          integration once its adapter exists, and the status moves past planned only after a real run passes.
+          No adapter code exists for {e.name} yet. The summary above is the intended approach.
         </EmptyState>
       ) : (
         <div className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="min-w-0">
             <p className="max-w-[62ch] text-[15.5px] leading-relaxed text-ink-2">
-              <InlineCodeText text={i.summary} />
+              <InlineCodeText text={first} />
             </p>
+            {rest ? (
+              <details className="mt-2 max-w-[62ch] text-[15px] text-ink-2">
+                <summary className="cursor-pointer text-[14px] font-semibold text-cobalt-ink">How it is wired, in full</summary>
+                <p className="mt-2 leading-relaxed">
+                  <InlineCodeText text={rest} />
+                </p>
+              </details>
+            ) : null}
             <KeyValue
               className="mt-5"
               labelWidth="7.5rem"
@@ -116,15 +132,15 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
                     </tbody>
                   </table>
                 </div>
-                <p className="mt-2 text-[13px] text-ink-3">
-                  From the reports <code className="font-mono">scriptgo verify</code> wrote in the real runtime. Mocks, stubs and
-                  emulators never write one. <Link href="/docs/create-adapter#conformance" className="font-semibold text-cobalt-ink underline">How runs work</Link>
+                <p className="mt-3">
+                  <ReadMore href="/docs/environments#how-a-status-is-earned" className="!text-[14px]">
+                    What counts as a real run
+                  </ReadMore>
                 </p>
               </>
             ) : e.adapterState === "written" ? (
               <Banner tone="info" title="Adapter written, awaiting a real run." className="mt-3">
-                {e.blockedOn || "No run in the real runtime has passed yet."} Tests against mocks, stubs or a plain VM do not
-                count as a run; the known limitations say what has been tested so far.
+                {e.blockedOn || "No run in the real runtime has passed yet."}
               </Banner>
             ) : (
               <EmptyState title="No real run yet" className="mt-3">
@@ -165,16 +181,16 @@ export function ProtectionSection({ env: e }: { env: Pick<Environment, "name" | 
           {p.tier !== "none" ? <StateBadge p={p} /> : null}
         </div>
         <div className="min-w-0 text-[15px] text-ink-2">
-          <p className="max-w-[70ch]">
-            {lead ? <strong className="text-ink">{lead} </strong> : null}
-            {protectionNote(p)}
-          </p>
-          <p className="mt-2 text-[13.5px] text-ink-3">
-            What a buyer&rsquo;s server gets in {e.name}. Protection is deterrence, traceability and revocation, never a promise
-            that code cannot be copied.{" "}
-            <Link href="/protect" className="font-semibold text-cobalt-ink underline">
+          <p className="max-w-[70ch] font-semibold text-ink">{lead ?? tierShort[p.tier]}</p>
+          <details className="mt-2 max-w-[70ch]">
+            <summary className="cursor-pointer text-[14px] font-semibold text-cobalt-ink">What a buyer&rsquo;s server gets in {e.name}, in full</summary>
+            <p className="mt-2">{protectionNote(p)}</p>
+          </details>
+          <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[13.5px] text-ink-3">
+            Deterrence, traceability and revocation; never a promise that code cannot be copied.
+            <ReadMore href="/protect" className="!text-[14px] text-ink">
               How protection works
-            </Link>
+            </ReadMore>
           </p>
         </div>
       </div>
@@ -183,46 +199,48 @@ export function ProtectionSection({ env: e }: { env: Pick<Environment, "name" | 
 }
 
 /**
- * Every environment by protection tier, from the API. Used by the directory and by /protect, so the
- * two can never disagree. Each row carries the registry's note as written.
+ * Every environment by protection tier, from the API: one sheet per tier, the strongest first. Used
+ * by the directory and by /protect, so the two can never disagree. The registry's own sentence for
+ * an environment is on its page.
  */
 export function ProtectionTierTable({ envs, caption = "Protection tier by environment" }: { envs: Environment[]; caption?: string }) {
   const groups = groupByTier(envs);
   return (
-    <div className="panel relative overflow-x-auto">
-      <table className="w-full min-w-[720px] text-left text-[14px]">
-        <caption className="sr-only">{caption}</caption>
-        <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
-          <tr>
-            <th scope="col" className="px-3 py-2.5">Environment</th>
-            <th scope="col" className="px-3 py-2.5">State</th>
-            <th scope="col" className="px-3 py-2.5">What a buyer&rsquo;s server gets</th>
-          </tr>
-        </thead>
-        {groups.map((g) => (
-          <tbody key={g.tier}>
-            <tr className="border-t border-line-soft bg-surface-2">
-              <th scope="colgroup" colSpan={3} className="px-3 py-2.5">
-                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <StatusBadge meta={tierMeta[g.tier]} size="sm" />
-                  <span className="text-[13px] font-normal normal-case text-ink-2">{tierBlurb[g.tier]}</span>
-                </span>
-              </th>
-            </tr>
-            {g.envs.map((e) => (
-              <tr key={e.slug} className="border-t border-line-soft align-top">
-                <th scope="row" className="whitespace-nowrap px-3 py-2.5">
-                  <Link href={`/environments/${encodeURIComponent(e.slug)}`} className="font-bold hover:underline">
-                    {e.name}
-                  </Link>
-                </th>
-                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">Signed releases</span> : <StateBadge p={e.protection} />}</td>
-                <td className="px-3 py-2.5 text-ink-2">{protectionNote(e.protection)}</td>
+    <div className="grid gap-7 lg:grid-cols-3 lg:items-start">
+      {groups.map((g) => (
+        <section key={g.tier} className="sticker" aria-label={tierMeta[g.tier].label}>
+          <div className="border-b-[2.5px] border-line bg-paper p-4">
+            <StatusBadge meta={tierMeta[g.tier]} />
+            <p className="mt-2.5 text-[14.5px] text-ink-2">{tierShort[g.tier]}</p>
+          </div>
+          <table className="w-full text-left text-[14.5px]">
+            <caption className="sr-only">
+              {caption}: {tierMeta[g.tier].label}
+            </caption>
+            <thead className="sr-only">
+              <tr>
+                <th scope="col">Environment</th>
+                <th scope="col">State</th>
               </tr>
-            ))}
-          </tbody>
-        ))}
-      </table>
+            </thead>
+            <tbody>
+              {g.envs.map((e) => (
+                <tr key={e.slug} className="border-t-[1.5px] border-line-soft first:border-t-0">
+                  <th scope="row" className="px-4 py-2.5">
+                    <Link href={`/environments/${encodeURIComponent(e.slug)}`} className="font-bold hover:underline">
+                      {e.name}
+                    </Link>
+                  </th>
+                  <td className="px-4 py-2.5 text-right">
+                    {e.protection.tier === "none" ? <span className="text-ink-3">Signed releases</span> : <StateBadge p={e.protection} />}
+                    {e.protection.optIn ? <span className="mt-1 block text-[12.5px] leading-snug text-ink-3">opt-in server feature</span> : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ))}
     </div>
   );
 }

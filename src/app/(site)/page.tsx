@@ -1,17 +1,17 @@
 import Link from "next/link";
-import { ArrowRight, FileSignature, KeyRound, Lock, Server } from "lucide-react";
+import { FileSignature, KeyRound, Lock, Server } from "lucide-react";
 import { WorldCtas, WorldName, WorldNow, WorldPicker, WorldPlugLine, WorldProvider, type World } from "@/components/site/home-worlds";
+import { ReadMore } from "@/components/site/diagrams";
 import { Art, Ridge, SCENES, Section, SectionHead } from "@/components/site/ink";
 import { SellerCases } from "@/components/site/seller-cases";
 import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
-import { CodeBlock, CommandLine } from "@/components/ui/code-block";
+import { CommandLine } from "@/components/ui/code-block";
 import { EnvMonogramTile } from "@/components/ui/environment";
 import { ApiError } from "@/components/ui/feedback";
 import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
-import { CAPABILITIES } from "@/lib/contract";
 import { LANGUAGE_STATES, envMonogram } from "@/lib/env";
 import { formatDate } from "@/lib/format";
 import { adapterMetaFor } from "@/lib/integration";
@@ -20,31 +20,6 @@ import { environmentMeta, metaFor } from "@/lib/status";
 import { DEFAULT_WORLD, PICKER_ORDER, shortEnvName, worldArt } from "@/lib/worlds";
 
 type SP = Record<string, string | string[] | undefined>;
-
-// A server script from the quickstart: storage, an event and an export, the runtime's own names.
-const SERVER_SCRIPT = `-- server/main.lua
-local function give(owner, item, count)
-  local key = "inventory/" .. owner
-  local inv = ScriptGo.storage.get(key) or Inventory.new()
-  local total = Inventory.add(inv, item, count)
-  ScriptGo.storage.set(key, inv)
-  TriggerEvent("inventory_pro:itemAdded", owner, item, total)
-  return total
-end
-
-exports("give", give)`;
-
-// From the adapter guide (/docs/create-adapter): the table a host fills in.
-const ADAPTER = `-- adapters/myengine.lua
-return {
-  environment = "myengine",
-  sides = { server = true, client = false },
-  now = function() return MyEngine.time_seconds() end,
-  storage = {
-    load = function(key) return MyEngine.kv_get(key) end,
-    save = function(key, text) MyEngine.kv_set(key, text) end,
-  },
-}`;
 
 const BUILD_TILES: { label: string; art: string; c: string; ct?: string }[] = [
   { label: "Economies", art: "cover-economy", c: "#7a3cc8" },
@@ -56,9 +31,6 @@ const BUILD_TILES: { label: string; art: string; c: string; ct?: string }[] = [
   { label: "HUDs", art: "cover-hud", c: "#2f3ce0" },
   { label: "Frameworks", art: "cover-permissions", c: "#ffc83d", ct: "#0b0b1e" },
 ];
-
-/** The runtime's capabilities (lib/contract), written as words. */
-const CAPABILITY_WORDS = CAPABILITIES.map((c) => (c === "ui" ? "UI" : c === "http" ? "HTTP" : c));
 
 const MATRIX_ORDER = ["standalone", "godot", "garrysmod", "cctweaked", "rust", "open77", "fivem"];
 
@@ -171,8 +143,7 @@ function Hero({ now, cta }: { now: React.ReactNode; cta: React.ReactNode }) {
               Scripts for every world <em>you run.</em>
             </h1>
             <p className="lede">
-              SCRIPT//GO is a scripting sandbox you plug into a game engine, a mod platform or a multiplayer server. Build on top
-              of it, protect what you wrote, and sell it from your own Tebex shop.
+              A scripting sandbox for the games you run: build on it, protect what you wrote, sell it from your own Tebex shop.
             </p>
             {cta}
             <p className="langs mt-[22px]">
@@ -195,7 +166,7 @@ function Hero({ now, cta }: { now: React.ReactNode; cta: React.ReactNode }) {
   );
 }
 
-/** A real sequence, so it is numbered: account, SDK, script, store. */
+/** A real sequence, so it is numbered: account, SDK, script, store. One sentence per step. */
 function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.ReactNode }) {
   return (
     <Section ground="paper" id="setup" aria-labelledby="setup-title" className="!pt-14">
@@ -207,14 +178,8 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
             From sign-up to first sale, on <em>{platform}</em>
           </>
         }
-        aside={
-          <Link href="/docs/quickstart" className="ink-link">
-            Full quickstart <ArrowRight aria-hidden="true" strokeWidth={2.5} />
-          </Link>
-        }
-      >
-        Four steps. The first three are yours to do once; the fourth is where the money comes in.
-      </SectionHead>
+        aside={<ReadMore href="/docs/quickstart">Full quickstart</ReadMore>}
+      />
 
       <ol className="flow">
         <li className="step">
@@ -224,7 +189,7 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <h3 className="font-display text-[19px] font-extrabold leading-tight">
             <span className="sr-only">Step 1: </span>Create your account
           </h3>
-          <p className="text-[15.5px]">Sign up, then make a personal access token in your dashboard settings. It is the key the CLI signs in with.</p>
+          <p className="text-[15.5px]">Sign up and make your key in the dashboard settings.</p>
           <div className="ink-line">
             <KeyRound aria-hidden="true" size={16} strokeWidth={2.25} className="shrink-0" />
             <span>sg_pat_••••••••••••</span>
@@ -237,8 +202,7 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <h3 className="font-display text-[19px] font-extrabold leading-tight">
             <span className="sr-only">Step 2: </span>Plug the SDK in
           </h3>
-          <p className="text-[15.5px]">One adapter per platform maps the sandbox onto what the host already has. Start a resource with the CLI.</p>
-          {plug}
+          {plug ?? <p className="text-[15.5px]">One adapter maps the sandbox onto your platform.</p>}
           <CommandLine command="scriptgo init my_resource" className="!shadow-none" />
         </li>
         <li className="step">
@@ -248,7 +212,7 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <h3 className="font-display text-[19px] font-extrabold leading-tight">
             <span className="sr-only">Step 3: </span>Build on top
           </h3>
-          <p className="text-[15.5px]">Write your scripts against the sandbox, in Lua everywhere or in TypeScript on the .NET kit. Test them locally.</p>
+          <p className="text-[15.5px]">Write your scripts in Lua, or in TypeScript on the .NET kit.</p>
           <CommandLine command="scriptgo test" className="!shadow-none" />
         </li>
         <li className="step step-pay">
@@ -258,17 +222,13 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <h3 className="font-display text-[19px] font-extrabold leading-tight">
             <span className="sr-only">Step 4: </span>Open your shop
           </h3>
-          <p className="text-[15.5px]">Anyone can open a shop, on their own Tebex store. Map its products to your offers; a verified payment there issues a licence here.</p>
+          <p className="text-[15.5px]">On your own Tebex store. A payment there issues a licence here.</p>
           <div className="sheet flex flex-wrap items-center justify-between gap-2 border-2 border-line bg-surface px-3 py-2 text-[14px]">
-            <b>Your store on Tebex</b>
+            <b>Your store</b>
             <StatusBadge size="sm" meta={{ label: "Checkout not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." }} />
           </div>
         </li>
       </ol>
-      <p className="mt-6 max-w-[82ch] text-[13.5px] text-ink-3">
-        The CLI is in preview. A shop works as soon as its Tebex configuration is complete, but real checkout is not live yet: it
-        stays off, for every shop, until Tebex approves it in writing. Free packages need no store at all.
-      </p>
     </Section>
   );
 }
@@ -285,9 +245,9 @@ function Build() {
             What will you <em>build?</em>
           </>
         }
+        aside={<ReadMore href="/docs/runtime">The runtime API</ReadMore>}
       >
-        The sandbox gives your scripts {CAPABILITY_WORDS.slice(0, -1).join(", ")} and {CAPABILITY_WORDS[CAPABILITY_WORDS.length - 1]}.
-        What you make with them is yours, and yours to sell.
+        Events, storage, players, permissions and more. What you make with them is yours to sell.
       </SectionHead>
       <ul className="cats">
         {BUILD_TILES.map((t) => (
@@ -297,30 +257,11 @@ function Build() {
           </li>
         ))}
       </ul>
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-        <div className="min-w-0">
-          <CodeBlock code={SERVER_SCRIPT} lang="lua" filename="inventory_pro/server/main.lua" />
-        </div>
-        <div className="min-w-0 text-[16px] text-ink-2">
-          <p>
-            A resource is a folder with a manifest and shared, server and client scripts: the shape multiplayer scripters already
-            know. The same folder runs on every platform whose adapter provides the capabilities it asks for.
-          </p>
-          <p className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
-            <Link href="/sdk" className="ink-link">
-              What is in the SDK <ArrowRight aria-hidden="true" strokeWidth={2.5} />
-            </Link>
-            <Link href="/docs/runtime" className="ink-link">
-              The runtime API <ArrowRight aria-hidden="true" strokeWidth={2.5} />
-            </Link>
-          </p>
-        </div>
-      </div>
     </Section>
   );
 }
 
-/** The two seller cases: the same words as on /sdk and /protect (components/site/seller-cases). */
+/** The two seller cases: the same pictures as on /sdk and /protect (components/site/seller-cases). */
 function Earn() {
   return (
     <Section ground="cobalt" id="earn" aria-labelledby="earn-title">
@@ -332,25 +273,16 @@ function Earn() {
             Two ways to <em>earn with it.</em>
           </>
         }
+        aside={<ReadMore href="/docs/selling">How selling works</ReadMore>}
       >
-        What you sell is your own code, written against SCRIPT//GO. Both ways go through your own Tebex store: you are the seller,
-        Tebex takes the payment, and SCRIPT//GO issues and checks the licence behind each sale.
+        You sell your own code, from your own Tebex store. Real checkout is not live yet.
       </SectionHead>
       <SellerCases />
-      <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-        <ButtonLink href="/developers" variant="sun" arrow>
-          Selling, plainly
-        </ButtonLink>
-        <p className="max-w-[66ch] text-[14.5px] text-ink-2">
-          Real checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing. Sellers declare their
-          rights when they publish and answer for what they sell; SCRIPT//GO acts on reports.
-        </p>
-      </div>
     </Section>
   );
 }
 
-/** What protection is, and how far it goes on each kind of host. Counts come from the registry. */
+/** What protection is, in three lines and one limit. Counts come from the registry. */
 function Protection({ envs }: { envs: Environment[] }) {
   const tiers = groupByTier(envs);
   return (
@@ -362,7 +294,7 @@ function Protection({ envs }: { envs: Environment[] }) {
             <div className="sheet-card pin left">
               <div className="sheet-head">
                 <strong className="font-display text-[18px] font-extrabold">Protection by host</strong>
-                <span className="label">from the registry</span>
+                <span className="label">Platforms</span>
               </div>
               <ul className="divide-y-[1.5px] divide-line-soft">
                 {tiers.map((g) => {
@@ -377,7 +309,6 @@ function Protection({ envs }: { envs: Environment[] }) {
                   );
                 })}
               </ul>
-              <div className="sheet-note">Platforms per tier. &ldquo;Planned&rdquo; means it does not work there yet.</div>
             </div>
           ) : null}
         </div>
@@ -392,41 +323,34 @@ function Protection({ envs }: { envs: Environment[] }) {
               </>
             }
           >
-            A buyer gets a licence, not a zip to pass around. You decide how many servers it covers, and it ends when the payment
-            does.
+            A buyer gets a licence, not a zip to pass around.
           </SectionHead>
           <ul className="facts text-[16px]" style={{ "--fact": "#ffc83d" } as React.CSSProperties}>
             <li>
               <FileSignature aria-hidden="true" strokeWidth={2.4} />
               <span>
-                <b>Signed releases.</b> A modified file is detected before it is installed.
+                <b>Signed releases.</b> An altered file is refused.
               </span>
             </li>
             <li>
               <Server aria-hidden="true" strokeWidth={2.4} />
               <span>
-                <b>One licence per server.</b> A copied release does not open on a server that is not bound to the licence.
+                <b>One licence per server.</b> A copy elsewhere gets no key.
               </span>
             </li>
             <li>
               <Lock aria-hidden="true" strokeWidth={2.4} />
               <span>
-                <b>Encrypted delivery</b> on hosts that run compiled code and can hold a key. On a host that runs plain script, the
-                protection is the licence and the signature.
+                <b>Encrypted delivery</b> where the host can hold a key. Server scripts only.
               </span>
             </li>
           </ul>
-          <p className="mt-5 max-w-[58ch] text-[15px] text-ink-2">
-            It deters copying and makes leaks traceable. It does not make copying impossible, and the protection page says exactly
-            where each limit is.
-          </p>
-          <div className="cta-row mt-7">
+          <p className="mt-5 text-[15px] text-ink-2">It deters copying and traces leaks. It does not make copying impossible.</p>
+          <div className="cta-row mt-7 items-center">
             <ButtonLink href="/protect" variant="sun" arrow>
               How protection works
             </ButtonLink>
-            <ButtonLink href="/protect#limits-title" variant="secondary">
-              What it does not do
-            </ButtonLink>
+            <ReadMore href="/docs/protect-your-work#what-it-does-not-do">What it does not do</ReadMore>
           </div>
         </div>
       </div>
@@ -451,8 +375,7 @@ function Platforms({ envs, failure }: { envs: Environment[]; failure: Parameters
               </>
             }
           >
-            The SDK is started on each platform and its output is kept. Statuses and badges come from those reports, never from a
-            form.
+            Every status comes from a recorded run, never from a form.
           </SectionHead>
           <ul className="facts text-[16px]">
             {(["available", "beta", "experimental", "planned"] as const).map((s) => {
@@ -518,7 +441,6 @@ function Platforms({ envs, failure }: { envs: Environment[]; failure: Parameters
                   </tbody>
                 </table>
               </div>
-              <div className="sheet-note">Read from the adapter registry and the recorded runs, as on the platforms page.</div>
             </div>
           )}
         </div>
@@ -533,10 +455,7 @@ function ForPlatforms() {
     <Section ground="paper" id="sdk" aria-labelledby="add-title">
       <div className="split">
         <div className="plate">
-          <Art src={SCENES.signpost.src} width={SCENES.signpost.width} height={SCENES.signpost.height} />
-          <div className="pin">
-            <CodeBlock code={ADAPTER} lang="lua" filename="adapters/myengine.lua" copy={false} />
-          </div>
+          <Art src={SCENES.adapter.src} width={SCENES.adapter.width} height={SCENES.adapter.height} />
         </div>
         <div className="min-w-0">
           <SectionHead
@@ -549,8 +468,7 @@ function ForPlatforms() {
               </>
             }
           >
-            Write one adapter for your engine or mod platform, or embed the .NET host kit. Everyone who builds on SCRIPT//GO can
-            then ship to your community, with licences and shops included.
+            Write one adapter, or embed the .NET host kit, and SCRIPT//GO scripts run on your platform.
           </SectionHead>
           <div className="cta-row mt-7">
             <ButtonLink href="/docs/create-adapter" variant="primary" size="lg">

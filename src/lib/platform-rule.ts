@@ -67,5 +67,5 @@ export function platformRule(env: PlatformRuleSource): PlatformRule {
 
 /** The sentence that frames every platform note. */
 export function platformRuleFraming(name: string): string {
-  return `This is ${name}’s own rule, set by its rights holder, not a rule of SCRIPT//GO. A script is sold as a SCRIPT//GO script; whoever runs it on ${name} answers for following that rule.`;
+  return `Its rights holder’s rule, not ours. Whoever runs a script on ${name} answers for following it.`;
 }

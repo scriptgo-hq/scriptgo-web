@@ -201,7 +201,7 @@ export function PageHead({
           <h1 id={id} className="display">
             {title}
           </h1>
-          {lede ? <div className="lede mt-5 !max-w-[58ch] text-[#e6e2f3]">{lede}</div> : null}
+          {lede ? <p className="one-line mt-5 text-[#e6e2f3]">{lede}</p> : null}
           {children}
         </div>
         {aside ? <div className="min-w-0">{aside}</div> : null}
@@ -235,6 +235,19 @@ export const SCENES = {
   pass: { src: "/ink/scene-pass.webp", width: 1152, height: 691 },
   strongbox: { src: "/ink/scene-strongbox.webp", width: 1152, height: 691 },
   signpost: { src: "/ink/scene-signpost.webp", width: 1152, height: 691 },
+  // drawn for the site: one concept each
+  adapter: { src: "/ink/scene-adapter.webp", width: 1152, height: 720 },
+  workbench: { src: "/ink/scene-workbench.webp", width: 1152, height: 720 },
+  toolcase: { src: "/ink/scene-toolcase.webp", width: 1152, height: 720 },
+  seal: { src: "/ink/scene-seal.webp", width: 1152, height: 720 },
+  serverkey: { src: "/ink/scene-serverkey.webp", width: 1152, height: 720 },
+  watchtower: { src: "/ink/scene-watchtower.webp", width: 1152, height: 720 },
+  logbook: { src: "/ink/scene-logbook.webp", width: 1152, height: 720 },
+  gate: { src: "/ink/scene-gate.webp", width: 1152, height: 720 },
+  depot: { src: "/ink/scene-depot.webp", width: 1152, height: 720 },
+  beacon: { src: "/ink/scene-beacon.webp", width: 1152, height: 720 },
+  scaffold: { src: "/ink/scene-scaffold.webp", width: 1152, height: 720 },
+  scales: { src: "/ink/scene-scales.webp", width: 1152, height: 720 },
   band: { src: "/ink/band-ridge.webp", width: 2000, height: 750 },
   /** The same country without the traveller, drawn as a wide panorama: the home page's closing band. */
   ranges: { src: "/ink/band-ranges.webp", width: 2560, height: 720 },

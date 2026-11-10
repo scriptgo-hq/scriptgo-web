@@ -153,10 +153,7 @@ export function ProtectionPanel({
                   <span className="text-[14px] text-ink-2">Only the manifest.</span>
                 )}
               </p>
-              <p className="mt-1.5 text-[13px] text-ink-3">
-                The creator chose these patterns, so you can read and edit the manifest, the docs and the named config. Everything
-                else is encrypted.
-              </p>
+              <p className="mt-1.5 text-[13px] text-ink-3">Readable and editable. Everything else is encrypted.</p>
             </div>
             <FileList title={`Clear files (${esc.clearFiles.length})`} files={esc.clearFiles} />
             <FileList title={`Encrypted files (${esc.encryptedFiles.length}): names only`} files={esc.encryptedFiles} />
@@ -225,15 +222,13 @@ export function ProtectionPanel({
 
       {!sig ? (
         <Banner tone="info" title="This release carries no registry signature.">
-          It was published before release signing. Sentences above that mention the signature apply to signed releases only.
+          It was published before release signing.
         </Banner>
       ) : null}
 
       <p className="max-w-[72ch] text-[13.5px] text-ink-3">
-        Protection is deterrence, traceability and revocation. The operator of a machine that runs code can still inspect their own
-        machine; doing so takes real effort and the copy is traceable. A refund, a lost dispute, an ended subscription or a
-        revocation stops the next key release at once.{" "}
-        <Link href="/protect" className="font-semibold text-cobalt-ink underline">
+        Deterrence, traceability and revocation: only server scripts are protected, and a copy stays traceable.{" "}
+        <Link href="/docs/protect-your-work#what-it-does-not-do" className="font-semibold text-cobalt-ink underline">
           What protection does and does not do
         </Link>
       </p>

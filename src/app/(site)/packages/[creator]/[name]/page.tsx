@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Download, Flag, ScrollText } from "lucide-react";
 import { categoryLabel } from "@/components/illustrations";
+import { ReadMore } from "@/components/site/diagrams";
 import { CategoryArt } from "@/components/site/world-art";
 import { CheckoutControl } from "@/components/package/checkout-control";
 import { CompatStrip, EvidencePanel, sortCompat } from "@/components/package/compat-strip";
@@ -465,9 +466,11 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                       </div>
                     )}
                     <SellerLine creator={d.creator.displayName || d.seller.creator} provider={d.seller.provider} />
-                    <p className="text-[13.5px] text-ink-3">
-                      A license is granted only when the provider&rsquo;s signed payment event arrives, or by an audited administrative
-                      grant. Cancel at the provider at any time; the license stays active until the end of the paid period.
+                    <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13.5px] text-ink-3">
+                      A license is granted only on a verified payment event.
+                      <ReadMore href="/docs/licensing-api#who-does-what" className="!text-[14px] text-ink">
+                        Who does what
+                      </ReadMore>
                     </p>
                   </div>
                 ),
@@ -525,7 +528,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
             ]}
           />
           <p className="mt-10 text-[12px] text-ink-3">
-            Data from the SCRIPT//GO API{API_URL.includes("localhost") ? " (development)" : ""}. Compatibility shows only what recorded runs proved.
+            Data from the SCRIPT//GO API{API_URL.includes("localhost") ? " (development)" : ""}. Only recorded runs count.
           </p>
         </div>
       </div>

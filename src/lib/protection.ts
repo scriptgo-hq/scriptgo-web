@@ -99,6 +99,13 @@ export const tierBlurb: Record<ProtectionTier, string> = {
   none: "No licence check runs on this host today. Releases are still signed, so an altered file is detected. No code-secrecy claim.",
 };
 
+/** A tier in a few words, for a table's group row. The sentence above it is for tooltips and docs. */
+export const tierShort: Record<ProtectionTier, string> = {
+  escrow: "Decrypted in memory, for a licensed and bound server only.",
+  license: "Licence check and signed releases. The host runs plain script: no code-secrecy claim.",
+  none: "Signed releases. No licence check runs here today.",
+};
+
 /**
  * The state of a tier in one environment, as a short lead before its note. Read from the registry
  * fields only: `state` decides "available" or "planned", and `optIn` says the tier is a feature the

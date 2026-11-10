@@ -5,6 +5,7 @@ import { ProtectionTierTable } from "@/components/site/integration-section";
 import { EnvironmentSlotTile, EnvironmentTile } from "@/components/ui/environment";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/tabs";
+import { ReadMore } from "@/components/site/diagrams";
 import { PageHead, SCENES } from "@/components/site/ink";
 import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
@@ -22,6 +23,14 @@ export const metadata: Metadata = {
   title: "Environments",
   description: "Every engine, runtime and mod platform SCRIPT//GO targets, its status, languages and capability support.",
 };
+
+/** The four statuses, in as few words as the chips need. The full meaning is in /docs/environments. */
+const STATUS_LEGEND = [
+  ["available", "stable, suite passing"],
+  ["beta", "usable, partly proven"],
+  ["experimental", "expect changes"],
+  ["planned", "not usable yet"],
+] as const;
 
 /** Section header row inside a table: the group name across every column. */
 function GroupRow({ title, span }: { title: string; span: number }) {
@@ -54,20 +63,22 @@ export default async function EnvironmentsPage() {
           Environ&shy;ments, <em>by real status.</em>
         </>
       }
-    >
-      <p className="lede mt-5 !max-w-[64ch] !text-[17px] text-[#e6e2f3]">
-        Where packages run: engines and runtimes that run scripts themselves, and mod platforms that add scripting on top of an
-        existing game. Every environment runs Lua; the .NET kit also runs TypeScript and JavaScript. Every environment is a
-        peer, sorted by status, then by name. A status comes from the adapter&rsquo;s conformance runs, never from a form.
-        Planned environments have no install steps yet. The{" "}
-        <a href="#protection" className="font-semibold text-cobalt-ink underline">
-          Protection
-        </a>{" "}
-        view says what a buyer&rsquo;s server gets in each one. A script is sold as a SCRIPT//GO script that runs on these
-        environments; what each platform&rsquo;s own rights holder says about paid mods is noted on its page.
-      </p>
-    </PageHead>
+      lede="Every engine, runtime and mod platform a SCRIPT//GO script runs on, with the status its last real run earned."
+    />
     <div className="container-page pb-16 pt-10">
+      <div className="mb-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+        <ul className="flex flex-wrap gap-x-5 gap-y-3" aria-label="What each status means">
+          {STATUS_LEGEND.map(([status, words]) => (
+            <li key={status} className="flex items-center gap-2.5 text-[14px] text-ink-2">
+              <StatusBadge meta={environmentMeta[status]} size="sm" />
+              {words}
+            </li>
+          ))}
+        </ul>
+        <ReadMore href="/docs/environments" className="!text-[14.5px]">
+          How a status is earned
+        </ReadMore>
+      </div>
       <div>
         {!res.ok ? (
           <ApiError failure={res} title="Environments could not be loaded." />
@@ -181,21 +192,15 @@ export default async function EnvironmentsPage() {
                 label: "Protection",
                 content: (
                   <div className="pt-6">
-                    <p className="max-w-[70ch] text-[15px] text-ink-2">
-                      What a buyer&rsquo;s server gets in each environment. Code escrow needs a host that runs compiled code and can
-                      hold a key. A host that runs plain script gets a licence check and signed releases, and no code-secrecy
-                      claim. On a host where no licence check runs yet, releases are signed, and that is all we claim.
-                    </p>
-                    <div className="mt-4">
+                    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                      <p className="text-[16px] text-ink-2">What a buyer&rsquo;s server gets on each host.</p>
+                      <ReadMore href="/docs/protect-your-work#tiers" className="!text-[14.5px]">
+                        The tiers
+                      </ReadMore>
+                    </div>
+                    <div className="mt-5">
                       <ProtectionTierTable envs={envs} />
                     </div>
-                    <p className="mt-3 text-[13px] text-ink-3">
-                      Each sentence comes from the adapter registry, as written. Protection is deterrence, traceability and
-                      revocation.{" "}
-                      <Link href="/protect" className="font-semibold text-cobalt-ink underline">
-                        How protection works, and what it does not do
-                      </Link>
-                    </p>
                   </div>
                 ),
               },

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Banner } from "@/components/ui/feedback";
+import { PictureCard } from "@/components/site/diagrams";
+import { SCENES } from "@/components/site/ink";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
@@ -59,9 +61,23 @@ export default function LegalPage() {
           <DisplayTitle as="h1" className="text-[52px] sm:text-[64px]">
             Legal<em>.</em>
           </DisplayTitle>
-          <Banner tone="warning" title="These documents are drafts pending legal review." className="mt-6">
-            They describe how SCRIPT//GO intends to operate. They are not yet binding terms, and they will change before the
-            platform opens to the public. SCRIPT//GO is a working name until trademark and domain clearance.
+          <p className="one-line mt-4 text-ink-2">How SCRIPT//GO intends to operate, in four pictures. The full text is below.</p>
+          <div className="pcards pcards-4 mt-8 !gap-5">
+            <PictureCard art={SCENES.stall} title="The creator sells." more={{ href: "#commerce", label: "Who sells, who charges" }}>
+              Tebex takes the payment. SCRIPT//GO issues the licence.
+            </PictureCard>
+            <PictureCard art={SCENES.scales} title="Sellers declare, and answer." more={{ href: "#creator-agreement", label: "Creator agreement" }}>
+              A declaration of rights puts an offer on sale. No pre-approval.
+            </PictureCard>
+            <PictureCard art={SCENES.watchtower} title="We act on reports." more={{ href: "#ip-policy", label: "IP policy" }}>
+              Restrict, suspend or take down, with notice and appeal.
+            </PictureCard>
+            <PictureCard art={SCENES.strongbox} title="Protection has limits." more={{ href: "#protection", label: "Code protection" }}>
+              Deterrence and traceability, not DRM. Server scripts only.
+            </PictureCard>
+          </div>
+          <Banner tone="warning" title="These documents are drafts pending legal review." className="mt-9">
+            Not binding terms yet. SCRIPT//GO is a working name.
           </Banner>
         </div>
 

@@ -36,6 +36,8 @@
 .sheet-card,
 .step,
 .way,
+.flow-node,
+.pcard,
 .btn,
 .stamp,
 .tok {
@@ -81,7 +83,7 @@
 }
 
 :root[data-theme="dark"],
-:root[data-theme="dark"] :is(.sheet, .sticker, .sticker-sm, .panel, .sheet-card, .step, .way, .btn, .stamp, .tok) {
+:root[data-theme="dark"] :is(.sheet, .sticker, .sticker-sm, .panel, .sheet-card, .step, .way, .flow-node, .pcard, .btn, .stamp, .tok) {
   --paper: #121238;
   --paper-2: #181a48;
   --surface: #1c1d4e;
@@ -254,7 +256,7 @@
   .lede {
     font-size: 19px;
     line-height: 1.48;
-    max-width: 46ch;
+    max-width: 54ch;
   }
   .tabular { font-variant-numeric: tabular-nums; }
 
@@ -537,7 +539,7 @@
     --bad: #9b2414;
   }
   .g-night .tag, .g-cobalt .tag { --tag-bg: #f3ecdc; --tag-fg: #0b0b1e; }
-  :is(.g-night, .g-cobalt) :is(.sticker, .sticker-sm, .panel, .sheet, .sheet-card, .step, .way) .tag { --tag-bg: var(--g-ink); --tag-fg: var(--g-paper); }
+  :is(.g-night, .g-cobalt) :is(.sticker, .sticker-sm, .panel, .sheet, .sheet-card, .step, .way, .flow-node, .pcard) .tag { --tag-bg: var(--g-ink); --tag-fg: var(--g-paper); }
 
   /* A ground that runs to both edges of the page from inside a centred container. */
   .bleed {
@@ -994,8 +996,8 @@
     box-shadow: 10px 10px 0 var(--g-sun);
     min-width: 0;
   }
-  .way:first-child { transform: rotate(-0.6deg); }
-  .way:last-child { transform: rotate(0.6deg); box-shadow: 10px 10px 0 var(--g-ink); }
+  .ways > .way:first-child { transform: rotate(-0.6deg); }
+  .ways > .way:last-child { transform: rotate(0.6deg); box-shadow: 10px 10px 0 var(--g-ink); }
   .way > img { display: block; width: 100%; aspect-ratio: 16 / 8; object-fit: cover; border-bottom: var(--bw) solid var(--line); }
   .way-body { display: flex; flex-direction: column; gap: 12px; padding: 22px 24px 24px; flex: 1; }
   .way-body .label { color: var(--cobalt-ink); }
@@ -1009,11 +1011,90 @@
   }
   @media (max-width: 1080px) {
     .ways { grid-template-columns: minmax(0, 1fr); }
-    .way, .way:first-child, .way:last-child { transform: none; }
+    .ways > .way { transform: none; }
   }
   @media (max-width: 560px) {
     .way-body { padding: 18px 16px 18px; }
     .way, .way:last-child { box-shadow: 6px 6px 0 var(--g-sun); }
+  }
+
+  /* ---------- flow: illustrated steps joined by hand-drawn arrows ---------- */
+  .flowline { display: flex; align-items: stretch; }
+  .flow-node {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px 13px;
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--bw) solid var(--line);
+    box-shadow: 5px 5px 0 var(--plate, var(--shadow));
+  }
+  .flow-node:nth-child(4n + 1) { transform: rotate(-0.6deg); }
+  .flow-node:nth-child(4n + 3) { transform: rotate(0.5deg); }
+  .flow-ic {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--g-sun);
+    color: #0b0b1e;
+    border: 2px solid var(--line);
+    transform: skewX(-12deg);
+  }
+  .flow-ic > svg { transform: skewX(12deg); }
+  .flow-ic-cobalt { background: var(--g-cobalt); color: #fff; }
+  .flow-ic-ink { background: var(--g-ink); color: #f3ecdc; }
+  .flow-title { display: block; font-family: var(--font-display); font-stretch: 106%; font-weight: 800; font-size: 15.5px; line-height: 1.2; }
+  .flow-note { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.35; color: var(--ink-2); }
+  .flow-code { display: inline-block; margin-top: 7px; padding: 2px 7px; background: var(--g-ink); color: #f3ecdc; font-size: 12px; overflow-wrap: anywhere; }
+  .flow-arrow { flex: 0 0 38px; align-self: center; display: grid; place-items: center; }
+  /* a flow inside a card: smaller nodes, on paper */
+  .flow-compact .flow-node, .flow-compact .flow-node:nth-child(n) { padding: 10px 10px 9px; gap: 7px; background: var(--paper); box-shadow: 3px 3px 0 var(--line); transform: none; }
+  .flow-compact .flow-ic { width: 32px; height: 32px; }
+  .flow-compact .flow-ic > svg { width: 17px; height: 17px; }
+  .flow-compact .flow-title { font-size: 13.5px; }
+  .flow-compact .flow-note { font-size: 12.5px; }
+  .flow-compact .flow-arrow { flex-basis: 24px; }
+  .flow-compact .flow-arrow svg { width: 24px; height: 14px; }
+  .flow-arrow svg { width: 36px; height: 20px; }
+  @media (max-width: 960px) {
+    .flowline { flex-direction: column; }
+    .flow-node, .flow-node:nth-child(n) { flex-direction: row; align-items: center; gap: 14px; transform: none; }
+    .flow-arrow { flex-basis: 30px; align-self: flex-start; margin-left: 22px; transform: rotate(90deg); }
+  }
+
+  /* ---------- picture card: one point under one drawing ---------- */
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--bw) solid var(--line);
+    box-shadow: 7px 7px 0 var(--plate, var(--shadow));
+  }
+  .pcard > img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-bottom: var(--bw) solid var(--line); }
+  .pcard-body { display: flex; flex: 1; flex-direction: column; gap: 9px; padding: 16px 18px 18px; }
+  .pcard-title { font-family: var(--font-display); font-stretch: 112%; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -0.02em; }
+  .pcards { display: grid; gap: 28px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pcards-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pcards-2 .pcard > img { aspect-ratio: 2 / 1; }
+  .pcards-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+  @media (max-width: 1080px) {
+    .pcards, .pcards-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .pcards, .pcards-2, .pcards-4 { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+    .pcard { box-shadow: 5px 5px 0 var(--plate, var(--shadow)); }
+  }
+  /* one line that opens a page or a section: never more than two lines on a desktop */
+  .one-line { max-width: 62ch; font-size: 19px; line-height: 1.45; }
+  @media (max-width: 640px) {
+    .one-line { font-size: 17px; }
   }
 
   /* ---------- split features ---------- */

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { StatusBadge } from "@/components/ui/badge";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
-import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
+import { PageHead, SCENES } from "@/components/site/ink";
 import { api } from "@/lib/api";
 import type { Environment, Health, Stats } from "@/lib/contract";
 import { countOf, formatDateTime, relativeTime } from "@/lib/format";
@@ -23,16 +23,24 @@ export default async function StatusPage() {
   const apiMeta = health.ok ? (health.data.ok ? UP : DEGRADED) : health.kind === "unreachable" ? DOWN : DEGRADED;
 
   return (
-    <div className="container-page pb-16 pt-10">
-      <Eyebrow className="mb-4">Platform</Eyebrow>
-      <DisplayTitle as="h1" className="text-[52px] sm:text-[64px]">
-        Status<em>.</em>
-      </DisplayTitle>
-      <p className="mt-3 text-[14px] text-ink-3">
-        Checked <time dateTime={checkedAt}>{formatDateTime(checkedAt)}</time>, when this page was rendered. Reload to check again.
-      </p>
-
-      <section aria-labelledby="svc-title" className="mt-8">
+    <>
+    <PageHead
+      id="status-h1"
+      tag="Platform"
+      art={{ ...SCENES.beacon, position: "74% 40%" }}
+      title={
+        <>
+          Status<em>.</em>
+        </>
+      }
+      lede={
+        <>
+          Checked <time dateTime={checkedAt}>{formatDateTime(checkedAt)}</time>. Reload to check again.
+        </>
+      }
+    />
+    <div className="container-page pb-16 pt-6">
+      <section aria-labelledby="svc-title" className="mt-4">
         <h2 id="svc-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Services</h2>
         <ul className="sticker mt-4 divide-y-[1.5px] divide-line-soft">
           <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -119,5 +127,6 @@ export default async function StatusPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

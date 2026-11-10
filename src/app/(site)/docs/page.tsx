@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
+import { SCENES } from "@/components/site/ink";
 import { CommandLine } from "@/components/ui/code-block";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { DOCS, DOC_GROUPS, loadDoc } from "@/lib/docs";
@@ -20,15 +21,17 @@ export default async function DocsHome() {
       <DisplayTitle as="h1" className="text-[48px] sm:text-[64px]">
         The <em>docs.</em>
       </DisplayTitle>
-      <p className="mt-4 max-w-[62ch] text-[17px] text-ink-2">
-        A SCRIPT//GO package is a resource: a declarative manifest (<code className="font-mono text-[0.9em]">scriptgo.lua</code>{" "}
-        or <code className="font-mono text-[0.9em]">scriptgo.json</code>) plus shared, server and client scripts. Write it once
-        against capabilities; each environment&rsquo;s adapter runs it. Lua runs in every environment; TypeScript and JavaScript
-        run on the .NET kit.
-      </p>
-      <div className="mt-6 max-w-xl">
-        <CommandLine command="scriptgo init my_resource" />
-        <p className="mt-2 text-[13px] text-ink-3">The CLI is in preview; see the CLI page for what is available today.</p>
+      <div className="mt-5 grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)] md:items-center">
+        <div className="min-w-0">
+          <p className="one-line text-ink-2">A package is a folder: a manifest and your scripts, written once and run by each environment&rsquo;s adapter.</p>
+          <div className="mt-6 max-w-xl">
+            <CommandLine command="scriptgo init my_resource" />
+          </div>
+        </div>
+        <div className="plate hidden md:block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={SCENES.logbook.src} width={SCENES.logbook.width} height={SCENES.logbook.height} alt="" decoding="async" />
+        </div>
       </div>
       <div className="mt-12 space-y-12">
         {DOC_GROUPS.map((g) => (

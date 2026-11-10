@@ -112,7 +112,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
 
       {e.status === "experimental" ? (
         <Banner tone="warning" title="Experimental environment." className="mt-8">
-          Its integration tests or its review are still pending. Expect changes, and don&rsquo;t rely on it for production.
+          Expect changes. Do not rely on it for production yet.
         </Banner>
       ) : null}
 
@@ -122,7 +122,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
 
       <section aria-labelledby="platform-rule-title" className="mt-10">
         <h2 id="platform-rule-title" className="display scroll-mt-28 text-[30px]">
-          The platform&rsquo;s rule on paid mods.
+          Paid mods: the platform&rsquo;s rule.
         </h2>
         <div className="panel mt-4 grid gap-4 p-4 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:items-start">
           <div>
