@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { EnvironmentCardArt } from "@/components/site/world-art";
 import type { Environment } from "@/lib/contract";
 import { cn } from "@/lib/cn";
-import { environmentMeta, metaFor, salesMeta } from "@/lib/status";
+import { environmentMeta, metaFor } from "@/lib/status";
 import { StatusBadge } from "./badge";
 import { AdapterStateBadge } from "./integration";
 
@@ -20,7 +20,6 @@ export function EnvironmentTile({ env, className }: { env: Environment; classNam
         <p className="font-display text-[16px] font-extrabold leading-tight">{env.name}</p>
         <div className="flex flex-wrap gap-x-1.5 gap-y-2 pt-0.5">
           <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" />
-          {env.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, env.sales)} size="sm" /> : null}
           {env.status === "planned" ? <AdapterStateBadge state={env.adapterState} blockedOn={env.blockedOn} /> : null}
         </div>
       </div>

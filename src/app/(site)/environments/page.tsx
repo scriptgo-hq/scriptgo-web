@@ -11,7 +11,8 @@ import { api } from "@/lib/api";
 import { CAPABILITIES, type Environment } from "@/lib/contract";
 import { ENV_KINDS, envKind, languageLabels } from "@/lib/env";
 import { formatDate, relativeTime } from "@/lib/format";
-import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
+import { ENV_STATUS_ORDER, capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
+import { platformRule } from "@/lib/platform-rule";
 import { cn } from "@/lib/cn";
 import { adapterMetaFor } from "@/lib/integration";
 import { protectionMeta } from "@/lib/protection";
@@ -62,7 +63,8 @@ export default async function EnvironmentsPage() {
         <a href="#protection" className="font-semibold text-cobalt-ink underline">
           Protection
         </a>{" "}
-        view says what a buyer&rsquo;s server gets in each one.
+        view says what a buyer&rsquo;s server gets in each one. A script is sold as a SCRIPT//GO script that runs on these
+        environments; what each platform&rsquo;s own rights holder says about paid mods is noted on its page.
       </p>
     </PageHead>
     <div className="container-page pb-16 pt-10">
@@ -115,7 +117,7 @@ export default async function EnvironmentsPage() {
                           <tr>
                             <th scope="col" className="px-3 py-2.5">Environment</th>
                             <th scope="col" className="px-3 py-2.5">Status</th>
-                            <th scope="col" className="px-3 py-2.5">Selling</th>
+                            <th scope="col" className="px-3 py-2.5">Platform rule on paid mods</th>
                             <th scope="col" className="px-3 py-2.5">Protection</th>
                             <th scope="col" className="px-3 py-2.5">Languages</th>
                             <th scope="col" className="px-3 py-2.5">Runtime</th>
@@ -144,7 +146,7 @@ export default async function EnvironmentsPage() {
                                       </span>
                                     ) : null}
                                   </td>
-                                  <td className="px-3 py-2.5" title={e.salesNote || undefined}><StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" /></td>
+                                  <td className="px-3 py-2.5"><StatusBadge meta={platformRule(e).meta} size="sm" /></td>
                                   <td className="px-3 py-2.5"><StatusBadge meta={protectionMeta(e.protection)} size="sm" /></td>
                                   <td className="px-3 py-2.5">{languageLabels(e).join(" · ")}</td>
                                   <td className="tabular px-3 py-2.5">{e.runtimeVersions.join(", ") || "—"}</td>
@@ -182,7 +184,7 @@ export default async function EnvironmentsPage() {
                     <p className="max-w-[70ch] text-[15px] text-ink-2">
                       What a buyer&rsquo;s server gets in each environment. Code escrow needs a host that runs compiled code and can
                       hold a key. A host that runs plain script gets a licence check and signed releases, and no code-secrecy
-                      claim. Where the rights holder allows free packages only, nothing is sold.
+                      claim. On a host where no licence check runs yet, releases are signed, and that is all we claim.
                     </p>
                     <div className="mt-4">
                       <ProtectionTierTable envs={envs} />

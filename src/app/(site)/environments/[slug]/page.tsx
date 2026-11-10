@@ -16,7 +16,8 @@ import { envKind, languageLabels } from "@/lib/env";
 import { formatDateTime, relativeTime } from "@/lib/format";
 import { renderMarkdown } from "@/lib/markdown";
 import { protectionMeta } from "@/lib/protection";
-import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor, salesMeta } from "@/lib/status";
+import { capabilityMeta, compatibilityMeta, environmentMeta, metaFor } from "@/lib/status";
+import { platformRule, platformRuleFraming } from "@/lib/platform-rule";
 
 type Params = { slug: string };
 
@@ -42,6 +43,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
   const setup = !planned && e.setupMarkdown ? await renderMarkdown(e.setupMarkdown, { trusted: true }) : null;
   const capKeys = Array.from(new Set([...CAPABILITIES, ...Object.keys(e.capabilities)]));
   const art = worldArt(e.slug);
+  const rule = platformRule(e);
 
   return (
     <>
@@ -57,7 +59,6 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
           <h1 className="display">{e.name}.</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge meta={metaFor(environmentMeta, e.status)} />
-            {e.sales !== "allowed" ? <StatusBadge meta={metaFor(salesMeta, e.sales)} /> : null}
             {e.protection.tier !== "none" ? (
               <a href="#protection-title">
                 <StatusBadge meta={protectionMeta(e.protection)} />
@@ -108,15 +109,6 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
     </div>
     <div className="container-page pb-16 pt-2">
 
-      {e.sales !== "allowed" ? (
-        <Banner
-          tone={e.sales === "review" ? "warning" : "info"}
-          title={e.sales === "review" ? "Paid packages are reviewed first." : "Free packages only."}
-          className="mt-8"
-        >
-          {e.salesNote || metaFor(salesMeta, e.sales).hint}
-        </Banner>
-      ) : null}
 
       {e.status === "experimental" ? (
         <Banner tone="warning" title="Experimental environment." className="mt-8">
@@ -128,8 +120,23 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
 
       <ProtectionSection env={e} />
 
+      <section aria-labelledby="platform-rule-title" className="mt-10">
+        <h2 id="platform-rule-title" className="display scroll-mt-28 text-[30px]">
+          The platform&rsquo;s rule on paid mods.
+        </h2>
+        <div className="panel mt-4 grid gap-4 p-4 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:items-start">
+          <div>
+            <StatusBadge meta={rule.meta} />
+          </div>
+          <div className="min-w-0 text-[15px] text-ink-2">
+            <p className="max-w-[70ch] text-ink">{rule.note}</p>
+            <p className="mt-2 max-w-[70ch] text-[13.5px] text-ink-3">{platformRuleFraming(e.name)}</p>
+          </div>
+        </div>
+      </section>
+
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <section aria-labelledby="caps-title">
+        <section aria-labelledby="caps-title" className="min-w-0">
           <h2 id="caps-title" className="display text-[30px]">Capabilities.</h2>
           <div className="panel mt-4 relative overflow-x-auto">
             <table className="w-full min-w-[420px] text-left text-[14px]">
@@ -168,8 +175,8 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
             </>
           ) : null}
         </section>
-        <section aria-labelledby="setup-title">
-          <h2 id="setup-title" className="display text-[30px]">Setup.</h2>
+        <section aria-labelledby="setup-title" className="min-w-0">
+          <h2 id="setup-title" className="display scroll-mt-28 text-[30px]">Setup.</h2>
           <div className="mt-4">
             {planned ? (
               <EmptyState icon={CalendarClock} title="Planned, not usable yet">

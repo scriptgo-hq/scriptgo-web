@@ -147,8 +147,14 @@ export default function LegalPage() {
             <strong>A game&rsquo;s intellectual property is not ours to sell, and not a creator&rsquo;s.</strong> A package holds
             what its creator wrote and made. It does not hold a game&rsquo;s code, models, textures, audio, maps or other files,
             whether plain or encrypted. A script written for a platform built on a commercial game stays its author&rsquo;s work;
-            the game stays its publisher&rsquo;s. Where a rights holder does not allow paid mods, packages for that environment
-            are free only, and paid offers that target a proprietary game are reviewed before any purchase path opens.
+            the game stays its publisher&rsquo;s.
+          </p>
+          <p>
+            <strong>Sellers declare their rights and answer for what they sell.</strong> An offer with a declaration is on sale.
+            SCRIPT//GO does not pre-approve offers or stores: it acts on reports, and can restrict, suspend or take down a
+            listing, with a notice to its creator and a right of appeal. A script is sold as a SCRIPT//GO script that runs on
+            the environments it declares. Where a platform&rsquo;s own rights holder has a rule about paid mods, that rule is
+            noted on the platform&rsquo;s page, and whoever runs a script there answers for following it.
           </p>
           <p>
             Encryption never shields a package from this process. A report against an encrypted release is handled like any
@@ -236,7 +242,10 @@ export default function LegalPage() {
               key in your name. Both are used only to deliver and verify your releases.
             </li>
             <li>Immutability of published releases: a published version can&rsquo;t be changed, only deprecated or yanked.</li>
-            <li>Commercial classification of offers, and review of offers that touch proprietary third-party game content.</li>
+            <li>
+              Your declaration of rights on each release, which is what puts an offer on sale. SCRIPT//GO does not pre-approve
+              offers or stores; it acts on reports, with notice and appeal.
+            </li>
             <li>Your relationship with your payment provider, which is yours, and any platform fee, to be stated before checkout opens.</li>
           </ul>
         </Section>
@@ -248,7 +257,7 @@ export default function LegalPage() {
               <strong>The creator sells.</strong> They set their offers and connect their own store.
             </li>
             <li>
-              <strong>The payment provider charges</strong> (for example Tebex, once it approves the creator&rsquo;s store). SCRIPT//GO
+              <strong>The payment provider charges</strong> (for example Tebex). SCRIPT//GO
               has no partnership with, or endorsement from, any provider or engine.
             </li>
             <li>
@@ -256,7 +265,10 @@ export default function LegalPage() {
               grant. Never on a browser redirect alone.
             </li>
           </ul>
-          <p>Checkout is off by default and stays off until the provider approves the creator&rsquo;s store.</p>
+          <p>
+            Anyone can open a shop, on their own Tebex store, and it works as soon as its Tebex configuration is complete. Real
+            checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing.
+          </p>
           <p>
             What is sold is always the creator&rsquo;s own work: a script, or a feature of the seller&rsquo;s own server script, such
             as a monthly pass that unlocks it. Never a game, its content, or access to it.

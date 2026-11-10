@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Check, Minus } from "lucide-react";
-import { Art, PageHead, Ridge, SCENES } from "@/components/site/ink";
+import { PageHead, Ridge, SCENES } from "@/components/site/ink";
+import { InDevelopmentList, SellerCases } from "@/components/site/seller-cases";
 import { ProtectionTierTable } from "@/components/site/integration-section";
 import { ButtonLink } from "@/components/ui/button";
 import { CommandLine } from "@/components/ui/code-block";
@@ -22,33 +23,10 @@ const OWNED = [
   "The assets you created yourself: interface, images, sounds.",
 ];
 
-const CASES: { eyebrow: string; art: "stall" | "pass"; title: string; body: string[]; sold: string }[] = [
-  {
-    eyebrow: "a script studio",
-    art: "stall",
-    title: "Ready-made scripts, sold to server owners.",
-    body: [
-      "A studio writes a job system and sells it to the people who run servers. Each buyer gets a licence for their own servers.",
-      "The release is delivered encrypted and opens only on those servers. If a buyer is refunded, their key stops being released.",
-    ],
-    sold: "What is sold: a licence to run the studio's script.",
-  },
-  {
-    eyebrow: "a server operator",
-    art: "pass",
-    title: "A perk on their own server.",
-    body: [
-      "An operator sells a monthly VIP pass to their players. The pass unlocks a feature of the script the operator wrote for their server.",
-      "The licence renews with the subscription. When the subscription ends, the licence ends with it.",
-    ],
-    sold: "What is sold: a feature of the operator's own code. Not the game, not its content, not access to it.",
-  },
-];
-
 const STEPS: { title: string; body: string }[] = [
   {
     title: "The buyer pays on the creator's Tebex store.",
-    body: "Shops run on the creator's own Tebex store. In development a mock provider stands in. Checkout through Tebex stays off until Tebex approves it in writing.",
+    body: "Anyone can open a shop on their own Tebex store; it works as soon as its Tebex configuration is complete. Real checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing. In development a mock provider stands in.",
   },
   {
     title: "A licence is issued.",
@@ -89,7 +67,7 @@ const LIMITS: { title: string; body: string }[] = [
   },
   {
     title: "It is not obfuscation.",
-    body: "Obfuscation is at most a speed bump. We do not build one.",
+    body: "Obfuscation is at most a speed bump, never protection. An optional minify step at packaging is in development; it is a speed bump too, and we never count it as protection.",
   },
   {
     title: "It is not DRM, and it does not promise to stop all copying.",
@@ -193,23 +171,7 @@ export default function ProtectPage() {
           <DisplayTitle id="cases-title" className="text-[38px] sm:text-[48px]">
             Two ways <em>creators sell.</em>
           </DisplayTitle>
-          <ul className="ways mt-9">
-            {CASES.map((c) => (
-              <li key={c.eyebrow} className="way">
-                <Art src={SCENES[c.art].src} width={SCENES[c.art].width} height={SCENES[c.art].height} />
-                <div className="way-body">
-                  <span className="label">{c.eyebrow}</span>
-                  <h3 className="font-display text-[26px] font-black leading-[1.05] tracking-[-0.025em]">{c.title}</h3>
-                  {c.body.map((p) => (
-                    <p key={p} className="text-[15.5px] text-ink-2">
-                      {p}
-                    </p>
-                  ))}
-                  <p className="way-sold">{c.sold}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <SellerCases className="mt-9" />
         </div>
       </section>
 
@@ -274,8 +236,8 @@ export default function ProtectPage() {
           </DisplayTitle>
           <p className="mt-4 max-w-[68ch] text-[16px] text-ink-2">
             What a buyer&rsquo;s server gets depends on the host. Decrypting in memory needs a host that runs compiled code and
-            can hold a key. A host that runs plain script gets the licence check and the signature. Where the game&rsquo;s rights
-            holder allows free packages only, nothing is sold. &ldquo;Planned&rdquo; means it does not work there yet.
+            can hold a key. A host that runs plain script gets the licence check and the signature. On a host where no licence
+            check runs yet, releases are signed, and that is all we claim. &ldquo;Planned&rdquo; means it does not work there yet.
           </p>
           <div className="mt-6">
             <Tiers />
@@ -350,8 +312,14 @@ export default function ProtectPage() {
               ))}
             </ul>
             <p className="mt-5 max-w-[62ch] text-[14.5px] text-ink-2">
-              Where a rights holder does not allow paid mods, packages for that environment are free only. A paid offer that
-              targets a proprietary game is reviewed before it can be bought. Anyone can{" "}
+              Sellers declare their rights when they publish, and answer for what they sell. An offer with a declaration is on
+              sale: SCRIPT//GO does not pre-approve offers or stores. It acts on reports, and can restrict, suspend or take down
+              a listing, with a notice to its creator and a right of appeal. A script is sold as a SCRIPT//GO script, never
+              &ldquo;for&rdquo; a platform; what a platform&rsquo;s own rights holder says about paid mods is noted on its{" "}
+              <Link href="/environments" className="font-semibold text-cobalt-ink underline">
+                environment page
+              </Link>
+              , and whoever runs a script there answers for following it. Anyone can{" "}
               <Link href="/report" className="font-semibold text-cobalt-ink underline">
                 report a package
               </Link>
@@ -366,6 +334,13 @@ export default function ProtectPage() {
       </section>
 
       <Ridge from="sun" to="paper" ink="orange" n={2} />
+      <section aria-labelledby="next-title" className="sec g-paper bleed sec-sweeps container-page !pb-4 !pt-10">
+        <Eyebrow className="mb-[18px]">Next</Eyebrow>
+        <DisplayTitle id="next-title" className="text-[34px] sm:text-[42px]">
+          Being built, <em>not usable yet.</em>
+        </DisplayTitle>
+        <InDevelopmentList className="mt-8" />
+      </section>
       <section aria-labelledby="start-title" className="sec g-paper bleed container-page !pt-10">
         <div className="sticker grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
           <div className="min-w-0">

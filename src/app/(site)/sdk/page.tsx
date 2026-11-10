@@ -7,13 +7,14 @@ import { CodeBlock } from "@/components/ui/code-block";
 import { Suspense } from "react";
 import { PageHead, Ridge, SCENES } from "@/components/site/ink";
 import { ProofBlock } from "@/components/site/proof-block";
+import { IN_DEVELOPMENT_ITEMS, SellerCases } from "@/components/site/seller-cases";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 import { escrowAdapterGuideHref } from "@/lib/docs";
 import { LANGUAGE_STATES } from "@/lib/env";
 import { adapterMeta } from "@/lib/integration";
-import type { StatusMeta } from "@/lib/status";
+import { IN_DEVELOPMENT, type StatusMeta } from "@/lib/status";
 
 export const metadata: Metadata = {
   title: "SDK",
@@ -242,8 +243,9 @@ const PLATFORM: { title: string; body: React.ReactNode; href: string; link: stri
     title: "Shops on Tebex",
     body: (
       <>
-        Paid packages sell through the creator&rsquo;s own Tebex store, and SCRIPT//GO issues the license after a verified
-        payment event. The Tebex connector has not run against a live store yet; checkout stays off until written approval.
+        Anyone can open a shop on their own Tebex store; it works as soon as its Tebex configuration is complete, and SCRIPT//GO
+        issues the license after a verified payment event. Real checkout is not live yet: it stays off, for every shop, until
+        Tebex approves it in writing.
       </>
     ),
     href: "/developers",
@@ -277,6 +279,7 @@ const PLATFORM: { title: string; body: React.ReactNode; href: string; link: stri
 const notStarted = (hint: string): StatusMeta => ({ label: "Not started", tone: "muted", icon: "dashed", hint });
 
 const ROADMAP: { title: string; status: StatusMeta; body: React.ReactNode }[] = [
+  ...IN_DEVELOPMENT_ITEMS.map((it) => ({ title: it.title, status: IN_DEVELOPMENT, body: it.body as React.ReactNode })),
   {
     title: "Native C ABI kit",
     status: notStarted("Phase 4 of the plan."),
@@ -629,7 +632,20 @@ export default function SdkPage() {
         </div>
       </section>
 
-      <Ridge from="cobalt" to="night" ink="deep" n={0} />
+      <Ridge from="cobalt" to="paper" ink="sun" n={2} />
+      <section aria-labelledby="earn-title" className="sec g-paper bleed sec-sweeps container-page !pt-10">
+        <Eyebrow className="mb-[18px]">Monetize</Eyebrow>
+        <DisplayTitle id="earn-title" className="text-[38px] sm:text-[48px]">
+          Two ways to <em>earn with it.</em>
+        </DisplayTitle>
+        <p className="mt-4 max-w-[66ch] text-[16px] text-ink-2">
+          What is sold is the seller&rsquo;s own code, written against the SDK, as a SCRIPT//GO script that runs on the environments
+          it declares. Sellers declare their rights when they publish and answer for what they sell.
+        </p>
+        <SellerCases className="mt-9" />
+      </section>
+
+      <Ridge from="paper" to="night" ink="cobalt" n={0} />
       <ProtectSection />
 
       <Ridge from="night" to="paper2" ink="cobalt" n={1} />
@@ -663,8 +679,8 @@ export default function SdkPage() {
           Not built <em>yet.</em>
         </DisplayTitle>
         <p className="mt-4 max-w-[64ch] text-[16px] text-ink-2">
-          The plan, in the order it is meant to land. Nothing here is usable today; each item is listed only once it passes
-          real runs.
+          What is in development, then the plan in the order it is meant to land. Nothing here is usable today; each item is
+          listed as available only once it passes real runs.
         </p>
         <div className="panel relative mt-6 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-[14px]">

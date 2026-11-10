@@ -22,10 +22,10 @@ export const tierMeta: Record<ProtectionTier, StatusMeta> = {
     hint: "Licence check per server and signed releases. The host runs plain script, so its operator can read what it loads: no code-secrecy claim.",
   },
   none: {
-    label: "Nothing sold",
+    label: "Signing only",
     tone: "neutral",
     icon: "minus",
-    hint: "Free packages only here: nothing is sold or licensed. Releases are still signed.",
+    hint: "No licence check runs on this host today. Releases are still signed, so an altered file is detected.",
   },
 };
 
@@ -33,14 +33,24 @@ export const tierMeta: Record<ProtectionTier, StatusMeta> = {
 export function protectionMeta(p: EnvironmentProtection): StatusMeta {
   const base = tierMeta[p.tier];
   if (p.state === "planned") {
-    return { ...base, label: `${base.label}: planned`, tone: "neutral", icon: "hourglass", hint: p.note || base.hint };
+    return { ...base, label: `${base.label}: planned`, tone: "neutral", icon: "hourglass", hint: protectionNote(p) };
   }
-  return { ...base, hint: p.note || base.hint };
+  return { ...base, hint: protectionNote(p) };
+}
+
+/**
+ * The registry's sentence for an environment, as written. The one exception is the "signing only"
+ * tier: its registry sentence still speaks of what may be sold there, which is the platform's rule
+ * and not a matter of protection (see lib/platform-rule.ts), so the tier's own sentence is used.
+ */
+export function protectionNote(p: EnvironmentProtection): string {
+  if (p.tier === "none") return tierBlurb.none;
+  return p.note || tierBlurb[p.tier];
 }
 
 /** Short heading for a tier, used in tables. */
 export function tierHeading(tier: ProtectionTier): string {
-  return tier === "escrow" ? "Code escrow" : tier === "license" ? "Licence and signing" : "Nothing sold";
+  return tier === "escrow" ? "Code escrow" : tier === "license" ? "Licence and signing" : "Signing only";
 }
 
 /**
@@ -49,7 +59,7 @@ export function tierHeading(tier: ProtectionTier): string {
  */
 export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { label: string; sentence: string } {
   if (p.tier === "none") {
-    return { label: "Free only", sentence: "Nothing is sold in this environment. The release is signed, so you can check it was not altered." };
+    return { label: "Signing only", sentence: "No licence check runs on this host today. The release is signed, so you can check it was not altered." };
   }
   if (!escrowed) {
     return {
@@ -77,7 +87,7 @@ export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { 
   };
 }
 
-/** Tiers in the order the site lists them: the strongest first, "nothing sold" last. */
+/** Tiers in the order the site lists them: the strongest first, "signing only" last. */
 export const TIER_ORDER: ProtectionTier[] = ["escrow", "license", "none"];
 
 /** One plain sentence per tier, for the tier tables. The per-environment note says the rest. */
@@ -86,13 +96,13 @@ export const tierBlurb: Record<ProtectionTier, string> = {
     "The host runs compiled code outside the script VM, so it can hold a key. An encrypted release is decrypted in memory, for a licensed and bound server only.",
   license:
     "The host runs plain script. Your server checks its licence and the release is signed, but the operator can read what the host loads. We make no code-secrecy claim here.",
-  none: "The rights holder allows free packages only, so nothing is sold or licensed. Releases are still signed.",
+  none: "No licence check runs on this host today. Releases are still signed, so an altered file is detected. No code-secrecy claim.",
 };
 
 /**
  * The state of a tier in one environment, as a short lead before its note. Read from the registry
  * fields only: `state` decides "available" or "planned", and `optIn` says the tier is a feature the
- * server operator switches on. A free-only environment has nothing to wait for, so it gets no lead.
+ * server operator switches on. The signing-only tier has nothing to wait for, so it gets no lead.
  */
 export function protectionLead(p: EnvironmentProtection): string | null {
   if (p.tier === "none") return null;

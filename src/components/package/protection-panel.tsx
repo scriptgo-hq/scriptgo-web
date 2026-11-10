@@ -25,7 +25,7 @@ export function ReleaseProtectionBadges({ version: v }: { version: Pick<PackageV
 function FileList({ title, files, mono = true }: { title: string; files: string[]; mono?: boolean }) {
   if (files.length === 0) return null;
   return (
-    <details className="rounded-[10px] border-2 border-line-soft px-3 py-2">
+    <details className="border-2 border-line bg-surface px-3 py-2">
       <summary className="cursor-pointer text-[13.5px] font-semibold">{title}</summary>
       <ul className={`mt-2 space-y-0.5 text-[12.5px] text-ink-2 ${mono ? "font-mono" : ""}`}>
         {files.map((f) => (

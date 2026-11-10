@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, FileSignature, KeyRound, Lock, Server } from "lucide-react";
 import { WorldCtas, WorldName, WorldNow, WorldPicker, WorldPlugLine, WorldProvider, type World } from "@/components/site/home-worlds";
 import { Art, Ridge, SCENES, Section, SectionHead } from "@/components/site/ink";
+import { SellerCases } from "@/components/site/seller-cases";
 import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { CodeBlock, CommandLine } from "@/components/ui/code-block";
@@ -257,16 +258,16 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <h3 className="font-display text-[19px] font-extrabold leading-tight">
             <span className="sr-only">Step 4: </span>Open your shop
           </h3>
-          <p className="text-[15.5px]">Connect your own Tebex store and map its products to your offers. A verified payment there issues a licence here.</p>
+          <p className="text-[15.5px]">Anyone can open a shop, on their own Tebex store. Map its products to your offers; a verified payment there issues a licence here.</p>
           <div className="sheet flex flex-wrap items-center justify-between gap-2 border-2 border-line bg-surface px-3 py-2 text-[14px]">
             <b>Your store on Tebex</b>
-            <StatusBadge size="sm" meta={{ label: "Checkout off", tone: "warning", icon: "lock", hint: "Checkout through Tebex stays off until Tebex approves it in writing." }} />
+            <StatusBadge size="sm" meta={{ label: "Checkout not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." }} />
           </div>
         </li>
       </ol>
       <p className="mt-6 max-w-[82ch] text-[13.5px] text-ink-3">
-        The CLI is in preview. Checkout through Tebex stays off until Tebex approves it in writing; until then a mock provider stands
-        in for development, and free packages need no store at all.
+        The CLI is in preview. A shop works as soon as its Tebex configuration is complete, but real checkout is not live yet: it
+        stays off, for every shop, until Tebex approves it in writing. Free packages need no store at all.
       </p>
     </Section>
   );
@@ -319,7 +320,7 @@ function Build() {
   );
 }
 
-/** The two seller cases, in the words of the protection page. */
+/** The two seller cases: the same words as on /sdk and /protect (components/site/seller-cases). */
 function Earn() {
   return (
     <Section ground="cobalt" id="earn" aria-labelledby="earn-title">
@@ -335,47 +336,14 @@ function Earn() {
         What you sell is your own code, written against SCRIPT//GO. Both ways go through your own Tebex store: you are the seller,
         Tebex takes the payment, and SCRIPT//GO issues and checks the licence behind each sale.
       </SectionHead>
-
-      <div className="ways">
-        <article className="way sheet">
-          <Art src={SCENES.stall.src} width={SCENES.stall.width} height={SCENES.stall.height} />
-          <div className="way-body">
-            <span className="label">You make scripts</span>
-            <h3 className="font-display text-[28px] font-black leading-[1.05] tracking-[-0.025em]" style={{ fontStretch: "114%" }}>
-              Sell ready-made scripts
-            </h3>
-            <p>
-              A studio writes a job system and sells it to the people who run servers. Each buyer gets a licence for their own
-              servers, and updates and renewals follow the licence.
-            </p>
-            <p>If a buyer is refunded, their licence ends and their key stops being released.</p>
-            <p className="way-sold">What is sold: a licence to run the studio&rsquo;s script.</p>
-          </div>
-        </article>
-
-        <article className="way sheet">
-          <Art src={SCENES.pass.src} width={SCENES.pass.width} height={SCENES.pass.height} />
-          <div className="way-body">
-            <span className="label">You run a server</span>
-            <h3 className="font-display text-[28px] font-black leading-[1.05] tracking-[-0.025em]" style={{ fontStretch: "114%" }}>
-              Sell a perk in your own script
-            </h3>
-            <p>
-              An operator sells a monthly VIP pass to their players. The pass unlocks a feature of the script the operator wrote for
-              their server.
-            </p>
-            <p>The licence renews with the subscription. When the subscription ends, the licence ends with it.</p>
-            <p className="way-sold">What is sold: a feature of the operator&rsquo;s own code. Not the game, not its content, not access to it.</p>
-          </div>
-        </article>
-      </div>
+      <SellerCases />
       <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
         <ButtonLink href="/developers" variant="sun" arrow>
           Selling, plainly
         </ButtonLink>
-        <p className="max-w-[64ch] text-[14.5px] text-ink-2">
-          Checkout through Tebex is off until Tebex approves it. A paid offer that targets a proprietary game is reviewed before it
-          can be bought.
+        <p className="max-w-[66ch] text-[14.5px] text-ink-2">
+          Real checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing. Sellers declare their
+          rights when they publish and answer for what they sell; SCRIPT//GO acts on reports.
         </p>
       </div>
     </Section>

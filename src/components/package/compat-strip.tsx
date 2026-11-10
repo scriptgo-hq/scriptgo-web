@@ -74,21 +74,21 @@ export function EvidencePanel({ entry }: { entry: CompatibilityEntry }) {
 export function CompatStrip({ entries }: { entries: CompatibilityEntry[] }) {
   if (entries.length === 0) {
     return (
-      <p className="rounded-[10px] border-2 border-dashed border-line-soft px-4 py-3 text-[14px] text-ink-2">
+      <p className="border-[2.5px] border-dashed border-line-soft px-4 py-3 text-[14px] text-ink-2">
         No environments declared or tested for this release yet.
       </p>
     );
   }
   return (
     <div className="-mx-4 relative overflow-x-auto px-4 pb-2 md:mx-0 md:pl-0 md:pr-1.5">
-      <ul className="flex gap-3 md:grid md:grid-cols-[repeat(auto-fill,minmax(140px,1fr))]">
+      <ul className="flex gap-4 pb-1 md:grid md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))]">
         {sortCompat(entries).map((e) => {
           const meta = metaFor(compatibilityMeta, e.status);
           return (
             <li key={e.environment} className="w-[160px] shrink-0 md:w-auto">
               <Popover
                 triggerLabel={`${envLongName(e.environment)}: ${meta.label}. Show evidence`}
-                triggerClassName="sticker-sm sticker-hover flex w-full flex-col items-start gap-1.5 p-3 text-left"
+                triggerClassName="sticker-sm sticker-hover flex w-full flex-col items-start gap-2 p-3 text-left"
                 trigger={
                   <>
                     <span className="font-display text-[15px] font-extrabold leading-tight">{envLongName(e.environment)}</span>

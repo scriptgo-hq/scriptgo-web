@@ -77,21 +77,12 @@ export const environmentMeta: Record<EnvironmentStatus, StatusMeta> = {
   planned: { label: "Planned", tone: "muted", icon: "calendar", hint: "Not usable yet. No install instructions." },
 };
 
-/** Whether paid packages are possible on an environment (the underlying game's rule on selling mods). */
-export const salesMeta: Record<"allowed" | "free_only" | "review", StatusMeta> = {
-  allowed: { label: "Paid allowed", tone: "success", icon: "check", hint: "Creators may sell packages for this environment." },
-  free_only: {
-    label: "Free only",
-    tone: "neutral",
-    icon: "lock",
-    hint: "The game's rights holder does not allow selling mods: packages here are free.",
-  },
-  review: {
-    label: "Paid: review",
-    tone: "warning",
-    icon: "scale",
-    hint: "Paid packages need a review of the rights holder's terms first.",
-  },
+/** Announced and being built, not usable yet. The one stamp for everything in that state. */
+export const IN_DEVELOPMENT: StatusMeta = {
+  label: "In development",
+  tone: "warning",
+  icon: "hourglass",
+  hint: "Being built. Not usable yet.",
 };
 
 export const capabilityMeta: Record<CapabilitySupport, StatusMeta> = {
@@ -180,7 +171,7 @@ export const storeMeta: Record<StoreStatus, StatusMeta> = {
     label: "Connected, checkout off",
     tone: "warning",
     icon: "lock",
-    hint: "Awaiting provider approval before real checkout.",
+    hint: "The shop is set up. Real checkout is not live yet, for any shop, until Tebex approves it in writing.",
   },
   live: { label: "Live", tone: "success", icon: "check", hint: "Taking real payments." },
   needs_attention: { label: "Needs attention", tone: "danger", icon: "alert", hint: "Webhook deliveries are failing." },

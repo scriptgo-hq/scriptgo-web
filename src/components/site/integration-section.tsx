@@ -7,8 +7,9 @@ import { AdapterStateBadge, InlineCodeText } from "@/components/ui/integration";
 import type { Environment, EnvironmentDetail, EnvironmentProtection, ProofRun } from "@/lib/contract";
 import { formatDate } from "@/lib/format";
 import { integrationTypeLabel, sidesLabel } from "@/lib/integration";
-import { groupByTier, protectionLead, tierBlurb, tierMeta } from "@/lib/protection";
-import { metaFor, salesMeta, type StatusMeta } from "@/lib/status";
+import { platformRule } from "@/lib/platform-rule";
+import { groupByTier, protectionLead, protectionNote, tierBlurb, tierMeta } from "@/lib/protection";
+import type { StatusMeta } from "@/lib/status";
 
 interface ProofGroup {
   pkg: string;
@@ -69,12 +70,11 @@ export function IntegrationSection({ env: e }: { env: EnvironmentDetail }) {
                 { label: "Runtime", value: <InlineCodeText text={i.runtime} /> },
                 { label: "Sides", value: sidesLabel(e.sides) },
                 {
-                  label: "Selling",
+                  label: "Paid mods",
                   value: (
-                    <span className="inline-flex flex-wrap items-center gap-2">
-                      <StatusBadge meta={metaFor(salesMeta, e.sales)} size="sm" />
-                      {e.salesNote ? <span className="text-ink-2">{e.salesNote}</span> : null}
-                    </span>
+                    <a href="#platform-rule-title" className="inline-flex">
+                      <StatusBadge meta={platformRule(e).meta} size="sm" />
+                    </a>
                   ),
                 },
                 { label: "Adapter state", value: <AdapterStateBadge state={e.adapterState} long /> },
@@ -167,7 +167,7 @@ export function ProtectionSection({ env: e }: { env: Pick<Environment, "name" | 
         <div className="min-w-0 text-[15px] text-ink-2">
           <p className="max-w-[70ch]">
             {lead ? <strong className="text-ink">{lead} </strong> : null}
-            {p.note || tierBlurb[p.tier]}
+            {protectionNote(p)}
           </p>
           <p className="mt-2 text-[13.5px] text-ink-3">
             What a buyer&rsquo;s server gets in {e.name}. Protection is deterrence, traceability and revocation, never a promise
@@ -216,8 +216,8 @@ export function ProtectionTierTable({ envs, caption = "Protection tier by enviro
                     {e.name}
                   </Link>
                 </th>
-                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">Free only</span> : <StateBadge p={e.protection} />}</td>
-                <td className="px-3 py-2.5 text-ink-2">{e.protection.note || tierBlurb[e.protection.tier]}</td>
+                <td className="px-3 py-2.5">{e.protection.tier === "none" ? <span className="text-ink-3">Signed releases</span> : <StateBadge p={e.protection} />}</td>
+                <td className="px-3 py-2.5 text-ink-2">{protectionNote(e.protection)}</td>
               </tr>
             ))}
           </tbody>

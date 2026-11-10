@@ -58,7 +58,7 @@ export function CheckoutControl({
       : offer?.classification === "rejected"
         ? "This offer is not allowed on SCRIPT//GO."
         : offer && !offer.checkoutEnabled
-          ? (offer.checkoutDisabledReason ?? "The creator's store is not approved for checkout yet.")
+          ? (offer.checkoutDisabledReason ?? "Checkout is not live yet. It stays off, for every shop, until Tebex approves it in writing.")
           : null;
 
   return (
@@ -70,8 +70,8 @@ export function CheckoutControl({
             <li key={o.id}>
               <label
                 className={cn(
-                  "flex cursor-pointer items-center gap-3 rounded-[10px] border-2 px-3 py-2.5",
-                  selected === o.id ? "border-line bg-cobalt-soft" : "border-line-soft bg-surface hover:border-line",
+                  "flex cursor-pointer items-center gap-3 border-2 border-line px-3 py-2.5 transition-transform duration-100",
+                  selected === o.id ? "-translate-x-0.5 -translate-y-0.5 bg-sun text-on-sun shadow-[4px_4px_0_0_var(--line)]" : "bg-surface hover:bg-sun-soft",
                 )}
               >
                 <input
@@ -80,18 +80,18 @@ export function CheckoutControl({
                   value={o.id}
                   checked={selected === o.id}
                   onChange={() => setSelected(o.id)}
-                  className="h-4 w-4 accent-[var(--cobalt)]"
+                  className="h-[17px] w-[17px] accent-[var(--g-ink)]"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block font-bold leading-tight">{o.name}</span>
-                  <span className="block text-[12.5px] text-ink-3">
+                  <span className="block text-[13px] opacity-75">
                     {intervalLabel(o.interval)} · {o.deployments} {o.deployments === 1 ? "deployment" : "deployments"}
                     {o.classification === "pending_review" ? " · under review" : ""}
                   </span>
                 </span>
-                <span className="tabular whitespace-nowrap font-display text-[17px] font-extrabold">
+                <span className="tabular whitespace-nowrap font-display text-[18px] font-black">
                   {formatMoney(o.price)}
-                  <span className="text-[13px] font-bold text-ink-3">{intervalSuffix(o.interval)}</span>
+                  <span className="text-[12.5px] font-bold opacity-75">{intervalSuffix(o.interval)}</span>
                 </span>
               </label>
             </li>
@@ -101,7 +101,7 @@ export function CheckoutControl({
 
       {blockedReason ? (
         <div className="space-y-2">
-          <button type="button" disabled aria-describedby="checkout-reason" className={buttonClass("primary", "lg", "w-full")}>
+          <button type="button" disabled aria-describedby="checkout-reason" className={buttonClass("sun", "lg", "w-full")}>
             {offer?.classification === "pending_review" ? (
               <Hourglass aria-hidden="true" size={17} />
             ) : (
@@ -114,7 +114,7 @@ export function CheckoutControl({
           </p>
         </div>
       ) : !signedIn ? (
-        <Link href={`/sign-in?next=${encodeURIComponent(returnTo)}`} className={buttonClass("primary", "lg", "w-full")}>
+        <Link href={`/sign-in?next=${encodeURIComponent(returnTo)}`} className={buttonClass("sun", "lg", "w-full")}>
           Sign in to subscribe <ArrowRight aria-hidden="true" size={17} strokeWidth={2.5} />
         </Link>
       ) : (
@@ -123,7 +123,7 @@ export function CheckoutControl({
             type="button"
             onClick={subscribe}
             disabled={state.kind === "busy"}
-            className={buttonClass("primary", "lg", "w-full")}
+            className={buttonClass("sun", "lg", "w-full")}
           >
             {state.kind === "busy" ? "Opening checkout…" : offer?.interval === "perpetual" ? "Buy license" : "Subscribe"}
             <ArrowRight aria-hidden="true" size={17} strokeWidth={2.5} />
@@ -135,7 +135,7 @@ export function CheckoutControl({
         </div>
       )}
       {state.kind === "error" ? (
-        <p role="alert" className="rounded-md border-2 border-bad/50 bg-bad-soft px-3 py-2 text-[13px] text-bad">
+        <p role="alert" className="border-2 border-bad bg-bad-soft px-3 py-2 text-[13px] font-semibold text-ink">
           {state.message}
         </p>
       ) : null}

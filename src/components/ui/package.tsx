@@ -199,7 +199,10 @@ export function PackageCard({ pkg, className, showSummary = false }: { pkg: Pack
           </p>
           {showSummary ? <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-ink-2">{pkg.summary}</p> : null}
         </div>
-        <EnvCompatTags envs={pkg.environments} />
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+          <span className="label !text-[11.5px] !text-ink-3">Runs on</span>
+          <EnvCompatTags envs={pkg.environments} />
+        </div>
         {restricted ? <StatusBadge meta={metaFor(listingMeta, pkg.listingStatus)} size="sm" className="self-start" /> : null}
         <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           <CreatorLine creator={pkg.creator} />
@@ -228,7 +231,8 @@ export function PackageRow({ pkg }: { pkg: PackageSummary }) {
         </p>
         <p className="truncate text-[13.5px] text-ink-2">{pkg.summary}</p>
       </div>
-      <div className="col-span-2 md:col-span-1">
+      <div className="col-span-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 md:col-span-1">
+        <span className="label !text-[11.5px] !text-ink-3">Runs on</span>
         <EnvCompatTags envs={pkg.environments} max={4} />
       </div>
       <div className="col-span-2 flex items-center justify-between gap-3 md:col-span-1 md:flex-col md:items-end md:gap-1">

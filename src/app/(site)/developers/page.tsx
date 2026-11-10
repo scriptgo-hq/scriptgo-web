@@ -56,7 +56,7 @@ const steps = [
   {
     n: 5,
     title: "Connect a store (optional)",
-    body: "Free packages need nothing else. To sell, connect your Tebex store in Dashboard → Stores and map its products to your offers. Checkout opens once Tebex approves.",
+    body: "Free packages need nothing else. To sell, open your shop: connect your own Tebex store in Dashboard → Stores and map its products to your offers. It works as soon as its Tebex configuration is complete. Real checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing.",
     cmd: null,
   },
 ];
@@ -171,11 +171,12 @@ export default function DevelopersPage() {
             </DisplayTitle>
             <ul className="mt-5 space-y-3 text-[15px] text-ink-2">
               <li>
-                <strong className="text-ink">You sell.</strong> Offers belong to you: free, monthly, annual or perpetual.
+                <strong className="text-ink">You sell.</strong> Offers belong to you: free, monthly, annual or perpetual. A script
+                is sold as a SCRIPT//GO script that runs on the environments it declares, never &ldquo;for&rdquo; a platform.
               </li>
               <li>
-                <strong className="text-ink">Tebex takes the payment.</strong> Shops run on your own Tebex store. Checkout stays
-                off until Tebex approves it.
+                <strong className="text-ink">Tebex takes the payment.</strong> Anyone can open a shop, on their own Tebex store.
+                Real checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing.
               </li>
               <li>
                 <strong className="text-ink">SCRIPT//GO issues the license</strong>, only after a verified payment event, and your
@@ -195,8 +196,9 @@ export default function DevelopersPage() {
                 </Link>
               </li>
               <li>
-                <strong className="text-ink">Third-party game content is reviewed first.</strong> Paid offers that target a
-                proprietary game have no purchase path until a reviewer approves them.
+                <strong className="text-ink">You declare your rights, and answer for what you sell.</strong> An offer with a
+                declaration is on sale. SCRIPT//GO does not pre-approve offers or stores; it acts on reports, and can restrict,
+                suspend or take down a listing, with notice and appeal.
               </li>
             </ul>
           </div>
