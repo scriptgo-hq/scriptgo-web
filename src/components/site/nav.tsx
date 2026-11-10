@@ -77,7 +77,10 @@ export function TopBar({ signedIn }: { signedIn: boolean }) {
   const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const sync = () => setScrolled(window.scrollY > 36);
+    // Two thresholds, further apart than the bar's change of height (88 → 76 px on desktop). The bar
+    // is sticky, so that change moves the page and the browser re-anchors the scroll position: with
+    // one threshold, stopping just past it flipped the bar back and forth on every frame.
+    const sync = () => setScrolled((was) => (was ? window.scrollY > 12 : window.scrollY > 48));
     sync();
     window.addEventListener("scroll", sync, { passive: true });
     return () => window.removeEventListener("scroll", sync);
