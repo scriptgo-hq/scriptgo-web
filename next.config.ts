@@ -14,10 +14,16 @@ const config: NextConfig = {
   poweredByHeader: false,
   // The browser talks to the API through the web origin so better-auth cookies stay first-party.
   async rewrites() {
-    return [
-      { source: "/v1/:path*", destination: `${API_URL}/v1/:path*` },
-      { source: "/api/auth/:path*", destination: `${API_URL}/api/auth/:path*` },
-    ];
+    return {
+      beforeFiles: [],
+      afterFiles: [
+        { source: "/v1/:path*", destination: `${API_URL}/v1/:path*` },
+        { source: "/api/auth/:path*", destination: `${API_URL}/api/auth/:path*` },
+      ],
+      // The OpenID provider ("Sign in with SCRIPT//GO", issuer https://scriptgo.dev/oidc). A fallback
+      // rewrite, so the interaction page /oidc/interaction/[uid] (a dynamic route here) wins over it.
+      fallback: [{ source: "/oidc/:path*", destination: `${API_URL}/oidc/:path*` }],
+    };
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
