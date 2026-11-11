@@ -19,6 +19,8 @@ export interface DocEntry {
   description: string;
   group: "Start" | "Reference" | "Licensing" | "Platforms" | "Platform builders" | "Help";
   source: { kind: "spec" | "guide" | "repo-guide"; file: string };
+  /** Listed only when its file exists in the SDK the site is built from (a page newer than some tags). */
+  optional?: true;
 }
 
 const SDK_DIR = path.resolve(process.cwd(), process.env.SCRIPTGO_SDK_DIR || ".sdk");
@@ -95,6 +97,14 @@ const BUILT_IN_DOCS: DocEntry[] = [
     description: "Who sells, who charges and who licenses; the two ways to earn; opening a shop; the rules a seller answers for.",
     group: "Licensing",
     source: { kind: "guide", file: "selling.md" },
+  },
+  {
+    slug: "selling-assets",
+    title: "Selling assets",
+    description: "Maps, models, textures and sounds: what a package holds, how each platform delivers it, and what a fingerprinted copy is.",
+    group: "Licensing",
+    source: { kind: "guide", file: "selling-assets.md" },
+    optional: true,
   },
   {
     slug: "licensing-api",
@@ -181,8 +191,9 @@ const PLATFORM_DOCS: DocEntry[] = (() => {
 export const DOCS: DocEntry[] = (() => {
   const present = REPO_GUIDES.filter((g) => existsSync(path.join(REPO_GUIDE_DIR, g.source.file)));
   // Platform pages sit before the platform builders' group; repository guides at the end of theirs, before Help.
-  const builders = BUILT_IN_DOCS.findIndex((d) => d.group === "Platform builders");
-  const withPlatforms = builders < 0 ? [...BUILT_IN_DOCS, ...PLATFORM_DOCS] : [...BUILT_IN_DOCS.slice(0, builders), ...PLATFORM_DOCS, ...BUILT_IN_DOCS.slice(builders)];
+  const builtIn = BUILT_IN_DOCS.filter((d) => !d.optional || existsSync(path.join(GUIDE_DIR, d.source.file)));
+  const builders = builtIn.findIndex((d) => d.group === "Platform builders");
+  const withPlatforms = builders < 0 ? [...builtIn, ...PLATFORM_DOCS] : [...builtIn.slice(0, builders), ...PLATFORM_DOCS, ...builtIn.slice(builders)];
   if (present.length === 0) return withPlatforms;
   const help = withPlatforms.findIndex((d) => d.group === "Help");
   const at = help < 0 ? withPlatforms.length : help;

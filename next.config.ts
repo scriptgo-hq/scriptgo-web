@@ -12,6 +12,12 @@ const securityHeaders = [
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    // With a middleware in the app, Next keeps only the first 10 MB of any request body, the /v1
+    // rewrite included: an upload past that reached the API cut off. Releases with assets are larger
+    // (the API sets their cap; Cloudflare's free plan stops at 100 MB in front of it).
+    middlewareClientMaxBodySize: "100mb",
+  },
   // The browser talks to the API through the web origin so better-auth cookies stay first-party.
   async rewrites() {
     return {

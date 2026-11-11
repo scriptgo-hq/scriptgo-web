@@ -7,6 +7,7 @@ import { countOf, formatDate } from "@/lib/format";
 import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
 import { buyerProtection, formatFingerprint, protectionLead, tierMeta } from "@/lib/protection";
 import type { StatusMeta } from "@/lib/status";
+import { ASSETS_DOC, fingerprintedMeta } from "@/lib/assets";
 
 const signedMeta: StatusMeta = { label: "Signed", tone: "success", icon: "check", hint: "The registry signed this release. scriptgo add checks the signature before it writes a file." };
 const unsignedMeta: StatusMeta = { label: "Not signed", tone: "neutral", icon: "dashed", hint: "Published before release signing existed. Only the SHA-256 can be checked." };
@@ -14,10 +15,11 @@ const escrowMeta: StatusMeta = { label: "Encrypted release", tone: "success", ic
 const plainMeta: StatusMeta = { label: "Not encrypted", tone: "neutral", icon: "minus", hint: "Delivered as a plain archive." };
 
 /** Small badges for a version row: signed or not, encrypted or not. */
-export function ReleaseProtectionBadges({ version: v }: { version: Pick<PackageVersion, "escrow" | "signature"> }) {
+export function ReleaseProtectionBadges({ version: v }: { version: Pick<PackageVersion, "escrow" | "signature"> & { assets?: PackageVersion["assets"] } }) {
   return (
     <>
       {v.escrow ? <StatusBadge meta={escrowMeta} size="sm" /> : null}
+      {v.assets ? <StatusBadge meta={fingerprintedMeta} size="sm" /> : null}
       <StatusBadge meta={v.signature ? signedMeta : unsignedMeta} size="sm" />
     </>
   );
@@ -74,9 +76,18 @@ export function ProtectionPanel({
           This release
         </h3>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <StatusBadge meta={esc ? escrowMeta : plainMeta} />
+          <StatusBadge meta={esc ? escrowMeta : version.assets ? fingerprintedMeta : plainMeta} />
           <StatusBadge meta={sig ? signedMeta : unsignedMeta} />
         </div>
+        {version.assets ? (
+          <p className="mt-3 max-w-prose text-[14px] text-ink-2" data-assets-protection>
+            Its assets are licensed, fingerprinted and traceable: only licence holders download them, each as their own signed copy.
+            A player can still extract what their game loads.{" "}
+            <a href={ASSETS_DOC} className="font-semibold text-cobalt-ink underline">
+              Selling assets
+            </a>
+          </p>
+        ) : null}
         <KeyValue
           className="mt-4"
           labelWidth="9rem"

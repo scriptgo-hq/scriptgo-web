@@ -8,6 +8,7 @@ import {
   ChartLine,
   Crown,
   FileClock,
+  Fingerprint,
   Gavel,
   KeyRound,
   LayoutDashboard,
@@ -57,6 +58,7 @@ const ICONS = {
   reports: Gavel,
   audit: ScrollText,
   payments: Receipt,
+  assets: Fingerprint,
 } satisfies Record<string, LucideIcon>;
 
 function isActive(pathname: string, href: string, exact: boolean) {

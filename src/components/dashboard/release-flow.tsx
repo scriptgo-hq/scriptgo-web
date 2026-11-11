@@ -8,13 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Field, FormMessage, inputClass, textareaClass } from "@/components/ui/form";
 import { callApi } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
-import type { CheckStage, Release, ReleaseCheck, ThirdPartyAsset } from "@/lib/contract";
+import { AssetContents } from "@/components/package/asset-contents";
+import { ASSETS_DOC, fingerprintedMeta, RIGHTS_CASES, rightsCaseLabel } from "@/lib/assets";
+import type { AssetRightsCase, CheckStage, Release, ReleaseCheck, ThirdPartyAsset } from "@/lib/contract";
 import { envName } from "@/lib/env";
 import { formatBytes, formatDateTime, formatDuration, shortHash } from "@/lib/format";
 import { formatFingerprint, tierMeta } from "@/lib/protection";
 import { checkMeta, metaFor, releaseMeta } from "@/lib/status";
 
+/** Scripts only. A release with assets may be larger: the API sets that limit and says it when refused. */
 const MAX_BYTES = 20 * 1024 * 1024;
+/** The SDK's ceiling for every asset of a release (ASSET_LIMITS.maxReleaseBytes); the platform's own cap is lower or equal. */
+const MAX_ASSET_BYTES = 1024 * 1024 * 1024;
 
 // ------------------------------------------------------------------ upload
 
@@ -32,7 +37,7 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
     setError(null);
     if (!f) return;
     if (!/\.zip$/i.test(f.name)) return setError("Choose a .zip archive of your resource folder.");
-    if (f.size > MAX_BYTES) return setError(`This archive is ${formatBytes(f.size)}. The limit is ${formatBytes(MAX_BYTES)}.`);
+    if (f.size > MAX_ASSET_BYTES) return setError(`This archive is ${formatBytes(f.size)}. The most a release with assets can be is ${formatBytes(MAX_ASSET_BYTES)}.`);
     setFile(f);
   }
 
@@ -96,8 +101,14 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
         <FileArchive aria-hidden="true" size={34} strokeWidth={1.75} className="text-cobalt-ink" />
         <p className="font-bold">{file ? file.name : "Drop the resource zip here"}</p>
         <p className="tabular text-[13.5px] text-ink-3">
-          {file ? formatBytes(file.size) : <>The zip holds the folder with its <span className="font-mono">scriptgo.lua</span> manifest. Up to {formatBytes(MAX_BYTES)}.</>}
+          {file ? formatBytes(file.size) : <>The zip holds the folder with its <span className="font-mono">scriptgo.lua</span> manifest. Up to {formatBytes(MAX_BYTES)}, more with assets.</>}
         </p>
+        {file && file.size > MAX_BYTES ? (
+          <p className="max-w-prose text-[13px] text-ink-2" data-large-upload>
+            Over {formatBytes(MAX_BYTES)}: accepted only if the release declares assets, up to the platform&rsquo;s limit. For a large upload,{" "}
+            <span className="font-mono">scriptgo publish</span> is steadier than a browser.
+          </p>
+        ) : null}
         <input ref={input} id="archive" type="file" accept=".zip,application/zip" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         <Button variant="secondary" size="sm" onClick={() => input.current?.click()} disabled={busy}>
           {file ? "Choose another file" : "Choose a file"}
@@ -118,7 +129,8 @@ export function UploadRelease({ packageName, identifier }: { packageName: string
             <strong>Protect this release (escrow)</strong>
             <span id="protect-hint" className="mt-0.5 block text-[13.5px] text-ink-2">
               SCRIPT//GO encrypts your scripts before they are stored. Buyers download the encrypted bundle, and a server gets the key only
-              while it is licensed and bound. The archive you upload is checked in memory and is not kept.
+              while it is licensed and bound. The archive you upload is checked in memory and is not kept. Scripts only: a release with
+              assets can&rsquo;t use it.
             </span>
           </span>
         </label>
@@ -232,6 +244,42 @@ function CheckRow({ c }: { c: ReleaseCheck }) {
 function ProtectionSection({ release: r, creator }: { release: Release; creator: string | null }) {
   const e = r.escrow;
   const published = DONE.has(r.status);
+  if (r.assets) {
+    const copyHref =
+      creator && published ? `/v1/packages/${encodeURIComponent(creator)}/${encodeURIComponent(r.packageName)}/versions/${encodeURIComponent(r.version)}/download` : null;
+    return (
+      <section aria-labelledby="prot-title">
+        <h2 id="prot-title" className="font-display text-[24px] font-extrabold tracking-[-0.02em]">
+          Assets
+        </h2>
+        <div className="panel mt-4 p-4" data-escrow-state="assets">
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge meta={fingerprintedMeta} />
+            <span className="text-[14.5px] font-semibold">Licensed, fingerprinted, traceable.</span>
+          </div>
+          <p className="mt-2 max-w-prose text-[13.5px] text-ink-2">
+            Only licence holders download it, and each gets a copy signed with their licence, so a copy found elsewhere leads back to it. A
+            player can still extract what their game loads.{" "}
+            <a href={ASSETS_DOC} className="font-semibold text-cobalt-ink underline">
+              Selling assets
+            </a>
+          </p>
+          <div className="mt-4">
+            <AssetContents assets={r.assets} manifest={r.manifest} showContainers />
+          </div>
+          {r.signature ? <p className="tabular mt-3 text-[13px] text-ink-3">Release signature: registry key {formatFingerprint(r.signature.keyId)}</p> : null}
+          {copyHref ? (
+            <p className="mt-2 text-[13px]">
+              <a href={copyHref} className="font-semibold text-cobalt-ink underline">
+                Download your copy
+              </a>{" "}
+              <span className="text-ink-3">(fingerprinted to your account; the download is recorded)</span>
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
   if (!e) {
     return (
       <section aria-labelledby="prot-title">
@@ -530,12 +578,14 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
   const [ownsCode, setOwnsCode] = useState(r.rights?.ownsCode ?? false);
   const [targets, setTargets] = useState<"yes" | "no" | "">(r.rights ? (r.rights.targetsProprietaryGame ? "yes" : "no") : "");
   const [assets, setAssets] = useState<ThirdPartyAsset[]>(r.rights?.thirdPartyAssets ?? []);
+  const [assetRights, setAssetRights] = useState<AssetRightsCase | "">(r.rights?.assetRights ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!targets) return setError("Answer whether the resource targets a proprietary game.");
+    if (r.assets && !assetRights) return setError("Say which case applies to the assets.");
     const clean = assets.map((a) => ({ path: a.path.trim(), source: a.source.trim(), license: a.license.trim() }));
     if (clean.some((a) => !a.path || !a.source || !a.license)) return setError("Fill path, source and license for every third-party asset, or remove the empty rows.");
     setBusy(true);
@@ -544,6 +594,7 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
       ownsCode,
       targetsProprietaryGame: targets === "yes",
       thirdPartyAssets: clean,
+      ...(r.assets ? { assetRights: assetRights || null } : {}),
     });
     setBusy(false);
     if (!res.ok) return setError(res.message);
@@ -572,6 +623,7 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
                 ? "It targets a third-party game platform: paid offers are sold on your declaration, with no review before sale."
                 : "It does not target a proprietary third-party game."}
             </li>
+            {r.assets ? <li data-asset-rights-declared={r.rights.assetRights ?? "none"}>Assets: {rightsCaseLabel(r.rights.assetRights).toLowerCase()}.</li> : null}
             <li className="tabular">
               {r.rights.thirdPartyAssets.length} third-party {r.rights.thirdPartyAssets.length === 1 ? "asset" : "assets"} declared.
             </li>
@@ -609,6 +661,33 @@ function RightsSection({ release: r, onChange }: { release: Release; onChange: (
               ))}
             </div>
           </fieldset>
+          {r.assets ? (
+            <fieldset>
+              <legend className="text-[15px] font-bold">What are the assets?</legend>
+              <p className="text-[13.5px] text-ink-2">Required to publish. Shown on the package page as your statement; it does not hold a sale.</p>
+              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {RIGHTS_CASES.map((c) => (
+                  <label
+                    key={c.id}
+                    className="flex items-start gap-2 rounded-[10px] border-2 border-line-soft bg-surface px-3 py-2 text-[14px] has-[:checked]:border-line has-[:checked]:bg-sun-soft"
+                  >
+                    <input
+                      type="radio"
+                      name="asset-rights"
+                      value={c.id}
+                      checked={assetRights === c.id}
+                      onChange={() => setAssetRights(c.id)}
+                      className="mt-1 h-4 w-4 shrink-0 accent-[var(--cobalt)]"
+                    />
+                    <span>
+                      <strong>{c.label}</strong>
+                      <span className="block text-[12.5px] text-ink-2">{c.hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
           <fieldset>
             <legend className="text-[15px] font-bold">Third-party assets</legend>
             <p className="text-[13.5px] text-ink-2">Fonts, images, sounds or code you didn&rsquo;t write. Leave empty if there are none.</p>
@@ -757,7 +836,9 @@ function PublishSection({ release: r, running, onChange }: { release: Release; r
       <p className="mt-1 max-w-prose text-[14.5px] text-ink-2">
         {r.escrow
           ? `Publishing makes ${r.version} available to licensed customers, as an encrypted bundle. It can’t be edited afterwards.`
-          : `Publishing makes ${r.version} installable by everyone who can see the package. It can’t be edited afterwards.`}
+          : r.assets
+            ? `Publishing makes ${r.version} available to licence holders, each as their own fingerprinted copy. It can’t be edited afterwards.`
+            : `Publishing makes ${r.version} installable by everyone who can see the package. It can’t be edited afterwards.`}
       </p>
       {blocked ? (
         <div className="mt-3" id="publish-blockers">
