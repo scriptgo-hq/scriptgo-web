@@ -50,6 +50,11 @@ API_URL=http://127.0.0.1:<api port> corepack pnpm run build
 API_URL=http://127.0.0.1:<api port> corepack pnpm run start -- -p <port>
 ```
 
+A branch that needs an SDK not tagged yet builds against a local SDK checkout:
+`SCRIPTGO_SDK_DIR=<sdk> node scripts/sdk-local.mjs` overlays its `@scriptgo/shared` (and the same
+variable feeds the docs); `corepack pnpm install --force` goes back to the pinned tag. Such a branch
+merges only once that SDK is tagged and `package.json` pins it.
+
 Against an API built from `scriptgo-api`'s `main`, on a throwaway database (its README says how);
 never a developer's own API or database. Look at the pages you changed, in a browser, at desktop and
 phone widths. The browser-driven journeys (sign-up, creator, grants, escrow, takedown) live in

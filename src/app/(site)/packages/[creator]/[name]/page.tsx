@@ -7,6 +7,7 @@ import { ReadMore } from "@/components/site/diagrams";
 import { CategoryArt } from "@/components/site/world-art";
 import { CheckoutControl } from "@/components/package/checkout-control";
 import { CompatStrip, EvidencePanel, sortCompat } from "@/components/package/compat-strip";
+import { AssetContents } from "@/components/package/asset-contents";
 import { ProtectionPanel, ReleaseProtectionBadges } from "@/components/package/protection-panel";
 import { SellerLine } from "@/components/package/seller-line";
 import { StatusBadge, Tag } from "@/components/ui/badge";
@@ -77,6 +78,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const blockedDownload = d.listingStatus !== "active" || viewingRow?.restricted || viewingRow?.status === "yanked";
   const installCmd = `scriptgo add ${d.identifier}${viewing && viewing !== d.latestVersion ? `@${viewing}` : ""}`;
   const escrowed = Boolean(viewingRow?.escrow);
+  const assets = viewingRow?.assets ?? null;
   const protectionEnvs = envDetails.map(({ slug, detail }) => ({ slug, name: envLongName(slug, detail?.name), protection: detail?.protection ?? null, platformRules: detail?.platformRules ?? null, platformRulesNote: detail?.platformRulesNote ?? "" }));
   const downloadPath = viewing ? `/v1/packages/${encodeURIComponent(d.creator.username)}/${encodeURIComponent(d.name)}/versions/${encodeURIComponent(viewing)}/download` : null;
 
@@ -179,6 +181,14 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                     Protected release: delivered as an encrypted bundle, to licence holders.{" "}
                     <Link href="#protection" className="font-semibold text-cobalt-ink underline">
                       What your server gets
+                    </Link>
+                  </p>
+                ) : null}
+                {assets ? (
+                  <p className="text-[13px] text-ink-2" data-assets-rail>
+                    Includes assets: each licence holder downloads their own fingerprinted copy.{" "}
+                    <Link href="#contents" className="font-semibold text-cobalt-ink underline">
+                      What it contains
                     </Link>
                   </p>
                 ) : null}
@@ -285,7 +295,10 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                           <h3 className="font-display text-[19px] font-extrabold">Manual download</h3>
                           <p className="text-[14.5px] text-ink-2">
                             {escrowed ? "Encrypted bundle" : "Zip"} of {viewing}
-                            {viewingRow ? ` · ${formatBytes(viewingRow.size)}` : ""}. Check the SHA-256 before unpacking.
+                            {viewingRow ? ` · ${formatBytes(viewingRow.size)}` : ""}.{" "}
+                            {assets
+                              ? "Your own copy, fingerprinted to your licence: sign in with the account that holds it. Its SHA-256 is your copy's, sent with the download."
+                              : "Check the SHA-256 before unpacking."}
                             {escrowed
                               ? " The download needs a licence: sign in with the account that holds it. The bundle only opens on a server bound to that licence."
                               : ""}
@@ -298,7 +311,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                               <Download aria-hidden="true" size={16} /> Download {d.resourceName}-{viewing}{escrowed ? ".escrow" : ""}.zip
                             </a>
                           ) : null}
-                          {viewingRow?.sha256 ? (
+                          {viewingRow?.sha256 && !assets ? (
                             <p className="break-all font-mono text-[12.5px] text-ink-2">
                               <span className="text-ink-3">sha256 </span>
                               {viewingRow.sha256}
@@ -326,6 +339,30 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                   </div>
                 ),
               },
+              ...(assets
+                ? [
+                    {
+                      id: "contents",
+                      label: "Contents",
+                      content: (
+                        <div className="space-y-4 pt-6">
+                          <p className="max-w-prose text-[14.5px] text-ink-2">What {viewing} holds on each platform, and what a player downloads there.</p>
+                          <AssetContents assets={assets} manifest={d.manifest} />
+                          <p className="text-[13.5px] text-ink-2">
+                            Found a copy where it shouldn&rsquo;t be?{" "}
+                            <Link
+                              className="font-semibold text-cobalt-ink underline"
+                              href={`/dashboard/assets?package=${encodeURIComponent(d.identifier)}${viewing ? `&version=${encodeURIComponent(viewing)}` : ""}`}
+                            >
+                              Report it
+                            </Link>
+                            .
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "environments",
                 label: "Environments",

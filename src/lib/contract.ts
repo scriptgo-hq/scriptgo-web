@@ -105,6 +105,19 @@ export type {
   PerkPurchaseInfo,
   PerkCheckoutCreated,
   PerkCheckoutState,
+  AssetRightsCase,
+  AssetSupport,
+  AssetContainerInfo,
+  AssetEnvironmentInfo,
+  ReleaseAssetsInfo,
+  AssetLookupBody,
+  AssetLookupResult,
+  AssetDeliveryMatch,
+  AssetEvidence,
+  CreateAssetReportBody,
+  AssetReportStatus,
+  AssetReportAction,
+  AssetReportRow,
 } from "@scriptgo/shared";
 
 import type { Category } from "@scriptgo/shared";
