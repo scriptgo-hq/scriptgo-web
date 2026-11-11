@@ -3,7 +3,7 @@ import { Check, FileCode2, Image as ImageIcon, KeyRound, Minus, Play, Puzzle, Se
 import { Flow, OneLiners, PictureCard, ReadMore } from "@/components/site/diagrams";
 import { ProtectionTierTable } from "@/components/site/integration-section";
 import { PageHead, Ridge, SCENES } from "@/components/site/ink";
-import { InDevelopmentList, SellerCases } from "@/components/site/seller-cases";
+import { SellerCases } from "@/components/site/seller-cases";
 import { ButtonLink } from "@/components/ui/button";
 import { CommandLine } from "@/components/ui/code-block";
 import { ApiError, EmptyState } from "@/components/ui/feedback";
@@ -143,7 +143,7 @@ export default function ProtectPage() {
           numbered
           label="From a payment to a running server"
           steps={[
-            { icon: Store, title: "The buyer pays", note: "on the seller’s own Tebex store", chip: { label: "Not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." } },
+            { icon: Store, title: "The buyer pays", note: "on the seller’s own Tebex store" },
             { icon: Puzzle, title: "A licence is issued", note: "after a verified payment event", accent: "ink" },
             { icon: Server, title: "The server binds", note: "with a key it makes itself", accent: "cobalt" },
             { icon: KeyRound, title: "The key is released", note: "wrapped to that server only" },
@@ -161,9 +161,8 @@ export default function ProtectPage() {
               <ReadMore href="/docs/protect-your-work#publish-an-encrypted-release">Publish an encrypted release</ReadMore>
             </div>
           </div>
-          <div className="min-w-0 space-y-4">
+          <div className="min-w-0">
             <CommandLine command="scriptgo publish --escrow" />
-            <CommandLine command={'scriptgo publish --escrow --escrow-ignore "config.lua"'} />
           </div>
         </div>
       </section>
@@ -243,19 +242,6 @@ export default function ProtectPage() {
         </div>
       </section>
 
-      <Ridge from="sun" to="paper" ink="orange" n={3} />
-      <section aria-labelledby="next-title" className="sec g-paper bleed sec-sweeps container-page !pt-10">
-        <div className="sec-head">
-          <div>
-            <Eyebrow className="mb-[18px]">Next</Eyebrow>
-            <DisplayTitle id="next-title" className="text-[34px] sm:text-[42px]">
-              Being built, <em>not usable yet.</em>
-            </DisplayTitle>
-          </div>
-          <ReadMore href="/docs/selling#in-development">In development</ReadMore>
-        </div>
-        <InDevelopmentList />
-      </section>
     </div>
   );
 }

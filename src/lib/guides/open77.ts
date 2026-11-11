@@ -1,4 +1,4 @@
-import { sourceUrl } from "@/lib/docs";
+import { platformDocHref } from "@/lib/docs";
 import { API_HOST, CLI_INSTALL, type Guide, type GuideImage } from "./shared";
 
 /**
@@ -91,8 +91,8 @@ export const OPEN77_GUIDE: Guide = {
   titleEm: "step by step.",
   lede: "Two ways to earn: sell a script to server operators, or sell bonuses to the players of your own server.",
   notLive: {
-    title: "Real checkout is not live yet.",
-    text: "Everything here can be set up and tested today. Checkout through Tebex stays off, for every shop, until Tebex approves it in writing.",
+    title: "Checkout opens on Tebex approval.",
+    text: "Every step here can be set up and tested today; payments through Tebex start once Tebex approves them.",
   },
   tracks: [
     {
@@ -122,7 +122,6 @@ export const OPEN77_GUIDE: Guide = {
           title: "Install the CLI.",
           text: `It needs Node.js ${CLI_INSTALL.node} or later. Then sign it in with your token.`,
           commands: [CLI_INSTALL.command, CLI_INSTALL.login],
-          notes: ["The CLI is in preview: commands may gain flags."],
           images: [scene("toolcase", "An open tool case on a mountain ledge at dusk.")],
           link: { href: "/docs/cli", label: "The CLI" },
         },
@@ -153,11 +152,11 @@ export const OPEN77_GUIDE: Guide = {
         {
           id: "publish",
           title: "Publish it, and protect it if you like.",
-          text: "`--owns-code` declares your rights. With `--escrow` your server scripts are encrypted on your machine; OPEN//77 servers decrypt them in native memory, through the escrow adapter.",
+          text: "`--owns-code` declares your rights. With `--escrow` your server scripts are encrypted before they leave your machine, and run only on the server their licence is bound to.",
           commands: ["scriptgo publish --owns-code", "scriptgo publish --escrow --owns-code"],
           notes: [
             "Only server scripts are encrypted: shared and client scripts go to game clients, so they stay readable.",
-            "Escrow deters copying, binds the licence to a server, can be revoked and traces leaks. It is not unbreakable: an operator can still read their own process.",
+            "A licence can be revoked and a leaked copy traced. It does not make copying impossible: an operator can still inspect their own server.",
             "A published version never changes: to fix 1.0.0, publish 1.0.1.",
           ],
           images: [
@@ -204,17 +203,13 @@ export const OPEN77_GUIDE: Guide = {
         {
           id: "buyer-install",
           title: "They install it on the server.",
-          text: "`pack` turns the package into a folder OPEN//77 loads as is. A protected release is installed still encrypted instead, and the deployment token goes in a file of its own.",
+          text: "`pack` turns the package into a folder OPEN//77 loads as is. A protected release installs still encrypted, with its own steps.",
           commands: [
             "scriptgo add kestrel//inventory-pro",
             "scriptgo pack resources/inventory_pro --target open77 --out dist",
           ],
-          notes: [
-            "Protected: `scriptgo escrow install <bundle>.escrow.zip --target open77 --out <resources folder> --trusted-signer <key>`, then the token in `.open77/escrow-tokens/inventory_pro.token`.",
-            "Protected releases also need `resourceEscrow` switched on in `server.jsonc`, with the escrow adapter next to the server.",
-          ],
           images: [scene("adapter", "A plug about to meet its socket on a rocky slope.")],
-          link: { href: sourceUrl("sdk/adapters/open77/escrow/README.md"), label: "Escrow on an OPEN//77 server" },
+          link: { href: platformDocHref("open77", true), label: "Set up on OPEN//77, in full" },
         },
         {
           id: "buyer-config",

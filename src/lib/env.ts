@@ -145,14 +145,10 @@ export const LANGUAGE_STATES: { language: string; meta: StatusMeta }[] = [
   {
     language: "ts",
     meta: {
-      label: "TypeScript: .NET kit, experimental",
-      tone: "warning",
-      icon: "flask",
+      label: "TypeScript: .NET kit",
+      tone: "info",
+      icon: "check",
       hint: "TypeScript and JavaScript run on the .NET host kit only. Other environments run Lua.",
     },
-  },
-  {
-    language: "cs",
-    meta: { label: "C#: next", tone: "muted", icon: "calendar", hint: "Planned. No host runs C# yet." },
   },
 ];

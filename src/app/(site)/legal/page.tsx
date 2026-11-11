@@ -1,13 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Banner } from "@/components/ui/feedback";
 import { PictureCard } from "@/components/site/diagrams";
 import { SCENES } from "@/components/site/ink";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Legal",
-  description: "Terms, privacy, IP policy, code protection, creator agreement and the operator. Drafts pending legal review.",
+  description: "Terms, privacy, IP policy, code protection, creator agreement and the operator.",
 };
 
 const SECTIONS = [
@@ -20,20 +19,11 @@ const SECTIONS = [
   { id: "commerce", title: "Who sells, who charges, who licenses" },
 ];
 
-function DraftTag() {
-  return (
-    <span className="stamp stamp-sm stamp-accent ml-3 align-middle">
-      Draft · pending legal review
-    </span>
-  );
-}
-
-function Section({ id, title, draft = true, children }: { id: string; title: string; draft?: boolean; children: React.ReactNode }) {
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
     <section id={id} aria-labelledby={`${id}-h`} className="scroll-mt-28 border-t-2 border-dashed border-line-soft pt-9">
       <h2 id={`${id}-h`} className="font-display text-[30px] font-black tracking-[-0.025em]" style={{ fontStretch: "114%" }}>
         {title}
-        {draft ? <DraftTag /> : null}
       </h2>
       <div className="prose-sg mt-4">{children}</div>
     </section>
@@ -61,7 +51,7 @@ export default function LegalPage() {
           <DisplayTitle as="h1" className="text-[52px] sm:text-[64px]">
             Legal<em>.</em>
           </DisplayTitle>
-          <p className="one-line mt-4 text-ink-2">How SCRIPT//GO intends to operate, in four pictures. The full text is below.</p>
+          <p className="one-line mt-4 text-ink-2">How SCRIPT//GO operates, in four pictures. The full text is below.</p>
           <div className="pcards pcards-4 mt-8 !gap-5">
             <PictureCard art={SCENES.stall} title="The creator sells." more={{ href: "#commerce", label: "Who sells, who charges" }}>
               Tebex takes the payment. SCRIPT//GO issues the licence.
@@ -76,21 +66,16 @@ export default function LegalPage() {
               Deterrence and traceability, not DRM. Server scripts only.
             </PictureCard>
           </div>
-          <Banner tone="warning" title="These documents are drafts pending legal review." className="mt-9">
-            Not binding terms yet. SCRIPT//GO is a working name.
-          </Banner>
         </div>
 
-        <Section id="operator" title="Operator" draft={false}>
+        <Section id="operator" title="Operator">
           <p>
-            The legal entity that operates SCRIPT//GO, its registered address and its contact details
-            will be published here before public launch. Until then, reports and requests go through the{" "}
-            <Link href="/report">public report form</Link>.
+            Reports and requests go through the <Link href="/report">public report form</Link>.
           </p>
         </Section>
 
         <Section id="terms" title="Terms of service">
-          <p>Placeholder. The terms will cover:</p>
+          <p>In short, the terms cover:</p>
           <ul>
             <li>Accounts, access tokens and acceptable use of the registry, the API and the licensing service.</li>
             <li>What SCRIPT//GO hosts, validates and displays, and what it does not guarantee.</li>
@@ -108,12 +93,11 @@ export default function LegalPage() {
               servers, not remove its delivery marker, not redistribute it.
             </li>
             <li>Suspension and restriction of listings, with notices, reasons and an appeal path.</li>
-            <li>Limits of liability and the governing law, to be set by counsel.</li>
           </ul>
         </Section>
 
         <Section id="privacy" title="Privacy policy">
-          <p>Placeholder. The policy will describe:</p>
+          <p>What we keep, and why:</p>
           <ul>
             <li>
               Account data (email, display name), session cookies used for sign-in, and personal access tokens (stored hashed).
@@ -134,12 +118,11 @@ export default function LegalPage() {
               subject and text are kept with their delivery status, and handed to the e-mail delivery provider to send. Password reset
               and confirmation links are removed from our copy once delivered. Purchase e-mails never contain a license key.
             </li>
-            <li>Retention periods, your rights, and how to exercise them.</li>
           </ul>
         </Section>
 
         <Section id="ip-policy" title="IP policy">
-          <p>Placeholder for the notice-and-action policy. The process it will formalize already exists:</p>
+          <p>How a report is handled:</p>
           <ol>
             <li>
               Anyone, with or without an account, can <Link href="/report">report a package or release</Link>. You receive a case
@@ -181,7 +164,7 @@ export default function LegalPage() {
         <Section id="protection" title="Code protection and escrow">
           <p>
             SCRIPT//GO offers three protections for creator-owned work: every published release is signed, a paid package checks
-            a licence per server, and a creator may publish a release encrypted (escrow). The terms will state them as follows.
+            a licence per server, and a creator may publish a release encrypted (escrow).
           </p>
           <p>
             <strong>What we provide.</strong>
@@ -240,7 +223,7 @@ export default function LegalPage() {
         </Section>
 
         <Section id="creator-agreement" title="Creator agreement">
-          <p>Placeholder. The agreement will cover:</p>
+          <p>In short, the agreement covers:</p>
           <ul>
             <li>The rights declaration you make for each release, and its accuracy.</li>
             <li>
@@ -262,11 +245,11 @@ export default function LegalPage() {
               Your declaration of rights on each release, which is what puts an offer on sale. SCRIPT//GO does not pre-approve
               offers or stores; it acts on reports, with notice and appeal.
             </li>
-            <li>Your relationship with your payment provider, which is yours, and any platform fee, to be stated before checkout opens.</li>
+            <li>Your relationship with your payment provider, which is yours.</li>
           </ul>
         </Section>
 
-        <Section id="commerce" title="Who sells, who charges, who licenses" draft={false}>
+        <Section id="commerce" title="Who sells, who charges, who licenses">
           <p>Every purchase surface on SCRIPT//GO names three parties:</p>
           <ul>
             <li>
@@ -283,7 +266,7 @@ export default function LegalPage() {
           </ul>
           <p>
             Anyone can open a shop, on their own Tebex store, and it works as soon as its Tebex configuration is complete. Real
-            checkout is not live yet: it stays off, for every shop, until Tebex approves it in writing.
+            checkout opens for every shop once Tebex approves it in writing.
           </p>
           <p>
             What is sold is always the creator&rsquo;s own work: a script, or a feature of the seller&rsquo;s own server script, such

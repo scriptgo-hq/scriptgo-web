@@ -5,44 +5,36 @@ import { Braces, Cpu, FileText, KeyRound, Plug, Server, SquareTerminal, Wrench, 
 import { Flow, PictureCard, ReadMore } from "@/components/site/diagrams";
 import { PageHead, Ridge, SCENES } from "@/components/site/ink";
 import { ProofBlock } from "@/components/site/proof-block";
-import { IN_DEVELOPMENT_ITEMS, SellerCases } from "@/components/site/seller-cases";
-import { StatusBadge, Tag } from "@/components/ui/badge";
+import { SellerCases } from "@/components/site/seller-cases";
+import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 import { escrowAdapterGuideHref } from "@/lib/docs";
 import { LANGUAGE_STATES } from "@/lib/env";
-import { adapterMeta } from "@/lib/integration";
-import { IN_DEVELOPMENT, type StatusMeta } from "@/lib/status";
+import { environmentMeta } from "@/lib/status";
 
 export const metadata: Metadata = {
   title: "SDK",
   description:
-    "What the SCRIPT//GO SDK is: a portable Lua core, one adapter per host, a .NET host kit, a CLI and the specs. How an engine integrates it, and what is not built yet.",
+    "What the SCRIPT//GO SDK is: a portable Lua core, one adapter per host, a .NET host kit, a CLI and the specs, and how an engine integrates it.",
 };
 
 // One line each. The full description of every piece is in /docs/sdk#the-pieces.
-const PIECES: { title: string; path: string; icon: LucideIcon; body: string; badge?: StatusMeta }[] = [
-  { title: "Lua core", path: "sdk/lua/scriptgo", icon: Cpu, body: "One API for packages, on any Lua from 5.1 to 5.4 and LuaJIT." },
-  { title: "Adapters", path: "sdk/adapters/<host>/", icon: Plug, body: "One per host: it maps the API onto what the host already has." },
-  {
-    title: ".NET host kit",
-    path: "sdk/dotnet",
-    icon: Wrench,
-    body: "For C# engines and servers. Runs Lua and TypeScript side by side.",
-    badge: { label: "Experimental", tone: "warning", icon: "flask", hint: "Measured on Windows x64; its test suite also passes on Linux x64 in a container. Not published to NuGet." },
-  },
-  { title: "CLI", path: "packages/cli", icon: SquareTerminal, body: "init, test, verify, pack, publish, add. In preview." },
-  { title: "@scriptgo/types", path: "packages/types", icon: Braces, body: "TypeScript declarations, generated from the runtime IDL." },
-  { title: "Specs", path: "docs/spec", icon: FileText, body: "The runtime API, the manifest and the HTTP API, written down." },
+const PIECES: { title: string; icon: LucideIcon; body: string }[] = [
+  { title: "Lua core", icon: Cpu, body: "One API for scripts, on any Lua from 5.1 to 5.4 and LuaJIT." },
+  { title: "Adapters", icon: Plug, body: "One per host: it maps the API onto what the host already has." },
+  { title: ".NET host kit", icon: Wrench, body: "For C# engines and servers. Runs Lua and TypeScript side by side." },
+  { title: "CLI", icon: SquareTerminal, body: "Create, test, publish and install scripts from the command line." },
+  { title: "TypeScript types", icon: Braces, body: "Autocomplete for the whole API in your editor." },
+  { title: "Specs", icon: FileText, body: "The runtime API, the manifest and the HTTP API, written down." },
 ];
 
 // States come from LANGUAGE_STATES (lib/env.ts), the one place they change when the evidence does.
 const LANGUAGES: { language: string; name: string; body: string }[] = [
   { language: "lua", name: "Lua", body: "On each host’s own Lua, 5.1 to 5.4 or LuaJIT." },
   { language: "ts", name: "TypeScript and JavaScript", body: "On the .NET kit, compiled when you pack or verify." },
-  { language: "cs", name: "C#", body: "Planned. Until then a .cs script is refused." },
 ];
 
 function languageState(language: string) {
@@ -51,44 +43,21 @@ function languageState(language: string) {
 
 const PLATFORM: { title: string; body: string; href: string; link: string }[] = [
   { title: "Licensing", body: "A key per buyer, one activation per server, checked again on a schedule.", href: "/docs/licensing-api", link: "Licensing API" },
-  { title: "Shops on Tebex", body: "On the seller’s own store. Real checkout is not live yet.", href: "/docs/selling#open-a-shop", link: "Open a shop" },
+  { title: "Shops on Tebex", body: "On the seller’s own store: a payment there issues a licence here.", href: "/docs/selling#open-a-shop", link: "Open a shop" },
   { title: "Proof by real runs", body: "Statuses come from reports written in the real runtime, never from a form.", href: "/docs/environments#how-a-status-is-earned", link: "How a status is earned" },
   { title: "Imports", body: "scriptgo add checks the hash and the signature before it writes a file.", href: "/docs/cli", link: "scriptgo add" },
-];
-
-const notStarted = (hint: string): StatusMeta => ({ label: "Not started", tone: "muted", icon: "dashed", hint });
-
-// One line each. The plan, with its phases and reasons, is in /docs/sdk#not-built-yet.
-const ROADMAP: { title: string; status: StatusMeta; body: string }[] = [
-  ...IN_DEVELOPMENT_ITEMS.map((it) => ({ title: it.title, status: IN_DEVELOPMENT, body: it.body })),
-  { title: "Native C ABI kit", status: notStarted("Phase 4 of the plan."), body: "libscriptgo with C headers, for C and C++ engines." },
-  { title: "Node kit", status: notStarted("Phase 4 of the plan, after the C kit."), body: "For Node, Bun and Deno servers." },
-  { title: "JVM kit", status: { label: "Later", tone: "muted", icon: "calendar", hint: "After the C and Node kits." }, body: "For Java servers." },
-  { title: "C# guests", status: notStarted("Phase 3 of the plan."), body: "Scripts written in C#." },
-  {
-    title: "In-memory escrow on more hosts",
-    status: { label: "Planned", tone: "muted", icon: "hourglass", hint: "Each host is listed as planned on the environments page until its loader exists." },
-    body: "In the .NET kit today; planned where the host runs compiled code.",
-  },
-  { title: "NuGet and npm packages", status: { label: "Not published", tone: "muted", icon: "dashed", hint: "Not published to a package registry yet." }, body: "The kit, the CLI and the types are not published yet." },
-  {
-    title: "Linux and macOS measurements",
-    status: { label: "Partly measured", tone: "muted", icon: "dashed", hint: "No measured run on macOS, and none on Linux for the desktop hosts." },
-    body: "Desktop hosts were measured on Windows only.",
-  },
 ];
 
 async function AdapterCounts() {
   const res = await api<Environment[]>("/v1/environments");
   if (!res.ok || res.data.length === 0) return null;
-  const count = (s: string) => res.data.filter((e) => e.adapterState === s).length;
+  const runs = res.data.filter((e) => e.status !== "planned").length;
   const tiles = [
-    { n: count("verified"), meta: adapterMeta.verified, text: "environments" },
-    { n: count("written"), meta: adapterMeta.written, text: "awaiting a first real run" },
-    { n: count("none"), meta: adapterMeta.none, text: "planned" },
+    { n: runs, meta: { ...environmentMeta.beta, label: "Runs today", icon: "check" as const, tone: "success" as const }, text: "platforms, each tested for real" },
+    { n: res.data.length - runs, meta: environmentMeta.planned, text: "platforms on the roadmap" },
   ];
   return (
-    <ul className="mt-9 grid max-w-[640px] grid-cols-3 gap-4 sm:gap-5">
+    <ul className="mt-9 grid max-w-[440px] grid-cols-2 gap-4 sm:gap-5">
       {tiles.map((t) => (
         <li key={t.meta.label}>
           <Link href="/environments" className="sticker sticker-hover flex h-full flex-col gap-2 p-3 sm:p-4">
@@ -174,14 +143,8 @@ export default function SdkPage() {
                 <p.icon size={20} strokeWidth={2.4} />
               </span>
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                  <h3 className="font-display text-[19px] font-extrabold leading-tight">{p.title}</h3>
-                  {p.badge ? <StatusBadge meta={p.badge} size="sm" /> : null}
-                </div>
+                <h3 className="font-display text-[19px] font-extrabold leading-tight">{p.title}</h3>
                 <p className="mt-1.5 text-[14.5px] text-ink-2">{p.body}</p>
-                <Tag mono className="mt-2.5">
-                  {p.path}
-                </Tag>
               </div>
             </li>
           ))}
@@ -202,7 +165,6 @@ export default function SdkPage() {
             <PictureCard
               art={SCENES.toolcase}
               label="Your engine has no Lua"
-              chip={{ label: "Experimental", tone: "warning", icon: "flask", hint: "The .NET kit is the only kit today." }}
               title="Embed a host kit."
               more={{ href: "/docs/dotnet-kit", label: "Embed the .NET kit" }}
             >
@@ -223,7 +185,7 @@ export default function SdkPage() {
           </div>
           <ReadMore href="/docs/sdk#languages">How languages meet</ReadMore>
         </div>
-        <ul className="grid gap-7 md:grid-cols-3">
+        <ul className="grid gap-7 md:grid-cols-2">
           {LANGUAGES.map((l) => (
             <li key={l.name} className="sticker flex flex-col gap-2.5 p-5">
               <h3 className="font-display text-[21px] font-extrabold leading-tight">{l.name}</h3>
@@ -288,36 +250,6 @@ export default function SdkPage() {
         </div>
       </section>
 
-      <Ridge from="paper2" to="paper" ink="sand" n={2} />
-      <section aria-labelledby="roadmap-title" className="sec g-paper bleed sec-sweeps container-page !pt-10">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:items-start">
-          <div className="min-w-0">
-            <Eyebrow className="mb-[18px]">Roadmap</Eyebrow>
-            <DisplayTitle id="roadmap-title" className="text-[38px] sm:text-[48px]">
-              Not built <em>yet.</em>
-            </DisplayTitle>
-            <p className="one-line mt-4 text-ink-2">Nothing here is usable today.</p>
-            <div className="plate mt-7 hidden lg:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={SCENES.scaffold.src} width={SCENES.scaffold.width} height={SCENES.scaffold.height} alt="" loading="lazy" decoding="async" />
-            </div>
-            <p className="mt-9">
-              <ReadMore href="/docs/sdk#not-built-yet">The plan, in order</ReadMore>
-            </p>
-          </div>
-          <ul className="panel divide-y-[1.5px] divide-line-soft">
-            {ROADMAP.map((r) => (
-              <li key={r.title} className="grid gap-x-4 gap-y-1.5 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:items-center">
-                <div className="flex flex-col items-start gap-1.5">
-                  <span className="font-display text-[15.5px] font-extrabold leading-tight">{r.title}</span>
-                  <StatusBadge meta={r.status} size="sm" />
-                </div>
-                <p className="text-[14.5px] text-ink-2">{r.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
     </div>
   );
 }

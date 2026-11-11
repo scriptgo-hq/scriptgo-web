@@ -13,8 +13,7 @@ import { StatusIcon } from "@/components/ui/icon";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 import { LANGUAGE_STATES, envMonogram } from "@/lib/env";
-import { formatDate } from "@/lib/format";
-import { adapterMetaFor } from "@/lib/integration";
+import { platformDocHref } from "@/lib/docs";
 import { groupByTier, tierHeading } from "@/lib/protection";
 import { environmentMeta, metaFor } from "@/lib/status";
 import { DEFAULT_WORLD, PICKER_ORDER, shortEnvName, worldArt } from "@/lib/worlds";
@@ -32,6 +31,9 @@ const BUILD_TILES: { label: string; art: string; c: string; ct?: string }[] = [
   { label: "Frameworks", art: "cover-permissions", c: "#ffc83d", ct: "#0b0b1e" },
 ];
 
+/** Real checkout is off for every shop until Tebex approves it: said once, where a shop is opened. */
+const CHECKOUT_OFF = { label: "Checkout opens on Tebex approval", tone: "info", icon: "lock", hint: "A shop can be set up and tested today. Real checkout opens for every shop once Tebex approves it in writing." } as const;
+
 const MATRIX_ORDER = ["standalone", "godot", "garrysmod", "cctweaked", "rust", "open77", "fivem"];
 
 function toWorld(e: Environment): World | null {
@@ -44,9 +46,9 @@ function toWorld(e: Environment): World | null {
     art: w.art,
     tint: w.tint,
     status: metaFor(environmentMeta, e.status),
-    adapter: adapterMetaFor(e.adapterState).long,
-    runtime: e.runtimeVersions[0] ?? null,
-    hasSetup: e.status !== "planned",
+    tested: e.adapterState === "verified",
+    kindNoun: e.kind === "mod_platform" ? "server" : "runtime",
+    docsHref: e.status === "planned" ? "/docs/quickstart" : platformDocHref(e.slug, e.adapterState !== "none"),
   };
 }
 
@@ -225,7 +227,7 @@ function Setup({ platform, plug }: { platform: React.ReactNode; plug: React.Reac
           <p className="text-[15.5px]">On your own Tebex store. A payment there issues a licence here.</p>
           <div className="sheet flex flex-wrap items-center justify-between gap-2 border-2 border-line bg-surface px-3 py-2 text-[14px]">
             <b>Your store</b>
-            <StatusBadge size="sm" meta={{ label: "Checkout not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." }} />
+            <StatusBadge size="sm" meta={CHECKOUT_OFF} />
           </div>
         </li>
       </ol>
@@ -275,7 +277,7 @@ function Earn() {
         }
         aside={<ReadMore href="/docs/selling">How selling works</ReadMore>}
       >
-        You sell your own code, from your own Tebex store. Real checkout is not live yet.
+        You sell your own code, from your own Tebex store.
       </SectionHead>
       <SellerCases />
     </Section>
@@ -375,7 +377,7 @@ function Platforms({ envs, failure }: { envs: Environment[]; failure: Parameters
               </>
             }
           >
-            Every status comes from a recorded run, never from a form.
+            Every status comes from a test on the real platform, never from a form.
           </SectionHead>
           <ul className="facts text-[16px]">
             {(["available", "beta", "experimental", "planned"] as const).map((s) => {
@@ -403,20 +405,17 @@ function Platforms({ envs, failure }: { envs: Environment[]; failure: Parameters
             <div className="sheet-card lg:rotate-[0.8deg]">
               <div className="sheet-head">
                 <strong className="font-display text-[18px] font-extrabold">SCRIPT//GO SDK</strong>
-                <span className="label">Recorded runs</span>
+                <span className="label">Platforms</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="matrix">
-                  <caption className="sr-only">Status, runtime and last recorded run of a few platforms</caption>
+                  <caption className="sr-only">Status of a few platforms, and whether a real test passed</caption>
                   <thead>
                     <tr>
                       <th scope="col">Platform</th>
                       <th scope="col">Status</th>
                       <th scope="col" className="hide-s">
-                        Runtime
-                      </th>
-                      <th scope="col" className="hide-s">
-                        Last run
+                        Tested for real
                       </th>
                     </tr>
                   </thead>
@@ -432,10 +431,7 @@ function Platforms({ envs, failure }: { envs: Environment[]; failure: Parameters
                         <td>
                           <StatusBadge meta={metaFor(environmentMeta, e.status)} size="sm" />
                         </td>
-                        <td className="num hide-s max-w-[190px] truncate" title={e.runtimeVersions[0]}>
-                          {e.runtimeVersions[0] ?? "—"}
-                        </td>
-                        <td className="num hide-s whitespace-nowrap">{e.lastRun ? formatDate(e.lastRun.ranAt) : "No run yet"}</td>
+                        <td className="num hide-s whitespace-nowrap">{e.adapterState === "verified" ? "Yes" : <span aria-label="No">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>

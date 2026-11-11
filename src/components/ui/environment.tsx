@@ -3,10 +3,8 @@ import { Plus } from "lucide-react";
 import { EnvironmentCardArt } from "@/components/site/world-art";
 import type { Environment } from "@/lib/contract";
 import { cn } from "@/lib/cn";
-import { platformRulesInfo } from "@/lib/platform-rules";
 import { environmentMeta, metaFor } from "@/lib/status";
 import { StatusBadge } from "./badge";
-import { AdapterStateBadge } from "./integration";
 
 export function EnvironmentTile({ env, className }: { env: Environment; className?: string }) {
   return (
@@ -21,8 +19,6 @@ export function EnvironmentTile({ env, className }: { env: Environment; classNam
         <p className="font-display text-[16px] font-extrabold leading-tight">{env.name}</p>
         <div className="flex flex-wrap gap-x-1.5 gap-y-2 pt-0.5">
           <StatusBadge meta={metaFor(environmentMeta, env.status)} size="sm" />
-          {platformRulesInfo(env).notable ? <StatusBadge meta={platformRulesInfo(env).meta} size="sm" /> : null}
-          {env.status === "planned" ? <AdapterStateBadge state={env.adapterState} blockedOn={env.blockedOn} /> : null}
         </div>
       </div>
     </Link>

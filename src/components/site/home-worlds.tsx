@@ -18,12 +18,12 @@ export interface World {
   art: string;
   tint: string;
   status: StatusMeta;
-  /** The adapter's state in plain words ("Adapter written, awaiting a real run"). */
-  adapter: string;
-  /** The runtime the adapter targets, when the registry names one. */
-  runtime: string | null;
-  /** The platform has install steps on its page (it is past "planned"). */
-  hasSetup: boolean;
+  /** A real test passed on the platform. */
+  tested: boolean;
+  /** "server" for a mod platform, "runtime" for an engine. */
+  kindNoun: string;
+  /** Where the platform's setup is explained (its docs page). */
+  docsHref: string;
 }
 
 interface Ctx {
@@ -100,7 +100,7 @@ export function WorldCtas() {
           Create your account
           <ArrowRight aria-hidden="true" size={17} strokeWidth={2.5} />
         </Link>
-        <Link href={current.hasSetup ? `${envHref(current)}#setup-title` : "/docs/sdk"} className={buttonClass("secondary", "lg")}>
+        <Link href={current.docsHref} className={buttonClass("secondary", "lg")}>
           Read the SDK docs
         </Link>
       </div>
@@ -127,8 +127,7 @@ export function WorldPlugLine() {
       <Link href={envHref(current)} className="font-bold underline underline-offset-2">
         {current.name}
       </Link>
-      : {current.adapter.charAt(0).toLowerCase() + current.adapter.slice(1)}
-      {current.runtime ? <> ({current.runtime})</> : null}.
+      : {current.tested ? `tested on a real ${current.kindNoun}.` : "on the roadmap."}
     </p>
   );
 }

@@ -66,25 +66,13 @@ export const compatibilityMeta: Record<CompatibilityStatus, StatusMeta> = {
 };
 
 export const environmentMeta: Record<EnvironmentStatus, StatusMeta> = {
-  available: { label: "Available", tone: "success", icon: "check", hint: "Adapter stable, conformance suite passing." },
-  beta: { label: "Beta", tone: "info", icon: "flask", hint: "Adapter usable, conformance partial." },
-  experimental: {
-    label: "Experimental",
-    tone: "warning",
-    icon: "flask",
-    hint: "Integration tests or review still pending. Expect changes.",
-  },
-  planned: { label: "Planned", tone: "muted", icon: "calendar", hint: "Not usable yet. No install instructions." },
+  available: { label: "Available", tone: "success", icon: "check", hint: "Runs today, every check passing." },
+  beta: { label: "Beta", tone: "info", icon: "flask", hint: "Runs today, tested on a real server." },
+  experimental: { label: "Experimental", tone: "info", icon: "flask", hint: "Runs today, first real tests passed." },
+  planned: { label: "Planned", tone: "muted", icon: "calendar", hint: "On the roadmap." },
 };
 
 // An environment's own rules on paid scripts are worded in one place: lib/platform-rules.ts.
-/** Announced and being built, not usable yet. The one stamp for everything in that state. */
-export const IN_DEVELOPMENT: StatusMeta = {
-  label: "In development",
-  tone: "warning",
-  icon: "hourglass",
-  hint: "Being built. Not usable yet.",
-};
 
 export const capabilityMeta: Record<CapabilitySupport, StatusMeta> = {
   supported: { label: "Supported", tone: "success", icon: "check", hint: "Fully provided by the adapter." },
@@ -184,7 +172,7 @@ export const storeMeta: Record<StoreStatus, StatusMeta> = {
     label: "Connected, checkout off",
     tone: "warning",
     icon: "lock",
-    hint: "The shop is set up. Real checkout is not live yet, for any shop, until Tebex approves it in writing.",
+    hint: "The shop is set up. Checkout opens, for every shop, once Tebex approves it.",
   },
   live: { label: "Live", tone: "success", icon: "check", hint: "Taking real payments." },
   needs_attention: { label: "Needs attention", tone: "danger", icon: "alert", hint: "Webhook deliveries are failing." },

@@ -16,12 +16,13 @@ import { ApiError, Banner, EmptyState } from "@/components/ui/feedback";
 import { CreatorLine } from "@/components/ui/package";
 import { Popover } from "@/components/ui/popover";
 import { Prose } from "@/components/ui/prose";
-import { EnvTabs, Tabs } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { Eyebrow, Identifier } from "@/components/ui/typography";
 import { api, API_URL, qs } from "@/lib/api";
 import type { EnvironmentDetail, Offer, PackageDetail } from "@/lib/contract";
 import { dialectLabel, envLongName } from "@/lib/env";
 import { formatBytes, formatCount, formatDate, formatMoney, intervalLabel, intervalSuffix, relativeTime } from "@/lib/format";
+import { platformDocHref } from "@/lib/docs";
 import { renderMarkdown } from "@/lib/markdown";
 import { hasSessionCookie } from "@/lib/session";
 import { classificationMeta, compatibilityMeta, listingMeta, metaFor, releaseMeta } from "@/lib/status";
@@ -67,7 +68,8 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const envDetails = await Promise.all(
     declaredEnvs.slice(0, 8).map(async (slug) => {
       const r = await api<EnvironmentDetail>(`/v1/environments/${encodeURIComponent(slug)}`, { timeoutMs: 4000 });
-      return { slug, detail: r.ok ? r.data : null, setup: r.ok && r.data.setupMarkdown ? await renderMarkdown(r.data.setupMarkdown, { trusted: true }) : null };
+      // Setup steps live on the platform's docs page; the package page links there.
+      return { slug, detail: r.ok ? r.data : null, docs: r.ok && r.data.status !== "planned" ? platformDocHref(slug, r.data.adapterState !== "none") : null };
     }),
   );
   const freeOffers = d.offers.filter((o) => o.interval === "free" || o.classification === "free");
@@ -303,33 +305,20 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                             </p>
                           ) : null}
                         </section>
-                        {envDetails.length > 0 ? (
+                        {envDetails.some((x) => x.docs) ? (
                           <section className="space-y-3">
-                            <h3 className="font-display text-[19px] font-extrabold">Set up your environment</h3>
-                            <EnvTabs
-                              label="Environment"
-                              items={envDetails.map(({ slug, detail, setup }) => ({
-                                id: slug,
-                                label: envLongName(slug, detail?.name),
-                                content: (
-                                  <div className="pt-4">
-                                    {setup ? (
-                                      <Prose html={setup.html} />
-                                    ) : detail?.status === "planned" ? (
-                                      <p className="text-[14.5px] text-ink-2">This environment is planned. There are no install instructions yet.</p>
-                                    ) : (
-                                      <p className="text-[14.5px] text-ink-2">
-                                        Setup steps for this environment are on its{" "}
-                                        <Link className="font-semibold text-cobalt-ink underline" href={`/environments/${encodeURIComponent(slug)}`}>
-                                          environment page
-                                        </Link>
-                                        .
-                                      </p>
-                                    )}
-                                  </div>
-                                ),
-                              }))}
-                            />
+                            <h3 className="font-display text-[19px] font-extrabold">Set it up</h3>
+                            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                              {envDetails
+                                .filter((x) => x.docs)
+                                .map(({ slug, detail, docs }) => (
+                                  <li key={slug}>
+                                    <ReadMore href={docs!} className="!text-[14.5px]">
+                                      On {envLongName(slug, detail?.name)}
+                                    </ReadMore>
+                                  </li>
+                                ))}
+                            </ul>
                           </section>
                         ) : null}
                       </>
@@ -346,16 +335,14 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                       <EmptyState title="No environments yet">No compatibility runs or declarations exist for this release.</EmptyState>
                     ) : (
                       <div className="panel relative overflow-x-auto">
-                        <table className="w-full min-w-[640px] text-left text-[14px]">
+                        <table className="w-full min-w-[420px] text-left text-[14px]">
                           <caption className="sr-only">Compatibility of {viewing} by environment</caption>
                           <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
                             <tr>
                               <th scope="col" className="px-3 py-2.5">Environment</th>
                               <th scope="col" className="px-3 py-2.5">Status</th>
-                              <th scope="col" className="px-3 py-2.5">Runtime</th>
-                              <th scope="col" className="px-3 py-2.5">Adapter</th>
-                              <th scope="col" className="px-3 py-2.5">Last run</th>
-                              <th scope="col" className="px-3 py-2.5"><span className="sr-only">Evidence</span></th>
+                              <th scope="col" className="px-3 py-2.5">Tested</th>
+                              <th scope="col" className="px-3 py-2.5"><span className="sr-only">Details</span></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -363,18 +350,15 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                               <tr key={c.environment} className="border-t border-line-soft">
                                 <th scope="row" className="px-3 py-2.5 font-semibold">{envLongName(c.environment)}</th>
                                 <td className="px-3 py-2.5"><StatusBadge meta={metaFor(compatibilityMeta, c.status)} size="sm" /></td>
-                                <td className="tabular px-3 py-2.5">{c.runtimeVersion ?? "—"}</td>
-                                <td className="tabular px-3 py-2.5 font-mono text-[13px]">{c.adapterVersion ?? "—"}</td>
                                 <td className="tabular px-3 py-2.5">
-                                  {c.ranAt ? <time dateTime={c.ranAt} title={formatDate(c.ranAt)}>{relativeTime(c.ranAt)}</time> : "—"}
-                                  {c.runId ? <span className="block font-mono text-[12px] text-ink-3">run {c.runId}</span> : null}
+                                  {c.ranAt ? <time dateTime={c.ranAt} title={formatDate(c.ranAt)}>{formatDate(c.ranAt)}</time> : "—"}
                                 </td>
                                 <td className="px-3 py-2.5 text-right">
                                   <Popover
                                     align="end"
-                                    triggerLabel={`Evidence for ${envLongName(c.environment)}`}
+                                    triggerLabel={`Details for ${envLongName(c.environment)}`}
                                     triggerClassName="rounded-md border-2 border-line-soft px-2 py-1 text-[12.5px] font-semibold hover:border-line"
-                                    trigger="Evidence"
+                                    trigger="Details"
                                   >
                                     <EvidencePanel entry={c} />
                                   </Popover>

@@ -117,25 +117,17 @@ export function AuthForm({
           {busy ? (mode === "sign-in" ? "Signing in…" : "Creating account…") : mode === "sign-in" ? "Sign in" : "Create account"}
         </button>
       </form>
-      <div className="flex items-center gap-3 text-[12.5px] text-ink-3">
-        <span className="h-px flex-1 bg-line-soft" /> or <span className="h-px flex-1 bg-line-soft" />
-      </div>
-      <div>
-        <button
-          type="button"
-          onClick={github}
-          disabled={!githubEnabled}
-          aria-describedby={githubEnabled ? undefined : "github-reason"}
-          className={buttonClass("secondary", "lg", "w-full")}
-        >
-          Continue with GitHub
-        </button>
-        {!githubEnabled ? (
-          <p id="github-reason" className="mt-1.5 text-[13px] text-ink-3">
-            GitHub sign-in isn&rsquo;t configured on this server yet.
-          </p>
-        ) : null}
-      </div>
+      {/* GitHub sign-in only where the server has it configured: no disabled button and no excuse otherwise. */}
+      {githubEnabled ? (
+        <>
+          <div className="flex items-center gap-3 text-[12.5px] text-ink-3">
+            <span className="h-px flex-1 bg-line-soft" /> or <span className="h-px flex-1 bg-line-soft" />
+          </div>
+          <button type="button" onClick={github} className={buttonClass("secondary", "lg", "w-full")}>
+            Continue with GitHub
+          </button>
+        </>
+      ) : null}
       <p className="text-[14px] text-ink-2">
         {mode === "sign-in" ? (
           <>

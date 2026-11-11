@@ -12,27 +12,26 @@ import type { StatusMeta } from "./status";
  */
 
 /** The sentence that frames the note wherever it is shown. */
-export const PLATFORM_RULES_LEAD =
-  "This platform's own rules, which you answer for when you run a script there. SCRIPT//GO does not enforce them, and they do not change what can be sold.";
+export const PLATFORM_RULES_LEAD = "For information: whoever runs a script there answers for the platform's own rules.";
 
 const LABELS: Record<PlatformRules, { label: string; tone: StatusMeta["tone"]; icon: StatusMeta["icon"]; fallback: string }> = {
   no_restriction: {
-    label: "No platform restriction on paid scripts",
+    label: "No platform restriction",
     tone: "neutral",
     icon: "check",
     fallback: "No restriction on paid scripts is known from this platform's rights holder.",
   },
   restricts_paid: {
-    label: "Platform restricts paid scripts",
+    label: "Platform restricts paid mods",
     tone: "info",
     icon: "scale",
     fallback: "This platform's rights holder restricts paid scripts.",
   },
   unsettled: {
-    label: "Platform rules on paid scripts unsettled",
-    tone: "info",
+    label: "Platform has its own rules",
+    tone: "neutral",
     icon: "scale",
-    fallback: "This platform's rights holder publishes no clear rule on paid scripts, or it depends on the script.",
+    fallback: "The platform's rights holder has its own rules for its game's content.",
   },
 };
 

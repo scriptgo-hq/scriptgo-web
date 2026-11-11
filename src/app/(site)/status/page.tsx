@@ -8,7 +8,7 @@ import type { Environment, Health, Stats } from "@/lib/contract";
 import { countOf, formatDateTime, relativeTime } from "@/lib/format";
 import { ENV_STATUS_ORDER, compatibilityMeta, environmentMeta, metaFor, type StatusMeta } from "@/lib/status";
 
-export const metadata: Metadata = { title: "Status", description: "Live status of the SCRIPT//GO API and each environment's latest conformance run." };
+export const metadata: Metadata = { title: "Status", description: "Live status of the SCRIPT//GO API and the last real test on each platform." };
 
 const UP: StatusMeta = { label: "Operational", tone: "success", icon: "check", hint: "Answered the health check." };
 const DOWN: StatusMeta = { label: "Not reachable", tone: "danger", icon: "x", hint: "Did not answer the health check." };
@@ -74,7 +74,7 @@ export default async function StatusPage() {
       </section>
 
       <section aria-labelledby="ci-title" className="mt-10">
-        <h2 id="ci-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Latest conformance run per environment</h2>
+        <h2 id="ci-title" className="font-display text-[26px] font-black tracking-[-0.02em]">Last real test, per platform</h2>
         <div className="mt-3">
           {!envs.ok ? (
             <ApiError failure={envs} compact />
@@ -82,14 +82,13 @@ export default async function StatusPage() {
             <EmptyState title="No environments registered yet" />
           ) : (
             <div className="panel relative overflow-x-auto">
-              <table className="w-full min-w-[620px] text-left text-[14px]">
-                <caption className="sr-only">Latest conformance run per environment</caption>
+              <table className="w-full min-w-[420px] text-left text-[14px]">
+                <caption className="sr-only">Last real test, per platform</caption>
                 <thead className="bg-surface-2 text-[12px] uppercase tracking-wide text-ink-3">
                   <tr>
-                    <th scope="col" className="px-3 py-2.5">Environment</th>
-                    <th scope="col" className="px-3 py-2.5">Status</th>
-                    <th scope="col" className="px-3 py-2.5">Last run</th>
-                    <th scope="col" className="px-3 py-2.5">Run</th>
+                    <th scope="col" className="px-3 py-2.5">Platform</th>
+                    <th scope="col" className="px-3 py-2.5">Result</th>
+                    <th scope="col" className="px-3 py-2.5">When</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -106,7 +105,7 @@ export default async function StatusPage() {
                           </span>
                         </th>
                         <td className="px-3 py-2.5">
-                          {e.lastRun ? <StatusBadge meta={metaFor(compatibilityMeta, e.lastRun.status)} size="sm" /> : <span className="text-ink-3">No run yet</span>}
+                          {e.lastRun ? <StatusBadge meta={metaFor(compatibilityMeta, e.lastRun.status)} size="sm" /> : <span className="text-ink-3">—</span>}
                         </td>
                         <td className="tabular px-3 py-2.5">
                           {e.lastRun ? (
@@ -117,7 +116,6 @@ export default async function StatusPage() {
                             "—"
                           )}
                         </td>
-                        <td className="px-3 py-2.5 font-mono text-[13px]">{e.lastRun?.runId ?? "—"}</td>
                       </tr>
                     ))}
                 </tbody>

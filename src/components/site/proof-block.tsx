@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import type { CompatibilityEntry, CreatorProfile, Page, PackageDetail, PackageSummary } from "@/lib/contract";
 import { envLongName } from "@/lib/env";
 import { formatDate } from "@/lib/format";
+import { capabilityPlain } from "@/lib/integration";
 import { readmeExample } from "@/lib/markdown";
 import { COMPAT_ORDER, compatibilityMeta, metaFor } from "@/lib/status";
 import { StatusBadge } from "@/components/ui/badge";
@@ -19,22 +20,20 @@ function verifiedCount(p: PackageSummary) {
 
 export function EvidenceLine({ entry }: { entry: CompatibilityEntry }) {
   const meta = metaFor(compatibilityMeta, entry.status);
-  const parts: string[] = [];
-  if (entry.runtimeVersion) parts.push(entry.runtimeVersion);
-  if (entry.adapterVersion) parts.push(`adapter ${entry.adapterVersion}`);
-  if (entry.runId) parts.push(`run ${entry.runId}`);
+  // The environment and the date: the runtime build, adapter version and run id are in the docs.
+  const parts: string[] = [envLongName(entry.environment)];
   if (entry.ranAt) parts.push(formatDate(entry.ranAt));
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px]">
       <StatusBadge meta={meta} size="sm" />
       {entry.status === "not_tested" ? (
-        <span className="text-ink-3">Not tested yet. No run has been recorded for this environment.</span>
+        <span className="text-ink-3">Declared by the creator.</span>
       ) : entry.status === "unsupported" && entry.missingCapability ? (
         <span className="text-ink-3">
-          Needs <code className="font-mono">{entry.missingCapability}</code>, which this environment lacks.
+          Needs {capabilityPlain(entry.missingCapability).toLowerCase()}, which this platform does not provide.
         </span>
       ) : (
-        <span className="tabular font-mono text-ink-2">{parts.join(" · ")}</span>
+        <span className="tabular text-ink-2">{parts.join(" · ")}</span>
       )}
     </div>
   );
@@ -87,8 +86,8 @@ export async function ProofBlock() {
           {version ? <span className="tabular"> · v{version}</span> : null}
           <span>
             {example?.runnable
-              ? " · the README example, run in each environment on the right"
-              : " · from the package README (not run by verification)"}
+              ? " · the README example, run on each platform on the right"
+              : " · from the package README"}
           </span>
         </p>
         {code ? (
@@ -100,10 +99,10 @@ export async function ProofBlock() {
         )}
       </div>
       <div className="min-w-0">
-        <p className="mb-2 text-[13.5px] text-ink-2">Output recorded by each environment&rsquo;s compatibility run</p>
+        <p className="mb-2 text-[13.5px] text-ink-2">What each platform printed when it ran</p>
         {entries.length === 0 ? (
-          <EmptyState title="No compatibility runs recorded yet">
-            Nothing is marked Verified until a run passes in the real runtime.
+          <EmptyState title="Output appears once the script is tested">
+            Nothing is marked Verified until a test passes on the real platform.
           </EmptyState>
         ) : (
           <EnvTabs
@@ -114,10 +113,10 @@ export async function ProofBlock() {
               content: (
                 <div className="mt-3 space-y-2.5">
                   {e.log ? (
-                    <TerminalOutput text={e.log} title={`${envLongName(e.environment)} · run output`} maxHeight={260} />
+                    <TerminalOutput text={e.log} title={`${envLongName(e.environment)} · output`} maxHeight={260} />
                   ) : (
                     <div className="codeblock px-4 py-6 text-[13px] text-[#cfc7b7]">
-                      {e.status === "not_tested" ? "Not tested yet." : "No log attached to this run."}
+                      {e.status === "not_tested" ? "Declared by the creator." : "No output recorded."}
                     </div>
                   )}
                   <EvidenceLine entry={e} />

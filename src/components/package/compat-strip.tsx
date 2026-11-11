@@ -1,7 +1,8 @@
 import { ExternalLink } from "lucide-react";
 import type { CompatibilityEntry } from "@/lib/contract";
 import { envLongName } from "@/lib/env";
-import { formatDateTime, relativeTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
+import { capabilityPlain } from "@/lib/integration";
 import { COMPAT_ORDER, compatibilityMeta, metaFor } from "@/lib/status";
 import { StatusBadge } from "@/components/ui/badge";
 import { KeyValue } from "@/components/ui/data";
@@ -23,28 +24,25 @@ export function EvidencePanel({ entry }: { entry: CompatibilityEntry }) {
       </div>
       <p className="text-[13px] text-ink-2">{meta.hint}</p>
       {entry.status === "not_tested" ? (
-        <p className="text-[13px] text-ink-2">The creator declared this environment. No compatibility run has been recorded for {entry.version}.</p>
+        <p className="text-[13px] text-ink-2">Declared by the creator for {entry.version}.</p>
       ) : (
         <KeyValue
           labelWidth="6.5rem"
           className="text-[13px]"
           items={[
             { label: "Release", value: <span className="tabular font-mono">{entry.version}</span> },
-            { label: "Runtime", value: entry.runtimeVersion ?? "—" },
-            { label: "Adapter", value: entry.adapterVersion ? <span className="font-mono">{entry.adapterVersion}</span> : "—" },
             {
-              label: "Ran",
+              label: "Tested",
               value: entry.ranAt ? (
                 <time dateTime={entry.ranAt} title={formatDateTime(entry.ranAt)}>
-                  {formatDateTime(entry.ranAt)} ({relativeTime(entry.ranAt)})
+                  {formatDate(entry.ranAt)}
                 </time>
               ) : (
                 "—"
               ),
             },
-            { label: "Run", value: entry.runId ? <span className="font-mono">{entry.runId}</span> : "—" },
             ...(entry.missingCapability
-              ? [{ label: "Missing", value: <code className="font-mono">{entry.missingCapability}</code> }]
+              ? [{ label: "Needs", value: capabilityPlain(entry.missingCapability) }]
               : []),
           ]}
         />
@@ -61,16 +59,11 @@ export function EvidencePanel({ entry }: { entry: CompatibilityEntry }) {
           ))}
         </ul>
       ) : null}
-      {entry.log ? (
-        <pre className="max-h-40 overflow-auto rounded-md bg-code-bg p-2 font-mono text-[11.5px] leading-relaxed text-code-fg">
-          {entry.log.split("\n").slice(-12).join("\n")}
-        </pre>
-      ) : null}
     </div>
   );
 }
 
-/** One tile per declared environment; each opens its evidence. Scrolls horizontally on mobile. */
+/** One tile per declared environment; each opens its details. Scrolls horizontally on mobile. */
 export function CompatStrip({ entries }: { entries: CompatibilityEntry[] }) {
   if (entries.length === 0) {
     return (
@@ -87,14 +80,14 @@ export function CompatStrip({ entries }: { entries: CompatibilityEntry[] }) {
           return (
             <li key={e.environment} className="w-[160px] shrink-0 md:w-auto">
               <Popover
-                triggerLabel={`${envLongName(e.environment)}: ${meta.label}. Show evidence`}
+                triggerLabel={`${envLongName(e.environment)}: ${meta.label}. Show details`}
                 triggerClassName="sticker-sm sticker-hover flex w-full flex-col items-start gap-2 p-3 text-left"
                 trigger={
                   <>
                     <span className="font-display text-[15px] font-extrabold leading-tight">{envLongName(e.environment)}</span>
                     <StatusBadge meta={meta} size="sm" />
                     <span className="tabular truncate text-[12px] text-ink-3">
-                      {e.runtimeVersion ?? (e.missingCapability ? `needs ${e.missingCapability}` : "no run yet")}
+                      {e.missingCapability ? `Needs ${capabilityPlain(e.missingCapability).toLowerCase()}` : e.ranAt ? `Tested ${formatDate(e.ranAt)}` : "Declared by the creator"}
                     </span>
                   </>
                 }

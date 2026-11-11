@@ -14,8 +14,7 @@ export default async function SignUpPage({ searchParams }: { searchParams: Promi
     <AuthShell eyebrow="account" title="Create account." intro="One account to install, license and publish. Creating a creator profile is a separate, later step.">
       <AuthForm mode="sign-up" next={next} githubEnabled={Boolean(process.env.GITHUB_CLIENT_ID)} />
       <p className="mt-5 text-[12.5px] text-ink-3">
-        The <Link href="/legal#terms" className="underline">terms</Link> and <Link href="/legal#privacy" className="underline">privacy policy</Link> are
-        drafts pending legal review.
+        Read the <Link href="/legal#terms" className="underline">terms</Link> and the <Link href="/legal#privacy" className="underline">privacy policy</Link>.
       </p>
     </AuthShell>
   );

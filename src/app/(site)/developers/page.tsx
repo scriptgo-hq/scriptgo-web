@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Publish game scripts, prove where they run, protect and sell them with licenses. Or integrate the SCRIPT//GO SDK into your engine.",
 };
 
-const NOT_LIVE = { label: "Checkout not live yet", tone: "warning", icon: "lock", hint: "Real checkout stays off, for every shop, until Tebex approves it in writing." } as const;
+const CHECKOUT_OFF = { label: "Checkout opens on Tebex approval", tone: "info", icon: "lock", hint: "A shop can be set up and tested today. Real checkout opens for every shop once Tebex approves it in writing." } as const;
 
 export default function DevelopersPage() {
   return (
@@ -54,11 +54,11 @@ export default function DevelopersPage() {
             { icon: FlaskConical, title: "Test", note: "in the standalone host", code: "scriptgo test", accent: "cobalt" },
             { icon: Upload, title: "Publish", note: "real runs set each status", code: "scriptgo publish", accent: "ink" },
             { icon: Lock, title: "Protect", note: "optional: deliver it encrypted", code: "--escrow" },
-            { icon: Store, title: "Open your shop", note: "on your own Tebex store", chip: NOT_LIVE, accent: "cobalt" },
+            { icon: Store, title: "Open your shop", note: "on your own Tebex store", chip: CHECKOUT_OFF, accent: "cobalt" },
           ]}
         />
-        <p className="mt-7 text-[14.5px] text-ink-2">
-          The CLI is in preview. <ReadMore href="/docs/cli" className="!text-[14.5px]">The CLI</ReadMore>
+        <p className="mt-7">
+          <ReadMore href="/docs/cli" className="!text-[14.5px]">The CLI</ReadMore>
         </p>
       </section>
 
@@ -85,8 +85,8 @@ export default function DevelopersPage() {
             <PictureCard art={SCENES.watchtower} title="We act on reports.">
               Restrict, suspend or take down, with notice and appeal.
             </PictureCard>
-            <PictureCard art={SCENES.gate} chip={NOT_LIVE} title="Anyone can open a shop.">
-              Real checkout waits for Tebex&rsquo;s written approval.
+            <PictureCard art={SCENES.gate} title="Anyone can open a shop.">
+              On your own Tebex store. No staff approves it.
             </PictureCard>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function DevelopersPage() {
             One table maps the API onto your host.
           </PictureCard>
           <PictureCard art={SCENES.toolcase} label="Your engine has no Lua" title="Embed the .NET host kit." more={{ href: "/docs/dotnet-kit", label: "Embed the .NET kit" }}>
-            It runs Lua and TypeScript side by side. Experimental.
+            It runs Lua and TypeScript side by side.
           </PictureCard>
         </div>
       </section>

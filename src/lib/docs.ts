@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import pkg from "../../package.json" with { type: "json" };
@@ -17,7 +17,7 @@ export interface DocEntry {
   slug: string;
   title: string;
   description: string;
-  group: "Start" | "Reference" | "Licensing" | "Platform builders" | "Help";
+  group: "Start" | "Reference" | "Licensing" | "Platforms" | "Platform builders" | "Help";
   source: { kind: "spec" | "guide" | "repo-guide"; file: string };
 }
 
@@ -134,7 +134,7 @@ const BUILT_IN_DOCS: DocEntry[] = [
   {
     slug: "sdk",
     title: "The SDK",
-    description: "The pieces of the SDK, the two ways to integrate it, and what is not built yet.",
+    description: "The pieces of the SDK, the two ways to integrate it, and what comes next.",
     group: "Platform builders",
     source: { kind: "guide", file: "sdk.md" },
   },
@@ -154,21 +154,60 @@ const BUILT_IN_DOCS: DocEntry[] = [
   },
 ];
 
+/**
+ * One page per platform (docs/site/platforms/<slug>.md, generated in the SDK from its platform
+ * registry): how it runs, setup, capabilities, protection, limits and real runs. A platform's page on
+ * the site stays short and links here. Listed only when the SDK at the pinned tag has them.
+ */
+const PLATFORM_DOC_DIR = path.join(GUIDE_DIR, "platforms");
+const PLATFORM_DOCS: DocEntry[] = (() => {
+  if (!existsSync(PLATFORM_DOC_DIR)) return [];
+  return readdirSync(PLATFORM_DOC_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => {
+      const { data } = parseFrontMatter(readFileSync(path.join(PLATFORM_DOC_DIR, f), "utf8"));
+      const slug = f.slice(0, -3);
+      return {
+        slug: `platforms/${slug}`,
+        title: data.title || slug,
+        description: data.description || "",
+        group: "Platforms" as const,
+        source: { kind: "guide" as const, file: `platforms/${f}` },
+      };
+    })
+    .sort((a, b) => a.title.localeCompare(b.title));
+})();
+
 export const DOCS: DocEntry[] = (() => {
   const present = REPO_GUIDES.filter((g) => existsSync(path.join(REPO_GUIDE_DIR, g.source.file)));
-  if (present.length === 0) return BUILT_IN_DOCS;
-  // Repository guides sit at the end of their group, before the Help pages.
-  const help = BUILT_IN_DOCS.findIndex((d) => d.group === "Help");
-  const at = help < 0 ? BUILT_IN_DOCS.length : help;
-  return [...BUILT_IN_DOCS.slice(0, at), ...present, ...BUILT_IN_DOCS.slice(at)];
+  // Platform pages sit before the platform builders' group; repository guides at the end of theirs, before Help.
+  const builders = BUILT_IN_DOCS.findIndex((d) => d.group === "Platform builders");
+  const withPlatforms = builders < 0 ? [...BUILT_IN_DOCS, ...PLATFORM_DOCS] : [...BUILT_IN_DOCS.slice(0, builders), ...PLATFORM_DOCS, ...BUILT_IN_DOCS.slice(builders)];
+  if (present.length === 0) return withPlatforms;
+  const help = withPlatforms.findIndex((d) => d.group === "Help");
+  const at = help < 0 ? withPlatforms.length : help;
+  return [...withPlatforms.slice(0, at), ...present, ...withPlatforms.slice(at)];
 })();
+
+/**
+ * Where a platform's detail lives: its docs page when the SDK at the pinned tag has one, otherwise
+ * the adapter's folder on GitHub (README and SETUP.md), otherwise the page on statuses.
+ */
+export function platformDocHref(slug: string, hasAdapter: boolean): string {
+  if (DOCS.some((d) => d.slug === `platforms/${slug}`)) return `/docs/platforms/${slug}`;
+  if (hasAdapter) return `https://github.com/scriptgo-hq/scriptgo-sdk/tree/${SDK_TAG}/${slug === "dotnet" ? "sdk/dotnet" : `sdk/adapters/${slug}`}`;
+  return "/docs/environments";
+}
 
 /** Where to send a platform builder who wants escrow on their host: the adapter guide when it is published here. */
 export function escrowAdapterGuideHref(): string | null {
   return DOCS.some((d) => d.slug === ESCROW_ADAPTER_GUIDE_SLUG) ? `/docs/${ESCROW_ADAPTER_GUIDE_SLUG}` : null;
 }
 
-export const DOC_GROUPS: DocEntry["group"][] = ["Start", "Reference", "Licensing", "Platform builders", "Help"];
+/** The groups in nav order, the empty ones left out (Platforms needs an SDK that has its pages). */
+export const DOC_GROUPS: DocEntry["group"][] = (["Start", "Reference", "Licensing", "Platforms", "Platform builders", "Help"] as const).filter((g) =>
+  DOCS.some((d) => d.group === g),
+);
 
 export function findDoc(slug: string): DocEntry | undefined {
   return DOCS.find((d) => d.slug === slug);

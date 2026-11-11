@@ -199,7 +199,7 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
             {perks ? <StatusBadge meta={{ ...capabilityMeta[perks], label: `Perks: ${capabilityMeta[perks].label}` }} /> : null}
           </div>
         ) : null}
-        <Banner tone="warning" className="mt-5" title={guide.notLive.title}>
+        <Banner tone="info" className="mt-5" title={guide.notLive.title}>
           {guide.notLive.text}
         </Banner>
         <div id={TRACKS_ANCHOR} className="mt-8 scroll-mt-24">

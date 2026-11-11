@@ -78,7 +78,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
           </div>
           <div className="foot-fine">
             <span className="max-w-[78ch]">
-              SCRIPT//GO is a working name. Game, engine and provider names are trademarks of their owners; no endorsement is implied.
+              Game, engine and provider names are trademarks of their owners; no endorsement is implied.
             </span>
             <ThemeToggle label />
           </div>

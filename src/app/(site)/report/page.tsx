@@ -41,8 +41,7 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
         <div className="panel p-5 text-[14px] text-ink-2">
           <h2 className="font-display text-[17px] font-extrabold text-ink">How decisions are made</h2>
           <p className="mt-2">
-            Read the <Link href="/legal#ip-policy" className="font-semibold text-cobalt-ink underline">IP policy</Link> (draft pending
-            legal review) for the review process, possible outcomes and appeals.
+            Read the <Link href="/legal#ip-policy" className="font-semibold text-cobalt-ink underline">IP policy</Link> for the review process, possible outcomes and appeals.
           </p>
         </div>
       </aside>
