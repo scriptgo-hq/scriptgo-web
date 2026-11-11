@@ -118,6 +118,14 @@ export default function LegalPage() {
               subject and text are kept with their delivery status, and handed to the e-mail delivery provider to send. Password reset
               and confirmation links are removed from our copy once delivered. Purchase e-mails never contain a license key.
             </li>
+            <li>
+              Signing in as a player: a game server that turns this on sends, for each connected player, a keyed fingerprint of
+              their address, never the address, held in memory while they play. When you confirm a player, we keep a fingerprint
+              of that browser&apos;s address with it, 60 days after the last confirmation and at most 5 per player, and the browser
+              keeps a cookie for 30 days. &ldquo;Forget this browser and my addresses&rdquo; on the sign-in page clears both. A
+              fingerprint is a pseudonym, not anonymity: it keeps raw addresses out of our requests, storage and logs, but whoever
+              holds its key can test addresses against it.
+            </li>
           </ul>
         </Section>
 

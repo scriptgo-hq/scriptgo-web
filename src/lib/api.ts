@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
+import { cookies, headers as headers_ } from "next/headers";
 import { connection } from "next/server";
 import type { ErrorBody as ApiErrorBody } from "./contract";
+import { SITE_FORWARD_HEADER, signSiteForward, visitorAddress } from "./site-forward";
 
 /** Base URL for server-side calls. The browser uses same-origin `/v1/*` through Next rewrites. */
 export const API_URL = (process.env.API_URL ?? "http://localhost:4100").replace(/\/+$/, "");
@@ -34,6 +35,13 @@ export async function api<T>(path: string, opts: ApiOptions = {}): Promise<ApiRe
       .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
       .join("; ");
     if (cookieHeader) headers.cookie = cookieHeader;
+  }
+  // The visitor's address, signed: the API otherwise sees this website's (src/lib/site-forward.ts).
+  try {
+    const signed = await signSiteForward(visitorAddress(await headers_()), opts.method ?? "GET", path.split("?")[0]!);
+    if (signed) headers[SITE_FORWARD_HEADER] = signed;
+  } catch {
+    // Outside a request: nothing to forward.
   }
   let body: string | undefined;
   if (opts.body !== undefined) {
