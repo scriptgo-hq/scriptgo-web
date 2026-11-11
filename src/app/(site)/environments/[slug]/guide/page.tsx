@@ -5,7 +5,6 @@ import { CornerDownRight, Info } from "lucide-react";
 import { OneLiners, ReadMore } from "@/components/site/diagrams";
 import { PageHead, Ridge, type Ground } from "@/components/site/ink";
 import { StatusBadge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
 import { CodeBlock, CommandLine } from "@/components/ui/code-block";
 import { Breadcrumb } from "@/components/ui/data";
 import { Banner } from "@/components/ui/feedback";
@@ -18,6 +17,7 @@ import { guideFor, type GuideImage, type GuideStep, type GuideTrack } from "@/li
 import { protectionMeta } from "@/lib/protection";
 import { capabilityMeta, environmentMeta, metaFor } from "@/lib/status";
 import { worldArt, worldSrc, WORLD_SIZE } from "@/lib/worlds";
+import { TrackButtons, TrackPanels, TRACKS_ANCHOR, type TrackChoice } from "./track-switch";
 
 type Params = { slug: string };
 
@@ -56,9 +56,14 @@ function Shot({ img }: { img: GuideImage }) {
   );
 }
 
-function Step({ step: s, n, flip }: { step: GuideStep; n: number; flip: boolean }) {
+/** A step's anchor: step ids repeat across tracks, so the track prefixes them. */
+function stepAnchor(t: GuideTrack, s: GuideStep): string {
+  return `${t.id}-${s.id}`;
+}
+
+function Step({ step: s, anchor, n, flip }: { step: GuideStep; anchor: string; n: number; flip: boolean }) {
   return (
-    <li id={s.id} className="grid scroll-mt-28 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start lg:gap-12">
+    <li id={anchor} className="grid scroll-mt-28 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start lg:gap-12">
       <div className={cn("min-w-0", flip && "lg:order-2")}>
         <div className="flex items-start gap-4">
           <span aria-hidden="true" className="num-slab mt-0.5">
@@ -142,7 +147,7 @@ function Track({ track: t, ground }: { track: GuideTrack; ground: Ground }) {
           <ol start={g.start} aria-label={g.who ?? `${t.title} ${t.titleEm}`} className="space-y-16 lg:space-y-20">
             {g.steps.map((s) => {
               n += 1;
-              return <Step key={s.id} step={s} n={g.start + g.steps.indexOf(s)} flip={n % 2 === 0} />;
+              return <Step key={s.id} step={s} anchor={stepAnchor(t, s)} n={g.start + g.steps.indexOf(s)} flip={n % 2 === 0} />;
             })}
           </ol>
         </div>
@@ -161,7 +166,13 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
   const name = env?.name ?? guide.name;
   const art = worldArt(slug);
   const perks = env?.capabilities.perks;
-  const grounds: Ground[] = ["paper", "paper2"];
+  // One track is shown at a time, so each sits on the same ground.
+  const ground: Ground = "paper";
+  const choices: TrackChoice[] = guide.tracks.map((t) => ({
+    id: t.id,
+    label: `${t.title} ${t.titleEm.replace(/.$/, "")}`,
+    steps: t.steps.map((s) => stepAnchor(t, s)),
+  }));
 
   return (
     <div>
@@ -176,13 +187,7 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
         }
         lede={guide.lede}
       >
-        <div className="cta-row mt-8">
-          {guide.tracks.map((t, i) => (
-            <ButtonLink key={t.id} href={`#${t.id}`} variant={i === 0 ? "sun" : "secondary"} size="lg" arrow={i === 0}>
-              {t.title} {t.titleEm.replace(/\.$/, "")}
-            </ButtonLink>
-          ))}
-        </div>
+        <TrackButtons choices={choices} scroll className="mt-8" />
       </PageHead>
 
       <section aria-label="Before you start" className="g-paper bleed container-page pb-4 pt-6">
@@ -197,16 +202,15 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
         <Banner tone="warning" className="mt-5" title={guide.notLive.title}>
           {guide.notLive.text}
         </Banner>
+        <div id={TRACKS_ANCHOR} className="mt-8 scroll-mt-24">
+          <Eyebrow className="mb-3">What do you sell?</Eyebrow>
+          <TrackButtons choices={choices} size="md" />
+        </div>
       </section>
 
-      {guide.tracks.map((t, i) => (
-        <div key={t.id}>
-          {i > 0 ? <Ridge from={grounds[(i - 1) % 2]!} to={grounds[i % 2]!} ink={i % 2 ? "sand" : "sun"} n={i} /> : null}
-          <Track track={t} ground={grounds[i % 2]!} />
-        </div>
-      ))}
+      <TrackPanels choices={choices} panels={Object.fromEntries(guide.tracks.map((t) => [t.id, <Track key={t.id} track={t} ground={ground} />]))} />
 
-      <Ridge from={grounds[(guide.tracks.length - 1) % 2]!} to="night" ink="cobalt" n={guide.tracks.length} />
+      <Ridge from={ground} to="night" ink="cobalt" n={1} />
       <section aria-labelledby="guide-more" className="sec g-night bleed sec-sweeps container-page !pt-10">
         <Eyebrow className="mb-[18px]">Read more</Eyebrow>
         <DisplayTitle id="guide-more" className="text-[34px] sm:text-[42px]">
