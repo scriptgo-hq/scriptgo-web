@@ -35,7 +35,7 @@ set it for both.
 [`scriptgo-sdk`](https://github.com/scriptgo-hq/scriptgo-sdk) (public, MIT), at one tag, pinned in
 `package.json`:
 
-- `"scriptgo": { "sdk": "v0.1.3" }`: `scripts/fetch-sdk.mjs` downloads that tag's `docs/` into
+- `"scriptgo": { "sdk": "v0.1.4" }`: `scripts/fetch-sdk.mjs` downloads that tag's `docs/` into
   `.sdk/` before `dev` and `build`. The documentation pages (`/docs/*`) are rendered from it, and
   each page links to its source. To preview a documentation change, point `SCRIPTGO_SDK_DIR` at a
   local checkout of the SDK.

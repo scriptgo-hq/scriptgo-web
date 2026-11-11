@@ -6,7 +6,7 @@
  */
 export const CLI_INSTALL = {
   node: "22",
-  command: "npm install -g https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.3/scriptgo-cli-0.1.3.tgz",
+  command: "npm install -g https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.4/scriptgo-cli-0.1.4.tgz",
   login: "scriptgo login --token <your token>",
 } as const;
 

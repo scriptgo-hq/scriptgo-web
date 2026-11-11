@@ -109,7 +109,7 @@ export function TebexNotConnected() {
   const steps: [string, string][] = [
     ["Create the package in your own Tebex store", "Shops run on your own Tebex store: SCRIPT//GO never takes payments itself."],
     ["Connect the store below", "Paste the webhook secret (Tebex > Developers > Webhooks) and the public token (Tebex > Integrations > Headless API). Both are stored sealed and never shown again."],
-    ["Add the webhook endpoint in Tebex", "After connecting, this page shows the URL to paste in Tebex > Developers > Webhooks > Endpoints. Tebex validates it at once."],
+    ["Add the webhook endpoint in Tebex", "After connecting, paste the URL from the store card in Tebex > Developers > Webhooks > Endpoints, once for the whole store, and select the payment and recurring payment events."],
     ["Map each paid offer to its Tebex package id", "The id goes in the offer's provider product when you create the offer."],
     ["Declare your rights and publish", "An offer can be bought once you have declared your rights for a published release. SCRIPT//GO does not review offers before sale: you decide what you sell, and you answer for it."],
     ["Wait for Tebex", "Your store needs no approval by SCRIPT//GO staff. Checkout through Tebex opens for everyone once Tebex has approved SCRIPT//GO in writing; until then nothing can be bought through Tebex."],

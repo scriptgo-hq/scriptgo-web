@@ -43,9 +43,9 @@ function StoreCard({ s, readiness }: { s: Store; readiness: ApiResult<StoreReadi
       ) : null}
 
       {s.status === "needs_attention" ? (
-        <Banner tone="danger" className="mt-4" title="Webhook deliveries are failing.">
-          Payments may not turn into licenses until this is fixed. Check the webhook URL and secret in your provider dashboard, then compare with
-          the recent deliveries below.
+        <Banner tone="danger" className="mt-4" title="A webhook delivery failed.">
+          Sales made on your store outside SCRIPT//GO also arrive here and are not acted on. For anything else, check the webhook URL and
+          secret in your provider dashboard, then compare with the recent deliveries below.
         </Banner>
       ) : null}
 
@@ -180,7 +180,7 @@ export default async function StoresPage() {
       <PageHeader
         eyebrow="publishing"
         title="Stores."
-        description="SCRIPT//GO never takes payments itself. A store connects your account at a payment provider; its signed webhooks are what turn a payment into a license."
+        description="SCRIPT//GO never takes payments itself. A store connects your account at a payment provider; its signed webhooks are what turn a payment into a licence or a player's perk."
       />
       {!res.ok ? (
         <ApiError failure={res} title="Your stores couldn't be loaded." />
@@ -197,8 +197,8 @@ export default async function StoresPage() {
               {stores.length ? "Connect or update a store." : "Connect a store."}
             </h2>
             <p className="mt-1 max-w-prose text-[14px] text-ink-2">
-              Your store needs no approval by SCRIPT//GO staff. Tebex checkout stays off for everyone until Tebex approves SCRIPT//GO in writing; until then you can
-              prepare products and test with the sandbox.
+              Your store needs no approval by SCRIPT//GO staff. Tebex checkout opens for everyone on Tebex approval; until then you can
+              connect your store and map your packages.
             </p>
             <div className="mt-4">
               {/* The API refuses mock stores with provider_disabled when the server turns the test provider off; the form shows that message. */}
