@@ -47,7 +47,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
               <p className="mt-[18px] max-w-[34ch] opacity-80">The scripting sandbox for the games you run. Build once, protect your work, monetize it.</p>
               <p className="mt-3 max-w-[34ch] text-[14px] opacity-80">
                 The SDK is open source,{" "}
-                <a href={SDK_LICENSE} className="underline underline-offset-2 hover:opacity-100">
+                <a href={SDK_LICENSE} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:opacity-100">
                   MIT
                 </a>
                 .
@@ -105,9 +105,15 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
         {links.map(([href, label]) => (
           <li key={href}>
             {/* Account pages redirect a signed-out visitor: never prefetch them, or the redirect is what the router remembers after sign-in. */}
-            <Link href={href} prefetch={href.startsWith("/dashboard") ? false : undefined}>
-              {label}
-            </Link>
+            {/^https?:/.test(href) ? (
+              <a href={href} target="_blank" rel="noopener noreferrer">
+                {label}
+              </a>
+            ) : (
+              <Link href={href} prefetch={href.startsWith("/dashboard") ? false : undefined}>
+                {label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>

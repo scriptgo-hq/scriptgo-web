@@ -51,7 +51,7 @@ export function EvidencePanel({ entry }: { entry: CompatibilityEntry }) {
         <ul className="space-y-1 text-[13px]">
           {entry.evidence.map((ev) => (
             <li key={ev.url}>
-              <a href={ev.url} className="inline-flex items-center gap-1 font-semibold text-cobalt-ink underline-offset-2 hover:underline" rel="noopener">
+              <a href={ev.url} className="inline-flex items-center gap-1 font-semibold text-cobalt-ink underline-offset-2 hover:underline" target="_blank" rel="noopener noreferrer">
                 {ev.kind === "screenshot" ? "Screenshot" : "Full log"}
                 <ExternalLink aria-hidden="true" size={12} />
               </a>

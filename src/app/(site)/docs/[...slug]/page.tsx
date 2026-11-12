@@ -45,7 +45,7 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
           <span aria-hidden="true">·</span>
           <span>
             Source:{" "}
-            <a href={sourceUrl(doc.repoPath)} className="underline hover:text-ink">
+            <a href={sourceUrl(doc.repoPath)} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">
               <code>scriptgo-sdk/{doc.repoPath}</code>
             </a>
           </span>
@@ -58,7 +58,7 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
           {docRepoLinks(entry, doc.repoPath).map((l) => (
             <span key={l.href} className="contents">
               <span aria-hidden="true">·</span>
-              <a href={l.href} className="underline hover:text-ink">
+              <a href={l.href} {...(/^https?:/.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="underline hover:text-ink">
                 {l.label}
               </a>
             </span>

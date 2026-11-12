@@ -134,7 +134,7 @@ export default function SdkPage() {
             </a>
             .
           </span>
-          <a href={SDK_REPO} className="font-normal text-ink-2 underline underline-offset-2 hover:text-ink">
+          <a href={SDK_REPO} target="_blank" rel="noopener noreferrer" className="font-normal text-ink-2 underline underline-offset-2 hover:text-ink">
             The code on GitHub
           </a>
         </p>

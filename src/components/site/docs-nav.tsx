@@ -46,7 +46,7 @@ function NavList({ groups, pathname }: { groups: DocsNavGroup[]; pathname: strin
           </ul>
         </div>
       ))}
-      <a href={sdkTreeUrl("docs")} className="flex items-center gap-2 px-2 py-1.5 text-[14px] text-ink-2 hover:text-ink hover:underline">
+      <a href={sdkTreeUrl("docs")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-2 py-1.5 text-[14px] text-ink-2 hover:text-ink hover:underline">
         <GitHubMark size={16} /> These docs on GitHub
       </a>
     </div>

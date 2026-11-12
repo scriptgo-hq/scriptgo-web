@@ -151,7 +151,7 @@ export function TopBar({ signedIn }: { signedIn: boolean }) {
             <img className="brand-word" src={BRAND.word.src} width={BRAND.word.width} height={BRAND.word.height} alt="SCRIPT//GO" />
           </Link>
           <div className="top-actions">
-            <a href={SDK_REPO} className="icon-btn hidden min-[1081px]:inline-grid" title="The SDK on GitHub">
+            <a href={SDK_REPO} target="_blank" rel="noopener noreferrer" className="icon-btn hidden min-[1081px]:inline-grid" title="The SDK on GitHub">
               <GitHubMark size={19} />
               <span className="sr-only">The SDK on GitHub</span>
             </a>
@@ -189,7 +189,7 @@ export function TopBar({ signedIn }: { signedIn: boolean }) {
             ))}
           </ul>
         </nav>
-        <a href={SDK_REPO} className="mt-4 inline-flex items-center gap-2 px-1 text-[15px] font-bold underline underline-offset-2">
+        <a href={SDK_REPO} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-1 text-[15px] font-bold underline underline-offset-2">
           <GitHubMark size={17} /> The SDK on GitHub
         </a>
         <div className="mt-5 flex flex-wrap gap-4 px-1">
