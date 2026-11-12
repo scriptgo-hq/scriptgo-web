@@ -101,7 +101,7 @@ const BUILT_IN_DOCS: DocEntry[] = [
   {
     slug: "selling-assets",
     title: "Selling assets",
-    description: "Maps, models, textures and sounds: what a package holds, how each platform delivers it, and what a fingerprinted copy is.",
+    description: "Maps, models, textures and sounds on every platform that delivers files: how each one delivers them, what a fingerprinted copy is, and encrypted assets on OPEN//77.",
     group: "Licensing",
     source: { kind: "guide", file: "selling-assets.md" },
     optional: true,

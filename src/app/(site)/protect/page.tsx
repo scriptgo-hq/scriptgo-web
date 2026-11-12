@@ -126,6 +126,13 @@ export default function ProtectPage() {
             </li>
           ))}
         </ul>
+        <p className="mt-8 text-[15.5px] text-ink-2">
+          Maps, models and sounds you sell reach players on every platform that sends them files, licensed and traced to each
+          buyer. On OPEN//77 they can also be delivered encrypted.
+        </p>
+        <p className="mt-3">
+          <ReadMore href="/docs/selling-assets">Selling assets</ReadMore>
+        </p>
       </section>
 
       <Ridge from="paper2" to="paper" ink="sand" n={2} />
