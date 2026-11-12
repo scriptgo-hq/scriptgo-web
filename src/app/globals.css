@@ -1290,6 +1290,10 @@
   .prose-sg table { width: 100%; border-collapse: collapse; font-size: 14.5px; line-height: 1.5; }
   .prose-sg th { text-align: left; background: var(--paper); text-transform: uppercase; font-size: 12.5px; border-bottom: var(--bw) solid var(--line); }
   .prose-sg th, .prose-sg td { padding: 9px 13px; vertical-align: top; }
+  /* `anywhere` lets a cell shrink to one character, so the table squeezed its first columns letter by
+     letter; `break-word` still wraps a long token but keeps whole words as the column's minimum. */
+  .prose-sg th, .prose-sg td, .prose-sg table code { overflow-wrap: break-word; }
+  .prose-sg th { white-space: nowrap; }
   .prose-sg td { border-bottom: 1.5px solid var(--line-soft); }
   .prose-sg tr:last-child td { border-bottom: 0; }
   .prose-sg .callout {
