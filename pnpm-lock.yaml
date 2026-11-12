@@ -176,8 +176,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@scriptgo/shared':
-        specifier: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.7/scriptgo-shared-0.1.7.tgz
-        version: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.7/scriptgo-shared-0.1.7.tgz
+        specifier: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-shared-0.1.8.tgz
+        version: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-shared-0.1.8.tgz
       better-auth:
         specifier: ^1.7.18
         version: 1.7.18(next@15.5.29(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -564,9 +564,9 @@ packages:
     resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
     engines: {node: '>= 20.19.0'}
 
-  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.7/scriptgo-shared-0.1.7.tgz':
-    resolution: {integrity: sha512-SVSfwyOF9vh0CFm2Zv3xVokdB3LBjBz4+iYawKOWbzU9SLAh/aUvUm5xUNcfiBLER6yLhz/+oWakhvvHtT7eqQ==, tarball: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.7/scriptgo-shared-0.1.7.tgz}
-    version: 0.1.7
+  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-shared-0.1.8.tgz':
+    resolution: {integrity: sha512-y2inOTaq2W3yJ+2trNHhpKLfzzOo06KD2XHbIzEQ9RyMNUBaGZ49+KsRoP5jcl7lR3f1ZZbIGuI0lQVl+xr3dg==, tarball: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-shared-0.1.8.tgz}
+    version: 0.1.8
     engines: {node: '>=22'}
 
   '@shikijs/core@4.6.0':
@@ -1372,7 +1372,7 @@ snapshots:
 
   '@noble/hashes@2.4.0': {}
 
-  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.7/scriptgo-shared-0.1.7.tgz':
+  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-shared-0.1.8.tgz':
     dependencies:
       zod: 3.25.76
 
