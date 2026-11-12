@@ -213,7 +213,7 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
           </div>
         ) : null}
         <div id={TRACKS_ANCHOR} className="mt-8 scroll-mt-24">
-          <Eyebrow className="mb-3">What do you sell?</Eyebrow>
+          <Eyebrow className="mb-3">What do you want to do?</Eyebrow>
           <TrackButtons choices={choices} size="md" />
         </div>
       </section>

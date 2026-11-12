@@ -138,6 +138,14 @@ const BUILT_IN_DOCS: DocEntry[] = [
     source: { kind: "guide", file: "protect-your-work.md" },
   },
   {
+    slug: "protect-your-own-server",
+    title: "Protect your own server",
+    description: "Keep your own game server's scripts from leaking, with nothing sold: a private encrypted package granted to your server's key, platform by platform.",
+    group: "Licensing",
+    source: { kind: "guide", file: "protect-your-own-server.md" },
+    optional: true,
+  },
+  {
     slug: "perks",
     title: "Player perks",
     description: "Sell a perk to the players of your own server: the server link, the check, the event queue, the purchase link and ScriptGo.perks.",

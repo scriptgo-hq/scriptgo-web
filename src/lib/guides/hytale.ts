@@ -3,6 +3,7 @@ import {
   assetManifest,
   assetsTrack,
   fingerprintStep,
+  noProtectOwnServerTrack,
   NOT_LIVE,
   publishAssetsStep,
   SCENE,
@@ -107,6 +108,11 @@ export const HYTALE_GUIDE: Guide = {
           images: [SCENE.depot()],
         },
       ],
+    }),
+    noProtectOwnServerTrack({
+      tag: "Track 3",
+      name: "Hytale",
+      why: "A loader for Hytale servers (a plugin with a native library) is planned, not built yet.",
     }),
   ],
   more: [

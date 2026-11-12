@@ -13,7 +13,17 @@ import { licenseMeta, metaFor } from "@/lib/status";
  * "Protect without selling": the free licenses a creator granted for one package, the form to grant
  * another one and the button to revoke. Nothing here involves a price or a payment provider.
  */
-export async function GrantsPanel({ packageName, identifier, environments }: { packageName: string; identifier: string; environments: { slug: string; name: string }[] }) {
+export async function GrantsPanel({
+  packageName,
+  identifier,
+  environments,
+  isPrivate = false,
+}: {
+  packageName: string;
+  identifier: string;
+  environments: { slug: string; name: string }[];
+  isPrivate?: boolean;
+}) {
   const res = await api<GrantList>(`/v1/creator/packages/${encodeURIComponent(packageName)}/grants`, { auth: true });
   if (!res.ok) return <ApiError compact className="mt-4" failure={res} title="The granted licenses couldn't be loaded." />;
   const { grants, canGrant, blockedReason, perDay, grantedToday } = res.data;
@@ -87,7 +97,13 @@ export async function GrantsPanel({ packageName, identifier, environments }: { p
           </table>
         </div>
       )}
-      <GrantForm packageName={packageName} identifier={identifier} environments={environments} blockedReason={canGrant ? null : (blockedReason ?? "Granting is not available right now.")} />
+      <GrantForm
+        packageName={packageName}
+        identifier={identifier}
+        environments={environments}
+        isPrivate={isPrivate}
+        blockedReason={canGrant ? null : (blockedReason ?? "Granting is not available right now.")}
+      />
       {perDay > 0 ? (
         <p className="tabular text-[12.5px] text-ink-3">
           {grantedToday} of {perDay} grants used for this package in the last 24 hours. Every grant and every revocation is recorded.

@@ -1,4 +1,4 @@
-import { CLI_INSTALL, type GuideImage, type GuideStep, type GuideTrack } from "./shared";
+import { CLI_INSTALL, type GuideCode, type GuideImage, type GuideStep, type GuideTrack } from "./shared";
 
 /**
  * Pieces every guide shares: the drawings, the dashboard screens that show nothing of one platform
@@ -307,4 +307,117 @@ export function scriptTrack(o: ScriptTrackOptions): GuideTrack {
 /** The "Sell assets" track's frame: the steps are the platform's own. */
 export function assetsTrack(o: { tag: string; lede: string; before?: string[]; steps: GuideStep[] }): GuideTrack {
   return { id: "sell-assets", tag: o.tag, title: "Sell", titleEm: "assets.", lede: o.lede, before: o.before, steps: o.steps };
+}
+
+/**
+ * "Protect your own server": a server owner keeps their own scripts from leaking, with nothing sold
+ * (no store, no offer, no Tebex). Only where SCRIPT//GO has a loader that decrypts on the server
+ * (code escrow). Sources at the pinned SDK tag: docs/site/protect-your-own-server.md and the
+ * platform's setup page.
+ */
+export interface ProtectOwnOptions {
+  tag: string;
+  name: string;
+  /** The environment slug the grant names. */
+  slug: string;
+  /** One plain line on what was run for real. */
+  tested: string;
+  /** Turn the loader on and read the server's public key. */
+  keyStep: { text: string; code?: GuideCode[]; notes?: string[] };
+  /** Put the encrypted release and the token on the server. */
+  installStep: { text: string; commands: string[]; code?: GuideCode[]; notes?: string[] };
+  docs: string;
+  /** Extra steps after the main ones (OPEN//77: maps and other assets). */
+  extra?: GuideStep[];
+}
+
+export const PROTECT_OWN_DOC = "/docs/protect-your-own-server";
+
+export function protectOwnServerTrack(o: ProtectOwnOptions): GuideTrack {
+  return {
+    id: "protect-own-server",
+    tag: o.tag,
+    title: "Protect your",
+    titleEm: "own server.",
+    lede: `You run a ${o.name} server and want its scripts not to leak: to staff who leave, to a host, to another server. Nothing is sold.`,
+    before: [
+      "You need an account, a creator profile, an access token and the CLI, as in Track 1. No store, no offer, no Tebex.",
+      o.tested,
+    ],
+    steps: [
+      {
+        id: "server-side",
+        title: "Keep what matters in server scripts.",
+        text: "Only server scripts are encrypted. Client scripts, shared scripts and the UI are sent to every player's game, so they stay readable.",
+        images: [SCENE.workbench()],
+      },
+      {
+        id: "publish",
+        title: "Publish it privately, encrypted.",
+        text: "`--escrow` encrypts your server scripts before they leave your machine. `--private` keeps the package off every page and list: only you see it, and the servers you grant it to.",
+        commands: ["scriptgo publish my_scripts --escrow --private --owns-code"],
+        notes: ["`--escrow-ignore config.lua` keeps a file readable, such as a config your staff edit."],
+        images: [SCENE.seal()],
+      },
+      {
+        id: "key",
+        title: "Turn protection on and read your server's key.",
+        text: o.keyStep.text,
+        code: o.keyStep.code,
+        notes: o.keyStep.notes,
+        images: [SCENE.serverkey()],
+        link: { href: o.docs, label: `Set up on ${o.name}, in full` },
+      },
+      {
+        id: "grant",
+        title: "Grant the package to that key.",
+        text: "A free licence, held by you and bound to your server from the start. Its deployment token is shown once: copy it.",
+        commands: [`scriptgo grant create my-scripts --server-key <the key> --environment ${o.slug} --name main-server`],
+        notes: [
+          "Or on the site: your package → Free licenses → My own server.",
+          "The token alone is useless: it works only together with your server's own key.",
+        ],
+        images: [scene("pass", "A gold pass hanging at the open door of a cabin, behind a velvet rope.", 691)],
+        link: { href: "/dashboard/packages", label: "Your packages" },
+      },
+      {
+        id: "install",
+        title: "Install it, still encrypted, with its token.",
+        text: o.installStep.text,
+        commands: o.installStep.commands,
+        code: o.installStep.code,
+        notes: o.installStep.notes,
+        images: [SCENE.adapter()],
+      },
+      {
+        id: "result",
+        title: "A copied folder runs nowhere else.",
+        text: "The key goes to your server only. Another server with the same folder, token included, is refused. You can revoke the licence at any time, every delivery is marked with the server it went to, and a changed file is refused.",
+        commands: ["scriptgo grant revoke <licence id> --reason \"server retired\""],
+        notes: [
+          "Whoever controls the machine can still, with real effort, read what their own server runs. Choose your host accordingly.",
+          "It is not obfuscation, and it does not hide what players' games receive.",
+        ],
+        images: [SCENE.logbook()],
+        link: { href: PROTECT_OWN_DOC, label: "What it does and does not do" },
+      },
+      ...(o.extra ?? []),
+    ],
+  };
+}
+
+/** The same track where SCRIPT//GO has no loader that decrypts on the server: said plainly, no steps. */
+export function noProtectOwnServerTrack(o: { tag: string; name: string; why: string }): GuideTrack {
+  return {
+    id: "protect-own-server",
+    tag: o.tag,
+    title: "Protect your",
+    titleEm: "own server.",
+    lede: `Keeping a ${o.name} server's own scripts from leaking, with nothing sold.`,
+    before: [
+      `Not available on ${o.name}. ${o.why}`,
+      "Where it works today: OPEN//77 and Rust, whose servers decrypt protected scripts themselves.",
+    ],
+    steps: [],
+  };
 }

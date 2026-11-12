@@ -3,6 +3,7 @@ import {
   assetManifest,
   assetsTrack,
   fingerprintStep,
+  noProtectOwnServerTrack,
   NOT_LIVE,
   publishAssetsStep,
   SCENE,
@@ -105,6 +106,11 @@ export const BEAMMP_GUIDE: Guide = {
           images: [SCENE.depot()],
         },
       ],
+    }),
+    noProtectOwnServerTrack({
+      tag: "Track 3",
+      name: "BeamMP",
+      why: "SCRIPT//GO has no loader on BeamMP that decrypts on the server, so an encrypted release cannot run there.",
     }),
   ],
   more: [

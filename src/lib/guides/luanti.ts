@@ -3,6 +3,7 @@ import {
   assetManifest,
   assetsTrack,
   fingerprintStep,
+  noProtectOwnServerTrack,
   NOT_LIVE,
   publishAssetsStep,
   SCENE,
@@ -106,6 +107,11 @@ export const LUANTI_GUIDE: Guide = {
           images: [SCENE.depot()],
         },
       ],
+    }),
+    noProtectOwnServerTrack({
+      tag: "Track 3",
+      name: "Luanti",
+      why: "Luanti runs plain Lua: the server would have to write the decrypted scripts to disk to load them, and a licence check written in Lua can be deleted by whoever has the files. That does not stop a leaked folder.",
     }),
   ],
   more: [

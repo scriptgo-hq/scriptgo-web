@@ -4,6 +4,7 @@ import {
   assetsTrack,
   buyerLicenceStep,
   fingerprintStep,
+  noProtectOwnServerTrack,
   NOT_LIVE,
   offerStep,
   publishAssetsStep,
@@ -98,6 +99,11 @@ export const FIVEM_GUIDE: Guide = {
           images: [SCENE.depot()],
         },
       ],
+    }),
+    noProtectOwnServerTrack({
+      tag: "Scripts",
+      name: "FiveM",
+      why: "SCRIPT//GO has no loader and no licence check on FiveM, so an encrypted release cannot run there.",
     }),
   ],
   more: [

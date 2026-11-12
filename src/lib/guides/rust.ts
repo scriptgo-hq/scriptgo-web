@@ -1,5 +1,5 @@
 import { platformDocHref } from "@/lib/docs";
-import { assetManifest, assetsTrack, NOT_LIVE, publishAssetsStep, SCENE, scriptTrack, sellLikeAScriptStep, validateStep } from "./common";
+import { assetManifest, assetsTrack, NOT_LIVE, protectOwnServerTrack, publishAssetsStep, SCENE, scriptTrack, sellLikeAScriptStep, validateStep } from "./common";
 import { API_HOST, type Guide } from "./shared";
 
 /**
@@ -16,7 +16,7 @@ export const RUST_GUIDE: Guide = {
   name: "Rust",
   title: "Sell on Rust,",
   titleEm: "step by step.",
-  lede: "Two ways to earn: sell a script to server operators, or sell a custom map.",
+  lede: "Sell a script to server operators, or sell a custom map. Or sell nothing, and keep your own server's scripts from leaking.",
   notLive: NOT_LIVE,
   tracks: [
     scriptTrack({
@@ -90,10 +90,32 @@ export const RUST_GUIDE: Guide = {
         },
       ],
     }),
+    protectOwnServerTrack({
+      tag: "Track 3",
+      name: "Rust",
+      slug: "rust",
+      tested: "Protected scripts were run on real Rust servers, with Oxide and with Carbon on Windows and with Oxide on Linux: licensed, bound to the server, refused elsewhere, stopped on a refund.",
+      keyStep: {
+        text: "Install the SCRIPT//GO plugin with its native library, then turn escrow on in the plugin config. The first protected start logs `this server's public key is` followed by 43 characters.",
+        code: [{ lang: "json", filename: "oxide/config/ScriptGo.json", code: `"escrow": { "enabled": true, "master": "https://${API_HOST}", "trustedSigners": [] }` }],
+        notes: ["Carbon: `carbon/configs/ScriptGo.json`. The identity is kept in `oxide/data/ScriptGo/escrow/identity.key`: back it up."],
+      },
+      installStep: {
+        text: "Download the encrypted release with the token, install it without decrypting anything, and write the token in its own file. Then `scriptgo start my_scripts` in the server console.",
+        commands: [
+          "scriptgo add <you>//my-scripts --deployment-token <sg_dep_...>",
+          "scriptgo escrow install resources/my_scripts-1.0.0.escrow.zip --target rust --out oxide/data/ScriptGo/resources",
+        ],
+        code: [{ lang: "bash", filename: "oxide/data/ScriptGo/escrow/tokens/my_scripts.token", code: "sg_dep_..." }],
+        notes: ["`scriptgo status` shows `started [escrow licensed, ...]`, or why it was refused."],
+      },
+      docs: DOCS,
+    }),
   ],
   more: [
     { href: "/docs/selling", label: "Selling" },
     { href: "/docs/selling-assets", label: "Selling assets" },
+    { href: "/docs/protect-your-own-server", label: "Protect your own server" },
     { href: "/docs/protect-your-work", label: "Protect your work" },
     { href: "/docs/cli", label: "The CLI" },
   ],

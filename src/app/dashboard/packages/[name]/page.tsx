@@ -247,7 +247,7 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
         <section id="grants" aria-labelledby="grants-title" className="scroll-mt-20">
           <H2 id="grants-title">Free licenses</H2>
           <p className="mt-2 max-w-prose text-[14px] text-ink-2">
-            Protect without selling. Grant a free license to another account, or to the key of a server whose operator sent it to you, so
+            Protect without selling. Grant a free license to your own server, to another account, or to the key of a server whose operator sent it to you, so
             {protectedReleases.length > 0 ? " your protected release runs" : " the package runs under a license"} on the servers you chose. Nothing is sold here and no payment
             provider is involved. A granted license is an ordinary license: bound to one server per deployment, every key delivery logged,
             and you can revoke it. That deters copying and lets you trace and cut off a copy; it does not make the code impossible to copy.
@@ -258,7 +258,12 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
               &ldquo;Protect this release (escrow)&rdquo; to deliver it encrypted.
             </p>
           ) : null}
-          <GrantsPanel packageName={p.name} identifier={p.identifier} environments={p.environments.map((e) => ({ slug: e.slug, name: envLongName(e.slug) }))} />
+          <GrantsPanel
+            packageName={p.name}
+            identifier={p.identifier}
+            environments={p.environments.map((e) => ({ slug: e.slug, name: envLongName(e.slug) }))}
+            isPrivate={p.visibility === "private"}
+          />
         </section>
 
         <section aria-labelledby="det-title">

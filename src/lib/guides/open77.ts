@@ -1,5 +1,5 @@
 import { platformDocHref } from "@/lib/docs";
-import { assetManifest, fingerprintStep, publishAssetsStep, SCENE, sellLikeAScriptStep, validateStep } from "./common";
+import { assetManifest, fingerprintStep, protectOwnServerTrack, publishAssetsStep, SCENE, sellLikeAScriptStep, validateStep } from "./common";
 import { API_HOST, CLI_INSTALL, type Guide, type GuideImage } from "./shared";
 
 /**
@@ -100,12 +100,21 @@ const PRELOAD_LAYOUT = `neon_docks/
     archive/pc/mod/neon_docks.xl         -- ArchiveXL, if it needs it
     r6/tweaks/neon_docks.yaml            -- tweaks, if any`;
 
+const ESCROW_CONFIG = `"resourceEscrow": {
+  "enabled": true,
+  "master": "https://${API_HOST}",
+  "environment": "open77",
+  "identityFile": ".open77/escrow-identity.bin",
+  "tokensDirectory": ".open77/escrow-tokens",
+  "trustedSigners": []
+}`;
+
 export const OPEN77_GUIDE: Guide = {
   slug: "open77",
   name: "OPEN//77",
   title: "Sell on OPEN//77,",
   titleEm: "step by step.",
-  lede: "Three ways to earn: sell a script to server operators, sell bonuses to the players of your own server, or sell assets such as a district map.",
+  lede: "Sell a script to server operators, sell bonuses to the players of your own server, or sell assets such as a district map. Or sell nothing, and keep your own server's scripts from leaking.",
   notLive: {
     title: "Checkout opens on Tebex approval.",
     text: "Every step here can be set up and tested today; payments through Tebex start once Tebex approves them.",
@@ -357,10 +366,45 @@ export const OPEN77_GUIDE: Guide = {
         },
       ],
     },
+    protectOwnServerTrack({
+      tag: "Track 4",
+      name: "OPEN//77",
+      slug: "open77",
+      tested: "Tested on a real OPEN//77 dedicated server: a private package granted to that server's key ran there, was refused on another server, and stopped when revoked. No game client joined that test.",
+      keyStep: {
+        text: "Put the escrow adapter next to the server (from the SDK releases), turn the feature on, and start the server once. It prints its public key at boot: `publicKey=` followed by 43 characters.",
+        code: [{ lang: "json", filename: "server.jsonc", code: ESCROW_CONFIG }],
+        notes: ["The server's identity file is created on that first start. Keep it in your backups: a new identity is a new server."],
+      },
+      installStep: {
+        text: "Download the encrypted release with the token, install it without decrypting anything, and write the token in its own file, never in `server.jsonc`. Restart the server: the resource starts.",
+        commands: [
+          "scriptgo add <you>//my-scripts --deployment-token <sg_dep_...>",
+          "scriptgo escrow install resources/my_scripts-1.0.0.escrow.zip --target open77 --out <resources folder>",
+        ],
+        code: [{ lang: "bash", filename: ".open77/escrow-tokens/my_scripts.token", code: "sg_dep_..." }],
+      },
+      docs: platformDocHref("open77", true),
+      extra: [
+        {
+          id: "assets",
+          title: "Your maps too, in a package of their own.",
+          text: "Preload packages can be sealed for your server the same way: publish them privately with `--asset-escrow`, grant them to the same key, and players the OPEN//77 master admits get the key when they join.",
+          commands: ["scriptgo publish my_maps --asset-escrow --asset-rights original --private --owns-code"],
+          notes: [
+            "While the game runs, the decrypted archives are on the player's disk: it stops a leaked server folder, not a player copying what their game loaded.",
+            "Scripts and assets go in two packages: one release cannot use both `--escrow` and `--asset-escrow`.",
+          ],
+          images: [SCENE.depot()],
+          link: { href: "/docs/selling-assets#encrypted-assets-on-open77", label: "Encrypted assets on OPEN//77" },
+        },
+      ],
+    }),
   ],
   more: [
     { href: "/docs/selling", label: "Selling" },
     { href: "/docs/selling-assets", label: "Selling assets" },
+    { href: "/docs/protect-your-own-server", label: "Protect your own server" },
     { href: "/docs/perks", label: "Player perks" },
     { href: "/docs/protect-your-work", label: "Protect your work" },
     { href: "/docs/cli", label: "The CLI" },

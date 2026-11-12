@@ -27,7 +27,7 @@ const CATEGORY_OPTIONS: [Category, string][] = [
 const VISIBILITY_OPTIONS: [Visibility, string][] = [
   ["public", "Public — listed in Explore once a release is published"],
   ["unlisted", "Unlisted — reachable by link only"],
-  ["private", "Private — only you"],
+  ["private", "Private — you and the servers you grant it to"],
 ];
 
 interface PackageInitial {

@@ -8,17 +8,26 @@ import { Field, FormMessage, describedBy, fieldErrors, inputClass, selectClass }
 import { callApi } from "@/lib/client-api";
 import type { GrantCreated, GrantRow } from "@/lib/contract";
 
-type Recipient = "account" | "server_key";
+/** `own_server` and `server_key` make the same request (a server key); they differ only in wording. */
+type Recipient = "own_server" | "account" | "server_key";
+
+const RECIPIENTS: [Recipient, string][] = [
+  ["own_server", "My own server"],
+  ["account", "A SCRIPT//GO account"],
+  ["server_key", "A server key someone sent me"],
+];
 
 /**
  * Grant a free license for one of the creator's own packages (POST /v1/creator/packages/:name/grants).
- * Nothing is sold: there is no price field and no payment provider on this form, on purpose.
+ * Nothing is sold: there is no price field and no payment provider on this form, on purpose. A private
+ * package goes to a server key only (an account would not see it), so the account choice is not offered.
  */
 export function GrantForm({
   packageName,
   identifier,
   environments,
   blockedReason,
+  isPrivate = false,
 }: {
   packageName: string;
   identifier: string;
@@ -26,10 +35,13 @@ export function GrantForm({
   environments: { slug: string; name: string }[];
   /** Why no license can be granted right now (shown next to the disabled button), or null. */
   blockedReason: string | null;
+  isPrivate?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [recipient, setRecipient] = useState<Recipient>("account");
+  const [recipient, setRecipient] = useState<Recipient>(isPrivate ? "own_server" : "account");
+  const [ownServer, setOwnServer] = useState(false);
+  const choices = isPrivate ? RECIPIENTS.filter(([r]) => r !== "account") : RECIPIENTS;
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
@@ -45,7 +57,7 @@ export function GrantForm({
       if (!to) local.to = "Enter the recipient's account id, or a creator username.";
       else if (to.includes("@")) local.to = "An e-mail address is not accepted. Ask the recipient for their account id (Dashboard → Settings).";
     } else if (!/^[A-Za-z0-9_-]{43}$/.test(serverKey)) {
-      local.serverKey = "A server public key is 43 characters, as “scriptgo escrow identity” prints it.";
+      local.serverKey = "A server public key is 43 characters, as the server prints it.";
     }
     const deployments = Number(fd.get("deployments") ?? 1);
     if (recipient === "account" && (!Number.isInteger(deployments) || deployments < 1 || deployments > 100)) local.deployments = "Whole number from 1 to 100.";
@@ -70,6 +82,7 @@ export function GrantForm({
       return setMessage(res.message);
     }
     setCreated(res.data);
+    setOwnServer(recipient === "own_server");
     setOpen(false);
     router.refresh();
   }
@@ -86,7 +99,9 @@ export function GrantForm({
           {token ? (
             <>
               <p className="text-[13.5px]">
-                This is the deployment token of that server. It is shown once: copy it now and hand it to the operator over a private channel.
+                {ownServer
+                  ? "This is your server's deployment token. It is shown once: copy it now and put it on that server, in its own file."
+                  : "This is the deployment token of that server. It is shown once: copy it now and hand it to the operator over a private channel."}{" "}
                 It only works with the server key you entered.
               </p>
               <div className="flex flex-wrap items-center gap-2">
@@ -96,8 +111,11 @@ export function GrantForm({
                 <CopyButton text={token} tone="light" />
               </div>
               <p className="text-[13px] text-ink-2">
-                On their server: <code className="font-mono">scriptgo add {identifier} --deployment-token &lt;the token&gt;</code>, then their loader with
-                the same token and identity file.
+                On {ownServer ? "your" : "their"} server: <code className="font-mono">scriptgo add {identifier} --deployment-token &lt;the token&gt;</code>, then the
+                loader reads the same token.{" "}
+                <a href="/docs/protect-your-own-server" className="font-semibold underline underline-offset-2">
+                  Steps for each platform
+                </a>
               </p>
             </>
           ) : (
@@ -123,12 +141,7 @@ export function GrantForm({
           <fieldset className="md:col-span-2">
             <legend className="text-[14px] font-bold">Who is it for</legend>
             <div className="mt-2 flex flex-wrap gap-2">
-              {(
-                [
-                  ["account", "A SCRIPT//GO account"],
-                  ["server_key", "A server key the operator sent me"],
-                ] as [Recipient, string][]
-              ).map(([value, label]) => (
+              {choices.map(([value, label]) => (
                 <label key={value} className="inline-flex items-center gap-2 rounded-full border-2 border-line-soft bg-surface px-3 py-1 text-[14px] has-[:checked]:border-line has-[:checked]:bg-sun-soft">
                   <input type="radio" name="recipient" value={value} checked={recipient === value} onChange={() => setRecipient(value)} className="h-4 w-4 accent-[var(--cobalt)]" />
                   {label}
@@ -157,7 +170,11 @@ export function GrantForm({
               <Field
                 id="gr-key"
                 label="Server public key"
-                hint="The operator runs “scriptgo escrow identity --identity <file>” on the server and sends you the public key it prints. You hold the license; it is bound to that server."
+                hint={
+                  recipient === "own_server"
+                    ? "Your server prints it when protection is on: the OPEN//77 server at boot, the Rust plugin on its first protected start. You hold the license; it is bound to that server."
+                    : "The operator's server prints it when protection is on, and they send it to you. You hold the license; it is bound to that server."
+                }
                 error={errors.serverKey}
                 className="md:col-span-2"
               >

@@ -66,7 +66,7 @@ export function TrackButtons({
   const [active, pick] = useActiveTrack(choices);
   const current = active ?? choices[0]?.id;
   return (
-    <div role="group" aria-label="What do you want to sell?" className={cn("cta-row", className)}>
+    <div role="group" aria-label="What do you want to do?" className={cn("cta-row", className)}>
       {choices.map((c) => {
         const on = c.id === current;
         return (
