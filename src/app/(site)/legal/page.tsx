@@ -70,6 +70,9 @@ export default function LegalPage() {
 
         <Section id="operator" title="Operator">
           <p>
+            Contact: <a href="mailto:scriptgo.official@gmail.com">scriptgo.official@gmail.com</a>.
+          </p>
+          <p>
             Reports and requests go through the <Link href="/report">public report form</Link>.
           </p>
         </Section>
