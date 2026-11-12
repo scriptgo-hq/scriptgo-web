@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/data";
 import { Prose } from "@/components/ui/prose";
-import { DOCS, findDoc, loadDoc, neighbours, sourceUrl } from "@/lib/docs";
+import { DOCS, docRepoLinks, findDoc, loadDoc, neighbours, sourceUrl } from "@/lib/docs";
 import { renderMarkdown } from "@/lib/markdown";
 
 export const dynamic = "force-static";
@@ -55,6 +55,14 @@ export default async function DocPage({ params }: { params: Promise<Params> }) {
               <span>Specification (normative)</span>
             </>
           ) : null}
+          {docRepoLinks(entry, doc.repoPath).map((l) => (
+            <span key={l.href} className="contents">
+              <span aria-hidden="true">·</span>
+              <a href={l.href} className="underline hover:text-ink">
+                {l.label}
+              </a>
+            </span>
+          ))}
         </div>
         {toc.length > 0 ? (
           <details className="panel mt-6 xl:hidden">

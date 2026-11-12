@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { GitHubMark } from "@/components/ui/github-mark";
 import { cn } from "@/lib/cn";
+import { sdkTreeUrl } from "@/lib/repo";
 
 export interface DocsNavGroup {
   group: string;
@@ -44,6 +46,9 @@ function NavList({ groups, pathname }: { groups: DocsNavGroup[]; pathname: strin
           </ul>
         </div>
       ))}
+      <a href={sdkTreeUrl("docs")} className="flex items-center gap-2 px-2 py-1.5 text-[14px] text-ink-2 hover:text-ink hover:underline">
+        <GitHubMark size={16} /> These docs on GitHub
+      </a>
     </div>
   );
 }

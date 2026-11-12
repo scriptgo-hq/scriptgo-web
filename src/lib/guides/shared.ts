@@ -1,12 +1,14 @@
 /** What every guide shares: the CLI install line, the API host, and the shape of a guide. */
 
 /**
- * How to install the CLI, in one place so it can be corrected without touching the guides. The SDK
- * release attaches the CLI tarball; the CLI's default API is production, so no `--api` flag.
+ * How to install the CLI, in one place so it can be corrected without touching the guides. The SDK's
+ * release workflow publishes `@scriptgo/cli` to npm; the CLI's default API is production, so no `--api` flag.
  */
 export const CLI_INSTALL = {
   node: "22",
-  command: "npm install -g https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.8/scriptgo-cli-0.1.8.tgz",
+  command: "npm install -g @scriptgo/cli",
+  /** The package on npm, and the tarballs of every SDK release (an install without the registry). */
+  npm: "https://www.npmjs.com/package/@scriptgo/cli",
   login: "scriptgo login --token <your token>",
 } as const;
 

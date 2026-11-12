@@ -1,8 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import pkg from "../../package.json" with { type: "json" };
 import { parseFrontMatter } from "./markdown";
+import { SDK_RELEASES, SDK_TAG, adapterPath, sdkEditUrl, sdkFileUrl, sdkTreeUrl } from "./repo";
 
 /**
  * Docs registry. Every page is read at build time from the SCRIPT//GO SDK (scriptgo-hq/scriptgo-sdk,
@@ -28,10 +28,27 @@ const SPEC_DIR = path.join(SDK_DIR, "docs/spec");
 const GUIDE_DIR = path.join(SDK_DIR, "docs/site");
 const REPO_GUIDE_DIR = path.join(SDK_DIR, "docs/guides");
 
-/** The SDK tag the site is built from, and where a page's source can be read. */
-export const SDK_TAG: string = (pkg as { scriptgo: { sdk: string } }).scriptgo.sdk;
+export { SDK_TAG };
+/** Where a page's source can be read: the file at the pinned tag. */
 export function sourceUrl(repoPath: string): string {
-  return `https://github.com/scriptgo-hq/scriptgo-sdk/blob/${SDK_TAG}/${repoPath}`;
+  return sdkFileUrl(repoPath);
+}
+
+/**
+ * The GitHub links under a page's title, besides its source: where to suggest a change (not for the
+ * platform pages, which are generated from the registry and the adapter's SETUP.md), the adapter's
+ * folder for a platform page, and the releases for the CLI.
+ */
+export function docRepoLinks(entry: DocEntry, repoPath: string): { href: string; label: string }[] {
+  const links: { href: string; label: string }[] = [];
+  if (entry.group === "Platforms") {
+    const slug = entry.slug.replace(/^platforms\//, "");
+    links.push({ href: sdkTreeUrl(adapterPath(slug)), label: "Adapter source" });
+  } else {
+    links.push({ href: sdkEditUrl(repoPath), label: "Suggest an edit" });
+  }
+  if (entry.slug === "cli") links.push({ href: "https://www.npmjs.com/package/@scriptgo/cli", label: "npm" }, { href: SDK_RELEASES, label: "Releases" });
+  return links;
 }
 
 /** The adapter guide for escrow, written next to the SDK. Listed only when the file is there. */
@@ -206,7 +223,7 @@ export const DOCS: DocEntry[] = (() => {
  */
 export function platformDocHref(slug: string, hasAdapter: boolean): string {
   if (DOCS.some((d) => d.slug === `platforms/${slug}`)) return `/docs/platforms/${slug}`;
-  if (hasAdapter) return `https://github.com/scriptgo-hq/scriptgo-sdk/tree/${SDK_TAG}/${slug === "dotnet" ? "sdk/dotnet" : `sdk/adapters/${slug}`}`;
+  if (hasAdapter) return sdkTreeUrl(adapterPath(slug));
   return "/docs/environments";
 }
 

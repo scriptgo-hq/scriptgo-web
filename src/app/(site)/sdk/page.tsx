@@ -8,10 +8,12 @@ import { ProofBlock } from "@/components/site/proof-block";
 import { SellerCases } from "@/components/site/seller-cases";
 import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
+import { GitHubMark } from "@/components/ui/github-mark";
 import { DisplayTitle, Eyebrow } from "@/components/ui/typography";
 import { api } from "@/lib/api";
 import type { Environment } from "@/lib/contract";
 import { escrowAdapterGuideHref } from "@/lib/docs";
+import { SDK_LICENSE, SDK_REPO } from "@/lib/repo";
 import { LANGUAGE_STATES } from "@/lib/env";
 import { environmentMeta } from "@/lib/status";
 
@@ -123,6 +125,19 @@ export default function SdkPage() {
             Embed the .NET kit
           </ButtonLink>
         </div>
+        <p className="mt-5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold">
+          <GitHubMark size={18} />
+          <span>
+            Open source,{" "}
+            <a href={SDK_LICENSE} className="underline underline-offset-2 hover:text-ink">
+              MIT
+            </a>
+            .
+          </span>
+          <a href={SDK_REPO} className="font-normal text-ink-2 underline underline-offset-2 hover:text-ink">
+            The code on GitHub
+          </a>
+        </p>
         <AdapterCounts />
       </PageHead>
 

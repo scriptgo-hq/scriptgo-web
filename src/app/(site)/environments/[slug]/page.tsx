@@ -13,6 +13,7 @@ import { PackageCard } from "@/components/ui/package";
 import { api } from "@/lib/api";
 import type { EnvironmentDetail } from "@/lib/contract";
 import { platformDocHref } from "@/lib/docs";
+import { adapterPath, sdkTreeUrl } from "@/lib/repo";
 import { envKind, languageLabels } from "@/lib/env";
 import { guideHref } from "@/lib/guides";
 import { plainText, sidesLabel } from "@/lib/integration";
@@ -110,7 +111,7 @@ export default async function EnvironmentPage({ params }: { params: Promise<Para
     <div className="container-page pb-16 pt-2">
 
 
-      {planned ? null : <HowItWorksSection env={e} more={docs} />}
+      {planned ? null : <HowItWorksSection env={e} more={docs} source={e.adapterState !== "none" ? sdkTreeUrl(adapterPath(e.slug)) : null} />}
 
       <ProtectionSection env={e} />
 

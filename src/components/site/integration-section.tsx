@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ReadMore, Flow } from "@/components/site/diagrams";
 import { FileCode2, KeyRound, Lock, Play, Server } from "lucide-react";
 import { StatusBadge, Tag } from "@/components/ui/badge";
+import { GitHubMark } from "@/components/ui/github-mark";
 import type { Environment, EnvironmentDetail, EnvironmentProtection } from "@/lib/contract";
 import { CAPABILITIES } from "@/lib/contract";
 import { capabilityPlain, deliveryStep } from "@/lib/integration";
@@ -13,7 +14,7 @@ import type { StatusMeta } from "@/lib/status";
  * it runs) and what a script can use there, in plain words. Everything technical (the adapter, the
  * setup, the API names, the real runs) is on the platform's docs page, linked as `more`.
  */
-export function HowItWorksSection({ env: e, more }: { env: EnvironmentDetail; more: string }) {
+export function HowItWorksSection({ env: e, more, source }: { env: EnvironmentDetail; more: string; source?: string | null }) {
   const step = deliveryStep(e.integration?.type, e.name);
   const server = e.sides.includes("server");
   const client = e.sides.includes("client");
@@ -25,9 +26,16 @@ export function HowItWorksSection({ env: e, more }: { env: EnvironmentDetail; mo
         <h2 id="how-title" className="display scroll-mt-28 text-[30px]">
           How it works.
         </h2>
-        <ReadMore href={more} className="!text-[14.5px]">
-          How it works, in full
-        </ReadMore>
+        <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+          <ReadMore href={more} className="!text-[14.5px]">
+            How it works, in full
+          </ReadMore>
+          {source ? (
+            <a href={source} className="inline-flex items-center gap-1.5 text-[14px] text-ink-2 underline underline-offset-2 hover:text-ink">
+              <GitHubMark size={15} /> Adapter source
+            </a>
+          ) : null}
+        </div>
       </div>
       <Flow
         className="mt-5"

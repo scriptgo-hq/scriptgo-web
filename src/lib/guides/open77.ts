@@ -1,4 +1,5 @@
 import { platformDocHref } from "@/lib/docs";
+import { assetManifest, fingerprintStep, publishAssetsStep, SCENE, sellLikeAScriptStep, validateStep } from "./common";
 import { API_HOST, CLI_INSTALL, type Guide, type GuideImage } from "./shared";
 
 /**
@@ -84,12 +85,27 @@ RegisterCommand("vip", function(player)
   -- send url to that player: it is signed for them
 end)`;
 
+const ASSET_MANIFEST = assetManifest(
+  "neon_docks",
+  "Neon Docks",
+  "open77",
+  `environment_asset "open77" "dist/neon_docks.zip"   -- the preload package
+game_build "open77" "2.5"                           -- the game build you made it for`,
+);
+
+const PRELOAD_LAYOUT = `neon_docks/
+  scriptgo.lua
+  dist/neon_docks.zip
+    archive/pc/mod/neon_docks.archive    -- the district
+    archive/pc/mod/neon_docks.xl         -- ArchiveXL, if it needs it
+    r6/tweaks/neon_docks.yaml            -- tweaks, if any`;
+
 export const OPEN77_GUIDE: Guide = {
   slug: "open77",
   name: "OPEN//77",
   title: "Sell on OPEN//77,",
   titleEm: "step by step.",
-  lede: "Two ways to earn: sell a script to server operators, or sell bonuses to the players of your own server.",
+  lede: "Three ways to earn: sell a script to server operators, sell bonuses to the players of your own server, or sell assets such as a district map.",
   notLive: {
     title: "Checkout opens on Tebex approval.",
     text: "Every step here can be set up and tested today; payments through Tebex start once Tebex approves them.",
@@ -293,9 +309,58 @@ export const OPEN77_GUIDE: Guide = {
         },
       ],
     },
+    {
+      id: "sell-assets",
+      tag: "Track 3",
+      title: "Sell",
+      titleEm: "assets.",
+      lede: "Maps, interiors, vehicles, textures and sounds, sold like a script. Example: Kestrel Works sells Neon Docks, a district map.",
+      before: ["You need a creator profile, an access token and the CLI, as in Track 1."],
+      steps: [
+        {
+          id: "package",
+          title: "Put the map in a preload package.",
+          text: "A `.zip` with the game's own layout: archives under `archive/pc/mod/`, tweaks under `r6/tweaks/`, engine settings under `engine/config/`. OPEN//77 mounts it when the game boots.",
+          code: [{ lang: "bash", filename: "the package folder", code: PRELOAD_LAYOUT }],
+          notes: ["At most 8 preload packages of 256 MiB each.", "A package with `.xl` files needs ArchiveXL, which runs code on players' games: the server then runs in OPEN//77's unsecured mode."],
+          images: [SCENE.workbench()],
+          link: { href: "/docs/selling-assets#how-each-platform-delivers-them", label: "What each platform delivers" },
+        },
+        {
+          id: "declare",
+          title: "Declare it.",
+          text: "`environment_asset` names the package; `game_build` the game build you made it for, shown to operators. A package can hold assets and scripts, or assets only.",
+          code: [{ lang: "lua", filename: "neon_docks/scriptgo.lua", code: ASSET_MANIFEST }],
+          images: [SCENE.signpost()],
+          link: { href: "/docs/manifest", label: "The manifest" },
+        },
+        validateStep("neon_docks", "OPEN//77"),
+        publishAssetsStep({ escrow: true }),
+        fingerprintStep("neon_docks-1.0.0.zip"),
+        sellLikeAScriptStep("OPEN//77", "sell-a-script"),
+        {
+          id: "buyer-install",
+          who: "Then your buyer, on their OPEN//77 server",
+          title: "The buyer installs their server's copy.",
+          text: "With the deployment token, `add` downloads the copy made for that server (encrypted for it, if you chose to). `pack` writes the resource with its preload lines; then they restart the server.",
+          commands: ["scriptgo add kestrel//neon-docks --deployment-token <sg_dep_...>", "scriptgo pack resources/neon_docks --target open77 --out dist"],
+          notes: ["Preloads are mounted when the game boots: a new or changed one needs a server restart."],
+          images: [SCENE.adapter()],
+          link: { href: platformDocHref("open77", true), label: "Set up on OPEN//77, in full" },
+        },
+        {
+          id: "players",
+          title: "Players get it when they join.",
+          text: "The server sends the preload, and the launcher puts it in place before the game starts. An encrypted preload opens only with a key the server hands to that player.",
+          notes: ["Only a player the OPEN//77 master admits to that server gets a key: enrolled, not banned, owning the game."],
+          images: [SCENE.depot()],
+        },
+      ],
+    },
   ],
   more: [
     { href: "/docs/selling", label: "Selling" },
+    { href: "/docs/selling-assets", label: "Selling assets" },
     { href: "/docs/perks", label: "Player perks" },
     { href: "/docs/protect-your-work", label: "Protect your work" },
     { href: "/docs/cli", label: "The CLI" },

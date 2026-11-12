@@ -14,6 +14,7 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import type { EnvironmentDetail } from "@/lib/contract";
 import { guideFor, type GuideImage, type GuideStep, type GuideTrack } from "@/lib/guides";
+import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
 import { protectionMeta } from "@/lib/protection";
 import { capabilityMeta, environmentMeta, metaFor } from "@/lib/status";
 import { worldArt, worldSrc, WORLD_SIZE } from "@/lib/worlds";
@@ -166,6 +167,7 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
   const name = env?.name ?? guide.name;
   const art = worldArt(slug);
   const perks = env?.capabilities.perks;
+  const rule = env ? platformRulesInfo(env) : null;
   // One track is shown at a time, so each sits on the same ground.
   const ground: Ground = "paper";
   const choices: TrackChoice[] = guide.tracks.map((t) => ({
@@ -202,6 +204,14 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
         <Banner tone="info" className="mt-5" title={guide.notLive.title}>
           {guide.notLive.text}
         </Banner>
+        {rule?.notable ? (
+          // The platform's own rules, worded in the one place that words them: information for the operator.
+          <div className="panel mt-5 max-w-[78ch] p-4">
+            <StatusBadge meta={rule.meta} />
+            <p className="mt-2.5 text-[15px] text-ink-2">{rule.note}</p>
+            <p className="mt-1 text-[13.5px] text-ink-3">{PLATFORM_RULES_LEAD}</p>
+          </div>
+        ) : null}
         <div id={TRACKS_ANCHOR} className="mt-8 scroll-mt-24">
           <Eyebrow className="mb-3">What do you sell?</Eyebrow>
           <TrackButtons choices={choices} size="md" />

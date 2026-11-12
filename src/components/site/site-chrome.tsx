@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { BRAND } from "@/components/ui/typography";
+import { SDK_LICENSE, SDK_REPO } from "@/lib/repo";
 import { hasSessionCookie } from "@/lib/session";
 import { SCENES } from "./ink";
 import { TopBar } from "./nav";
@@ -44,6 +45,13 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
             <div>
               <img className="foot-logo" src={BRAND.word.src} width={BRAND.word.width} height={BRAND.word.height} alt="SCRIPT//GO" loading="lazy" decoding="async" />
               <p className="mt-[18px] max-w-[34ch] opacity-80">The scripting sandbox for the games you run. Build once, protect your work, monetize it.</p>
+              <p className="mt-3 max-w-[34ch] text-[14px] opacity-80">
+                The SDK is open source,{" "}
+                <a href={SDK_LICENSE} className="underline underline-offset-2 hover:opacity-100">
+                  MIT
+                </a>
+                .
+              </p>
             </div>
             <FooterCol
               title="SDK"
@@ -52,6 +60,7 @@ export function SiteFooter({ band = true }: { band?: boolean }) {
                 ["/docs", "Docs"],
                 ["/environments", "Platforms"],
                 ["/docs/create-adapter", "Write an adapter"],
+                [SDK_REPO, "Source on GitHub"],
                 ["/status", "Status"],
               ]}
             />
