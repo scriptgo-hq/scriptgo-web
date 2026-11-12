@@ -9,7 +9,7 @@
     "node": ">=22"
   },
   "scriptgo": {
-    "sdk": "v0.1.11"
+    "sdk": "v0.1.12"
   },
   "scripts": {
     "fetch-sdk": "node scripts/fetch-sdk.mjs --only docs",
@@ -23,7 +23,7 @@
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/hanken-grotesk": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@scriptgo/shared": "https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz",
+    "@scriptgo/shared": "https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz",
     "better-auth": "^1.7.18",
     "lucide-react": "^1.70.0",
     "marked": "^18.1.3",

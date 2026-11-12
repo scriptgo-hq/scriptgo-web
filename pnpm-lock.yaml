@@ -176,8 +176,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@scriptgo/shared':
-        specifier: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz
-        version: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz
+        specifier: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz
+        version: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz
       better-auth:
         specifier: ^1.7.18
         version: 1.7.18(next@15.5.29(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -564,9 +564,9 @@ packages:
     resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
     engines: {node: '>= 20.19.0'}
 
-  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz':
-    resolution: {integrity: sha512-D1bFk+4FrxRq1rcmSf0Vhoun8/P7OYnP4FPUSiM3SSgKXTeTqA1er8WgF3N7LZT4VSv8Vh325fgv6O3xg5sKLw==, tarball: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz}
-    version: 0.1.11
+  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz':
+    resolution: {integrity: sha512-eclik417oWlXgnAt02wfOlidTmQ5/Q+RnIua9VecC7kSSCd1HTbDF/jhW3/MXLq2ypeGa8FXRqXVjNDtitoPcg==, tarball: https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz}
+    version: 0.1.12
     engines: {node: '>=22'}
 
   '@shikijs/core@4.6.0':
@@ -1372,7 +1372,7 @@ snapshots:
 
   '@noble/hashes@2.4.0': {}
 
-  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.11/scriptgo-shared-0.1.11.tgz':
+  '@scriptgo/shared@https://github.com/scriptgo-hq/scriptgo-sdk/releases/download/v0.1.12/scriptgo-shared-0.1.12.tgz':
     dependencies:
       zod: 3.25.76
 
