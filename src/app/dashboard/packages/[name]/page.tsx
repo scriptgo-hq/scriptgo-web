@@ -15,6 +15,7 @@ import type { CreatorPackageDetail, Environment, Provider, Store } from "@/lib/c
 import { envLongName, envName } from "@/lib/env";
 import { formatBytes, formatDate, formatMoney, intervalLabel, shortHash } from "@/lib/format";
 import { tierMeta } from "@/lib/protection";
+import { anyEncrypted, protectionOf } from "@/lib/release-protection";
 import { classificationMeta, listingMeta, metaFor, releaseMeta, visibilityMeta } from "@/lib/status";
 
 export async function generateMetadata({ params }: { params: Promise<{ name: string }> }) {
@@ -51,7 +52,8 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
   const published = p.releases.some((r) => r.status === "published" || r.status === "deprecated");
   const publicHref = `/packages/${encodeURIComponent(p.creator.username)}/${encodeURIComponent(p.name)}`;
   const newRelease = `/dashboard/packages/${encodeURIComponent(p.name)}/releases/new`;
-  const protectedReleases = p.releases.filter((r) => r.escrow);
+  // Server code, client code or asset escrow: each has keys a server asks for (the key log below).
+  const protectedReleases = p.releases.filter((r) => anyEncrypted(protectionOf(r)));
 
   return (
     <>
@@ -137,7 +139,7 @@ export default async function CreatorPackagePage({ params }: { params: Promise<{
                           <span className="flex flex-wrap gap-1">
                             <StatusBadge meta={metaFor(releaseMeta, r.status)} size="sm" />
                             {r.restricted ? <StatusBadge meta={listingMeta.restricted} size="sm" /> : null}
-                            {r.escrow ? <StatusBadge meta={{ ...tierMeta.escrow, label: "Protected" }} size="sm" /> : null}
+                            {anyEncrypted(protectionOf(r)) ? <StatusBadge meta={{ ...tierMeta.escrow, label: "Protected" }} size="sm" /> : null}
                           </span>
                         </td>
                         <td className="tabular px-3 py-2.5">

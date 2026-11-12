@@ -63,7 +63,7 @@ export default function LegalPage() {
               Restrict, suspend or take down, with notice and appeal.
             </PictureCard>
             <PictureCard art={SCENES.strongbox} title="Protection has limits." more={{ href: "#protection", label: "Code protection" }}>
-              Deterrence and traceability, not DRM. Server scripts only.
+              Deterrence and traceability, not DRM.
             </PictureCard>
           </div>
         </div>

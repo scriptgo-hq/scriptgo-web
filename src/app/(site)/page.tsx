@@ -343,7 +343,7 @@ function Protection({ envs }: { envs: Environment[] }) {
             <li>
               <Lock aria-hidden="true" strokeWidth={2.4} />
               <span>
-                <b>Encrypted delivery</b> where the host can hold a key. Server scripts only.
+                <b>Encrypted delivery</b> where the host can hold a key: server scripts, and on OPEN//77 client scripts and assets.
               </span>
             </li>
           </ul>

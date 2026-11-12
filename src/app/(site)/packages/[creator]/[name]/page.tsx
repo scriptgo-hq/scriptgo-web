@@ -9,6 +9,7 @@ import { CheckoutControl } from "@/components/package/checkout-control";
 import { CompatStrip, EvidencePanel, sortCompat } from "@/components/package/compat-strip";
 import { AssetContents } from "@/components/package/asset-contents";
 import { ProtectionPanel, ReleaseProtectionBadges } from "@/components/package/protection-panel";
+import { anyEncrypted, protectionOf } from "@/lib/release-protection";
 import { SellerLine } from "@/components/package/seller-line";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { CommandLine } from "@/components/ui/code-block";
@@ -78,6 +79,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
   const blockedDownload = d.listingStatus !== "active" || viewingRow?.restricted || viewingRow?.status === "yanked";
   const installCmd = `scriptgo add ${d.identifier}${viewing && viewing !== d.latestVersion ? `@${viewing}` : ""}`;
   const escrowed = Boolean(viewingRow?.escrow);
+  const protection = viewingRow ? protectionOf(viewingRow) : null;
   const assets = viewingRow?.assets ?? null;
   const protectionEnvs = envDetails.map(({ slug, detail }) => ({ slug, name: envLongName(slug, detail?.name), protection: detail?.protection ?? null, platformRules: detail?.platformRules ?? null, platformRulesNote: detail?.platformRulesNote ?? "" }));
   const downloadPath = viewing ? `/v1/packages/${encodeURIComponent(d.creator.username)}/${encodeURIComponent(d.name)}/versions/${encodeURIComponent(viewing)}/download` : null;
@@ -181,6 +183,17 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                     Protected release: delivered as an encrypted bundle, to licence holders.{" "}
                     <Link href="#protection" className="font-semibold text-cobalt-ink underline">
                       What your server gets
+                    </Link>
+                  </p>
+                ) : protection && anyEncrypted(protection) ? (
+                  <p className="text-[13px] text-ink-2" data-encrypted-parts>
+                    {protection.clientCode && protection.assets
+                      ? "Its client scripts and assets are encrypted for each licensed server."
+                      : protection.clientCode
+                        ? "Its client scripts are encrypted for each licensed server."
+                        : "Its assets are encrypted for each licensed server."}{" "}
+                    <Link href="#protection" className="font-semibold text-cobalt-ink underline">
+                      What it protects
                     </Link>
                   </p>
                 ) : null}
@@ -414,7 +427,7 @@ export default async function PackagePage({ params, searchParams }: { params: Pr
                 label: "Protection",
                 content: (
                   <div className="pt-6">
-                    <ProtectionPanel version={viewingRow} environments={protectionEnvs} paid={paidOffers.length > 0} />
+                    <ProtectionPanel version={viewingRow} manifest={d.manifest} environments={protectionEnvs} paid={paidOffers.length > 0} />
                   </div>
                 ),
               },

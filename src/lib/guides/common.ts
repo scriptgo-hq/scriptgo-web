@@ -348,7 +348,7 @@ export function protectOwnServerTrack(o: ProtectOwnOptions): GuideTrack {
       {
         id: "server-side",
         title: "Keep what matters in server scripts.",
-        text: "Only server scripts are encrypted. Client scripts, shared scripts and the UI are sent to every player's game, so they stay readable.",
+        text: "`--escrow` encrypts server scripts. Client scripts, shared scripts and the UI are sent to every player's game, where a player can read them, even compiled.",
         images: [SCENE.workbench()],
       },
       {

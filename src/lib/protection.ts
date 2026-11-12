@@ -64,7 +64,7 @@ export function buyerProtection(p: EnvironmentProtection, escrowed: boolean): { 
   if (!escrowed) {
     return {
       label: "Licence + signing",
-      sentence: "This release is not encrypted. Your server checks its licence, and the signed release shows it was not altered.",
+      sentence: "Its server scripts are not encrypted. Your server checks its licence, and the signed release shows it was not altered.",
     };
   }
   if (p.tier === "escrow" && p.state === "available") {

@@ -33,7 +33,7 @@ const CLAIMS = [
 ];
 
 const LIMITS = [
-  "Only server scripts are protected. What a client receives can be read.",
+  "Client code reaches the player. On OPEN//77 it arrives compiled and encrypted, and a decompiler can still turn it back into working logic; elsewhere it can be read as is.",
   "It does not stop a server’s operator from reading code that runs on their own machine.",
   "It hides nothing on a host that runs plain script.",
   "It is not obfuscation, and it is not DRM.",

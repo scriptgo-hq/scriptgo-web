@@ -3,7 +3,8 @@ import type { StatusMeta } from "./status";
 
 /**
  * Words for assets (docs/spec/assets.md; ADR-0043 in scriptgo-api). Assets are licensed,
- * fingerprinted and traceable: never "encrypted", "escrow" or "protected" on these pages.
+ * fingerprinted and traceable: never "encrypted", "escrow" or "protected" on these pages, except for
+ * a release with asset escrow (OPEN//77), worded in lib/release-protection.ts.
  */
 
 /** Where the detail lives: the SDK's page, rendered under /docs. */

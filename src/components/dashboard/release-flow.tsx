@@ -9,11 +9,13 @@ import { Field, FormMessage, inputClass, textareaClass } from "@/components/ui/f
 import { callApi } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 import { AssetContents } from "@/components/package/asset-contents";
+import { ReleaseProtects } from "@/components/package/release-protects";
 import { ASSETS_DOC, fingerprintedMeta, RIGHTS_CASES, rightsCaseLabel } from "@/lib/assets";
 import type { AssetRightsCase, CheckStage, Release, ReleaseCheck, ThirdPartyAsset } from "@/lib/contract";
 import { envName } from "@/lib/env";
 import { formatBytes, formatDateTime, formatDuration, shortHash } from "@/lib/format";
 import { formatFingerprint, tierMeta } from "@/lib/protection";
+import { CLIENT_ESCROW_DOC, protectionOf } from "@/lib/release-protection";
 import { checkMeta, metaFor, releaseMeta } from "@/lib/status";
 
 /** Scripts only. A release with assets may be larger: the API sets that limit and says it when refused. */
@@ -241,8 +243,63 @@ function CheckRow({ c }: { c: ReleaseCheck }) {
  * What is protected in this release and what is not. Everything shown is public metadata of the
  * bundle; the content key is never fetched by this page, only whether the master holds it sealed.
  */
+/** A command, inline, for a sentence (the highlighted CommandLine is a server component). */
+function Cmd({ children }: { children: string }) {
+  return <code className="break-all rounded bg-surface-2 px-1 py-0.5 font-mono text-[12.5px]">{children}</code>;
+}
+
+/**
+ * What the creator can still turn on, and how: protection is chosen when a version is published and
+ * a release never changes afterwards. Client code and asset escrow are set from the CLI only.
+ */
+function ProtectionHints({ release: r }: { release: Release }) {
+  const p = protectionOf(r);
+  const m = r.manifest;
+  const open77Only = Boolean(m && m.environments.length === 1 && m.environments[0] === "open77");
+  const clientHint = !p.clientCode && !p.serverCode && open77Only && (m?.clientScripts.length ?? 0) > 0;
+  const preloads = r.assets?.environments.find((e) => e.environment === "open77" && e.containers.length > 0);
+  const assetHint = Boolean(preloads) && !p.assets;
+  if (!clientHint && !assetHint) return null;
+  return (
+    <ul className="mt-3 space-y-1.5 text-[13.5px] text-ink-2" data-protection-hints>
+      {clientHint ? (
+        <li data-hint="client-escrow">
+          Its client scripts reach players as plain files. Client code escrow is not in this upload form: to send them compiled and
+          encrypted on OPEN//77, publish a new version from the CLI with <Cmd>scriptgo publish --client-escrow</Cmd>.{" "}
+          <a href={CLIENT_ESCROW_DOC} className="font-semibold text-cobalt-ink underline">
+            Client code escrow
+          </a>
+        </li>
+      ) : null}
+      {assetHint ? (
+        <li data-hint="asset-escrow">
+          Its OPEN//77 preloads are not encrypted. Asset escrow is not in this upload form: to have them encrypted for each licensed
+          server, publish a new version from the CLI with <Cmd>scriptgo publish --asset-escrow</Cmd>.
+        </li>
+      ) : null}
+    </ul>
+  );
+}
+
+/** The client line map of a release with client code escrow: the creator's only, never shipped. */
+function ClientLines({ release: r }: { release: Release }) {
+  const c = protectionOf(r).clientCode;
+  if (!c) return null;
+  return (
+    <p className="mt-3 text-[13.5px] text-ink-2" data-client-lines>
+      {c.lineNumbers === "creator_only" ? "A player's error names a position, not a line. " : null}
+      <a href={`/v1/creator/releases/${encodeURIComponent(r.id)}/client-lines`} download={`${r.packageName}-${r.version}-client-lines.json`} className="font-semibold text-cobalt-ink underline">
+        Download the line map
+      </a>{" "}
+      <span className="text-ink-3">(yours only, never shipped)</span>, then <Cmd>{`scriptgo escrow lines <map> "<error>"`}</Cmd> turns a position into a
+      line.
+    </p>
+  );
+}
+
 function ProtectionSection({ release: r, creator }: { release: Release; creator: string | null }) {
   const e = r.escrow;
+  const p = protectionOf(r);
   const published = DONE.has(r.status);
   if (r.assets) {
     const copyHref =
@@ -265,6 +322,11 @@ function ProtectionSection({ release: r, creator }: { release: Release; creator:
             </a>
           </p>
           <div className="mt-4">
+            <ReleaseProtects version={r} manifest={r.manifest} />
+          </div>
+          <ProtectionHints release={r} />
+          <ClientLines release={r} />
+          <div className="mt-4">
             <AssetContents assets={r.assets} manifest={r.manifest} showContainers />
           </div>
           {r.signature ? <p className="tabular mt-3 text-[13px] text-ink-3">Release signature: registry key {formatFingerprint(r.signature.keyId)}</p> : null}
@@ -274,6 +336,37 @@ function ProtectionSection({ release: r, creator }: { release: Release; creator:
                 Download your copy
               </a>{" "}
               <span className="text-ink-3">(fingerprinted to your account; the download is recorded)</span>
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
+  if (!e && p.clientCode) {
+    const copyHref =
+      creator && published ? `/v1/packages/${encodeURIComponent(creator)}/${encodeURIComponent(r.packageName)}/versions/${encodeURIComponent(r.version)}/download` : null;
+    return (
+      <section aria-labelledby="prot-title">
+        <h2 id="prot-title" className="font-display text-[24px] font-extrabold tracking-[-0.02em]">
+          Protection
+        </h2>
+        <div className="panel mt-4 p-4" data-escrow-state="client">
+          <ReleaseProtects version={r} manifest={r.manifest} />
+          <ClientLines release={r} />
+          <p className="mt-3 text-[13px] text-ink-2">
+            Each licensed server gets its own copy and its own key; players get the key when they join. Revoking the licence stops new
+            sessions.{" "}
+            <a href={CLIENT_ESCROW_DOC} className="font-semibold text-cobalt-ink underline">
+              Client code escrow
+            </a>
+          </p>
+          {r.signature ? <p className="tabular mt-2 text-[13px] text-ink-3">Release signature: registry key {formatFingerprint(r.signature.keyId)}</p> : null}
+          {copyHref ? (
+            <p className="mt-2 text-[13px]">
+              <a href={copyHref} className="font-semibold text-cobalt-ink underline">
+                Download your copy
+              </a>{" "}
+              <span className="text-ink-3">(in source, fingerprinted to your account; the download is recorded)</span>
             </p>
           ) : null}
         </div>
@@ -295,6 +388,7 @@ function ProtectionSection({ release: r, creator }: { release: Release; creator:
             Protection is chosen at upload and a release can&rsquo;t change afterwards. To protect this code, upload a higher version with
             &ldquo;Protect this release (escrow)&rdquo;, or run <span className="font-mono">scriptgo publish --escrow</span>.
           </p>
+          <ProtectionHints release={r} />
           {r.signature ? <p className="tabular mt-2 text-[13px] text-ink-3">Release signature: registry key {formatFingerprint(r.signature.keyId)}</p> : null}
         </div>
       </section>

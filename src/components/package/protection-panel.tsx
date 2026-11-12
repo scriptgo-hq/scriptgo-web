@@ -2,24 +2,35 @@ import Link from "next/link";
 import { StatusBadge, Tag } from "@/components/ui/badge";
 import { KeyValue } from "@/components/ui/data";
 import { Banner } from "@/components/ui/feedback";
-import type { EnvironmentProtection, PackageVersion, PlatformRules } from "@/lib/contract";
+import type { EnvironmentProtection, PackageVersion, ParsedManifest, PlatformRules } from "@/lib/contract";
 import { countOf, formatDate } from "@/lib/format";
 import { PLATFORM_RULES_LEAD, platformRulesInfo } from "@/lib/platform-rules";
 import { buyerProtection, formatFingerprint, protectionLead, tierMeta } from "@/lib/protection";
 import type { StatusMeta } from "@/lib/status";
 import { ASSETS_DOC, fingerprintedMeta } from "@/lib/assets";
+import { PROTECTION_LIMITS_DOC, protectionOf } from "@/lib/release-protection";
+import { ReleaseProtects } from "./release-protects";
+
+export { ReleaseProtects };
 
 const signedMeta: StatusMeta = { label: "Signed", tone: "success", icon: "check", hint: "The registry signed this release. scriptgo add checks the signature before it writes a file." };
 const unsignedMeta: StatusMeta = { label: "Not signed", tone: "neutral", icon: "dashed", hint: "Published before release signing existed. Only the SHA-256 can be checked." };
-const escrowMeta: StatusMeta = { label: "Encrypted release", tone: "success", icon: "shield", hint: "Delivered as an encrypted bundle. The key is released to a licensed, bound server only." };
-const plainMeta: StatusMeta = { label: "Not encrypted", tone: "neutral", icon: "minus", hint: "Delivered as a plain archive." };
+const escrowMeta: StatusMeta = { label: "Encrypted server scripts", tone: "success", icon: "shield", hint: "Delivered as an encrypted bundle. The key is released to a licensed, bound server only." };
+const clientMeta: StatusMeta = { label: "Encrypted client scripts", tone: "success", icon: "shield", hint: "Sent to players compiled, never as source, and decrypted only inside the game." };
+const assetEscrowMeta: StatusMeta = { label: "Encrypted assets", tone: "success", icon: "shield", hint: "Encrypted for each licensed server, decrypted only inside the game client." };
 
-/** Small badges for a version row: signed or not, encrypted or not. */
-export function ReleaseProtectionBadges({ version: v }: { version: Pick<PackageVersion, "escrow" | "signature"> & { assets?: PackageVersion["assets"] } }) {
+/** Small badges for a version row: what it encrypts, fingerprinted copies, signed or not. */
+export function ReleaseProtectionBadges({
+  version: v,
+}: {
+  version: Pick<PackageVersion, "escrow" | "signature"> & { assets?: PackageVersion["assets"]; protection?: PackageVersion["protection"] };
+}) {
+  const p = protectionOf({ escrow: v.escrow, assets: v.assets ?? null, protection: v.protection });
   return (
     <>
-      {v.escrow ? <StatusBadge meta={escrowMeta} size="sm" /> : null}
-      {v.assets ? <StatusBadge meta={fingerprintedMeta} size="sm" /> : null}
+      {p.serverCode ? <StatusBadge meta={escrowMeta} size="sm" /> : null}
+      {p.clientCode ? <StatusBadge meta={clientMeta} size="sm" /> : null}
+      {p.assets ? <StatusBadge meta={assetEscrowMeta} size="sm" /> : v.assets ? <StatusBadge meta={fingerprintedMeta} size="sm" /> : null}
       <StatusBadge meta={v.signature ? signedMeta : unsignedMeta} size="sm" />
     </>
   );
@@ -48,10 +59,13 @@ function FileList({ title, files, mono = true }: { title: string; files: string[
  */
 export function ProtectionPanel({
   version,
+  manifest = null,
   environments,
   paid,
 }: {
   version: PackageVersion | null;
+  /** The manifest of that release, to leave out a part it does not have (null: every part is shown). */
+  manifest?: ParsedManifest | null;
   /** `platformRules` is the platform's own terms on paid scripts (lib/platform-rules.ts); null when the environment could not be read. */
   environments: { slug: string; name: string; protection: EnvironmentProtection | null; platformRules?: PlatformRules | null; platformRulesNote?: string }[];
   /** The package has at least one paid offer, so a licence exists to check. */
@@ -75,14 +89,15 @@ export function ProtectionPanel({
         <h3 id="prot-release" className="font-display text-[19px] font-extrabold">
           This release
         </h3>
+        <p className="mt-1 text-[14px] text-ink-2">What it protects, part by part.</p>
+        <div className="mt-3">
+          <ReleaseProtects version={version} manifest={manifest} />
+        </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <StatusBadge meta={esc ? escrowMeta : version.assets ? fingerprintedMeta : plainMeta} />
           <StatusBadge meta={sig ? signedMeta : unsignedMeta} />
         </div>
         {version.assets ? (
-          <p className="mt-3 max-w-prose text-[14px] text-ink-2" data-assets-protection>
-            Its assets are licensed, fingerprinted and traceable: only licence holders download them, each as their own signed copy.
-            A player can still extract what their game loads.{" "}
+          <p className="mt-3 text-[13.5px]">
             <a href={ASSETS_DOC} className="font-semibold text-cobalt-ink underline">
               Selling assets
             </a>
@@ -260,8 +275,9 @@ export function ProtectionPanel({
       ) : null}
 
       <p className="max-w-[72ch] text-[13.5px] text-ink-3">
-        Deterrence, traceability and revocation: only server scripts are protected, and a copy stays traceable.{" "}
-        <Link href="/docs/protect-your-work#what-it-does-not-do" className="font-semibold text-cobalt-ink underline">
+        Deterrence, traceability and revocation, not secrecy: what a server or a game runs can be read by whoever controls it, and a copy
+        stays traceable to its licence.{" "}
+        <Link href={PROTECTION_LIMITS_DOC} className="font-semibold text-cobalt-ink underline">
           What protection does and does not do
         </Link>
       </p>
